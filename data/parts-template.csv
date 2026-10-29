@@ -1,0 +1,4 @@
+part_type,year,make,model,spec,price,mileage,stock_no,warranty,condition,description,image_url,status
+Engine,2013,Hyundai,Sonata,"2.4L, VIN C (8th digit)",1679,54000,JG-1001,3 months,"Used, tested",,,available
+Engine,2013,Hyundai,Sonata,"2.4L, VIN C (8th digit)",1209,153000,JG-1002,3 months,"Used, tested",,,available
+Engine,2013,Hyundai,Sonata,"2.0L Turbo, VIN B",1579,94000,JG-1003,3 months,"Used, tested",,,available

@@ -1,0 +1,170 @@
+part_type,year,make,model,spec,price,mileage,stock_no,warranty,condition,description,image_url,status
+Engine,2013,Hyundai,Sonata,"2.4L, VIN C (8th digit)",1679,54000,JG-1001,3 months,"Used, tested",,,available
+Engine,2013,Hyundai,Sonata,"2.4L, VIN C (8th digit)",1209,153000,JG-1002,3 months,"Used, tested",,,available
+Engine,2013,Hyundai,Sonata,"2.0L Turbo, VIN B",1579,94000,JG-1003,3 months,"Used, tested",,,available
+Transmission,2013,Hyundai,Sonata,"AT, FWD, 6-speed",1169,55000,JG-1004,3 months,"Used, tested",,,available
+Engine,2012,Hyundai,Sonata,"2.4L, VIN C (8th digit)",1659,52000,JG-1005,3 months,"Used, tested",,,available
+Engine,2012,Hyundai,Sonata,"2.0L Turbo, VIN B",1359,101000,JG-1006,3 months,"Used, tested",,,available
+Transmission,2012,Hyundai,Sonata,"AT, FWD, 6-speed",939,78000,JG-1007,3 months,"Used, tested",,,available
+Engine,2014,Hyundai,Sonata,"2.4L, VIN C (8th digit)",1429,102000,JG-1008,3 months,"Used, tested",,,available
+Engine,2014,Hyundai,Sonata,"2.4L, VIN C (8th digit)",1259,153000,JG-1009,3 months,"Used, tested",,,available
+Engine,2014,Hyundai,Sonata,"2.0L Turbo, VIN B",1739,76000,JG-1010,3 months,"Used, tested",,,available
+Transmission,2014,Hyundai,Sonata,"AT, FWD, 6-speed",929,128000,JG-1011,3 months,"Used, tested",,,available
+Engine,2011,Kia,Optima,"2.4L, VIN 5 (8th digit)",1679,53000,JG-1012,3 months,"Used, tested",,,available
+Transmission,2011,Kia,Optima,"AT, FWD, 6-speed",609,157000,JG-1013,3 months,"Used, tested",,,available
+Engine,2014,Kia,Optima,"2.4L, VIN 5 (8th digit)",1409,101000,JG-1014,3 months,"Used, tested",,,available
+Transmission,2014,Kia,Optima,"AT, FWD, 6-speed",849,117000,JG-1015,3 months,"Used, tested",,,available
+Engine,2015,Kia,Optima,"2.4L, VIN 5 (8th digit)",1639,87000,JG-1016,3 months,"Used, tested",,,available
+Engine,2015,Kia,Optima,"2.4L, VIN 5 (8th digit)",1279,152000,JG-1017,3 months,"Used, tested",,,available
+Transmission,2015,Kia,Optima,"AT, FWD, 6-speed",1059,71000,JG-1018,3 months,"Used, tested",,,available
+Engine,2017,Nissan,Altima,"2.5L, VIN A (4th digit)",1829,60000,JG-1019,3 months,"Used, tested",,,available
+Transmission,2017,Nissan,Altima,"CVT, FWD",889,139000,JG-1020,3 months,"Used, tested",,,available
+Engine,2018,Nissan,Altima,"2.5L, VIN A (4th digit)",1919,55000,JG-1021,3 months,"Used, tested",,,available
+Engine,2018,Nissan,Altima,"2.5L, VIN A (4th digit)",1769,74000,JG-1022,3 months,"Used, tested",,,available
+Transmission,2018,Nissan,Altima,"CVT, FWD",1059,135000,JG-1023,3 months,"Used, tested",,,available
+Engine,2014,Nissan,Altima,"2.5L, VIN A (4th digit)",1129,147000,JG-1024,3 months,"Used, tested",,,available
+Transmission,2014,Nissan,Altima,"CVT, FWD",1059,107000,JG-1025,3 months,"Used, tested",,,available
+Engine,2017,Nissan,Rogue,"2.5L, VIN V",1299,149000,JG-1026,3 months,"Used, tested",,,available
+Transmission,2017,Nissan,Rogue,"CVT, AWD",1139,137000,JG-1027,3 months,"Used, tested",,,available
+Engine,2016,Nissan,Rogue,"2.5L, VIN V",1459,121000,JG-1028,3 months,"Used, tested",,,available
+Transmission,2016,Nissan,Rogue,"CVT, AWD",1269,115000,JG-1029,3 months,"Used, tested",,,available
+Engine,2018,Nissan,Rogue,"2.5L, VIN V",1459,141000,JG-1030,3 months,"Used, tested",,,available
+Transmission,2018,Nissan,Rogue,"CVT, AWD",1339,84000,JG-1031,3 months,"Used, tested",,,available
+Engine,2011,Toyota,Camry,"2.5L, VIN K (5th digit)",1279,144000,JG-1032,3 months,"Used, tested",,,available
+Engine,2011,Toyota,Camry,3.5L V6,1509,110000,JG-1033,3 months,"Used, tested",,,available
+Transmission,2011,Toyota,Camry,"AT, FWD, 6-speed",1209,53000,JG-1034,3 months,"Used, tested",,,available
+Engine,2014,Toyota,Camry,"2.5L, VIN K (5th digit)",1529,121000,JG-1035,3 months,"Used, tested",,,available
+Engine,2014,Toyota,Camry,"2.5L, VIN K (5th digit)",1809,91000,JG-1036,3 months,"Used, tested",,,available
+Engine,2014,Toyota,Camry,3.5L V6,1559,124000,JG-1037,3 months,"Used, tested",,,available
+Transmission,2014,Toyota,Camry,"AT, FWD, 6-speed",1119,122000,JG-1038,3 months,"Used, tested",,,available
+Engine,2013,Toyota,Camry,"2.5L, VIN K (5th digit)",1229,155000,JG-1039,3 months,"Used, tested",,,available
+Engine,2013,Toyota,Camry,3.5L V6,1669,108000,JG-1040,3 months,"Used, tested",,,available
+Transmission,2013,Toyota,Camry,"AT, FWD, 6-speed",939,133000,JG-1041,3 months,"Used, tested",,,available
+Engine,2013,Honda,Accord,"2.4L, VIN 1 (6th digit)",1389,135000,JG-1042,3 months,"Used, tested",,,available
+Engine,2013,Honda,Accord,"2.4L, VIN 1 (6th digit)",1769,84000,JG-1043,3 months,"Used, tested",,,available
+Engine,2013,Honda,Accord,3.5L V6,1299,161000,JG-1044,3 months,"Used, tested",,,available
+Transmission,2013,Honda,Accord,"CVT, FWD",1199,92000,JG-1045,3 months,"Used, tested",,,available
+Engine,2015,Honda,Accord,"2.4L, VIN 1 (6th digit)",1659,93000,JG-1046,3 months,"Used, tested",,,available
+Engine,2015,Honda,Accord,3.5L V6,1919,62000,JG-1047,3 months,"Used, tested",,,available
+Engine,2015,Honda,Accord,3.5L V6,1899,55000,JG-1048,3 months,"Used, tested",,,available
+Transmission,2015,Honda,Accord,"CVT, FWD",1109,146000,JG-1049,3 months,"Used, tested",,,available
+Engine,2016,Honda,Accord,"2.4L, VIN 1 (6th digit)",1419,142000,JG-1050,3 months,"Used, tested",,,available
+Engine,2016,Honda,Accord,3.5L V6,1749,98000,JG-1051,3 months,"Used, tested",,,available
+Transmission,2016,Honda,Accord,"CVT, FWD",1459,58000,JG-1052,3 months,"Used, tested",,,available
+Engine,2015,Honda,Civic,"1.8L, VIN 8",1069,152000,JG-1053,3 months,"Used, tested",,,available
+Transmission,2015,Honda,Civic,"AT, FWD, 5-speed",829,158000,JG-1054,3 months,"Used, tested",,,available
+Engine,2013,Honda,Civic,"1.8L, VIN 8",1069,138000,JG-1055,3 months,"Used, tested",,,available
+Transmission,2013,Honda,Civic,"AT, FWD, 5-speed",979,93000,JG-1056,3 months,"Used, tested",,,available
+Engine,2014,Honda,Civic,"1.8L, VIN 8",1449,67000,JG-1057,3 months,"Used, tested",,,available
+Transmission,2014,Honda,Civic,"AT, FWD, 5-speed",1049,70000,JG-1058,3 months,"Used, tested",,,available
+Engine,2012,Ford,F150,"5.0L V8, VIN F (8th digit)",2489,110000,JG-1059,3 months,"Used, tested",,,available
+Engine,2012,Ford,F150,"3.5L EcoBoost Turbo, VIN T",2589,81000,JG-1060,3 months,"Used, tested",,,available
+Engine,2012,Ford,F150,"2.7L EcoBoost Turbo, VIN P",2709,66000,JG-1061,3 months,"Used, tested",,,available
+Transmission,2012,Ford,F150,"AT, 4WD, 6R80",1659,116000,JG-1062,3 months,"Used, tested",,,available
+Engine,2016,Ford,F150,"5.0L V8, VIN F (8th digit)",2519,120000,JG-1063,3 months,"Used, tested",,,available
+Engine,2016,Ford,F150,"5.0L V8, VIN F (8th digit)",2949,64000,JG-1064,3 months,"Used, tested",,,available
+Engine,2016,Ford,F150,"3.5L EcoBoost Turbo, VIN T",2559,127000,JG-1065,3 months,"Used, tested",,,available
+Engine,2016,Ford,F150,"3.5L EcoBoost Turbo, VIN T",2539,134000,JG-1066,3 months,"Used, tested",,,available
+Engine,2016,Ford,F150,"2.7L EcoBoost Turbo, VIN P",2719,106000,JG-1067,3 months,"Used, tested",,,available
+Transmission,2016,Ford,F150,"AT, 4WD, 6R80",1659,159000,JG-1068,3 months,"Used, tested",,,available
+Engine,2017,Ford,F150,"5.0L V8, VIN F (8th digit)",2709,98000,JG-1069,3 months,"Used, tested",,,available
+Engine,2017,Ford,F150,"3.5L EcoBoost Turbo, VIN T",2959,61000,JG-1070,3 months,"Used, tested",,,available
+Engine,2017,Ford,F150,"2.7L EcoBoost Turbo, VIN P",2619,99000,JG-1071,3 months,"Used, tested",,,available
+Engine,2017,Ford,F150,"2.7L EcoBoost Turbo, VIN P",2779,72000,JG-1072,3 months,"Used, tested",,,available
+Transmission,2017,Ford,F150,"AT, 4WD, 6R80",1999,74000,JG-1073,3 months,"Used, tested",,,available
+Engine,2014,Ford,Escape,"1.6L Turbo, VIN X",1779,54000,JG-1074,3 months,"Used, tested",,,available
+Engine,2014,Ford,Escape,"1.6L Turbo, VIN X",1939,48000,JG-1075,3 months,"Used, tested",,,available
+Engine,2014,Ford,Escape,"2.0L Turbo, VIN 9",1409,116000,JG-1076,3 months,"Used, tested",,,available
+Transmission,2014,Ford,Escape,"AT, FWD, 6F35",1069,94000,JG-1077,3 months,"Used, tested",,,available
+Engine,2013,Ford,Escape,"1.6L Turbo, VIN X",1139,159000,JG-1078,3 months,"Used, tested",,,available
+Engine,2013,Ford,Escape,"2.0L Turbo, VIN 9",1499,96000,JG-1079,3 months,"Used, tested",,,available
+Engine,2013,Ford,Escape,"2.0L Turbo, VIN 9",1329,129000,JG-1080,3 months,"Used, tested",,,available
+Transmission,2013,Ford,Escape,"AT, FWD, 6F35",1139,92000,JG-1081,3 months,"Used, tested",,,available
+Engine,2016,Ford,Escape,"1.6L Turbo, VIN X",1809,63000,JG-1082,3 months,"Used, tested",,,available
+Engine,2016,Ford,Escape,"2.0L Turbo, VIN 9",1639,107000,JG-1083,3 months,"Used, tested",,,available
+Transmission,2016,Ford,Escape,"AT, FWD, 6F35",1139,109000,JG-1084,3 months,"Used, tested",,,available
+Engine,2011,Ford,Explorer,"3.5L V6, VIN 8",1899,91000,JG-1085,3 months,"Used, tested",,,available
+Engine,2011,Ford,Explorer,"3.5L V6, VIN 8",1899,81000,JG-1086,3 months,"Used, tested",,,available
+Transmission,2011,Ford,Explorer,"AT, AWD, 6F50",979,154000,JG-1087,3 months,"Used, tested",,,available
+Engine,2012,Ford,Explorer,"3.5L V6, VIN 8",2049,50000,JG-1088,3 months,"Used, tested",,,available
+Engine,2012,Ford,Explorer,"3.5L V6, VIN 8",1699,115000,JG-1089,3 months,"Used, tested",,,available
+Transmission,2012,Ford,Explorer,"AT, AWD, 6F50",1459,66000,JG-1090,3 months,"Used, tested",,,available
+Engine,2015,Ford,Explorer,"3.5L V6, VIN 8",1679,145000,JG-1091,3 months,"Used, tested",,,available
+Transmission,2015,Ford,Explorer,"AT, AWD, 6F50",1349,86000,JG-1092,3 months,"Used, tested",,,available
+Engine,2014,Chevrolet,Silverado 1500,"5.3L V8, VIN J (8th digit)",2519,93000,JG-1093,3 months,"Used, tested",,,available
+Engine,2014,Chevrolet,Silverado 1500,"4.8L V8, VIN A",2319,116000,JG-1094,3 months,"Used, tested",,,available
+Transmission,2014,Chevrolet,Silverado 1500,"AT, 4WD, 6L80",1479,147000,JG-1095,3 months,"Used, tested",,,available
+Engine,2017,Chevrolet,Silverado 1500,"5.3L V8, VIN J (8th digit)",2279,129000,JG-1096,3 months,"Used, tested",,,available
+Engine,2017,Chevrolet,Silverado 1500,"4.8L V8, VIN A",2289,151000,JG-1097,3 months,"Used, tested",,,available
+Engine,2017,Chevrolet,Silverado 1500,"4.8L V8, VIN A",2109,157000,JG-1098,3 months,"Used, tested",,,available
+Transmission,2017,Chevrolet,Silverado 1500,"AT, 4WD, 6L80",1489,151000,JG-1099,3 months,"Used, tested",,,available
+Engine,2012,Chevrolet,Silverado 1500,"5.3L V8, VIN J (8th digit)",2009,142000,JG-1100,3 months,"Used, tested",,,available
+Engine,2012,Chevrolet,Silverado 1500,"4.8L V8, VIN A",2239,114000,JG-1101,3 months,"Used, tested",,,available
+Transmission,2012,Chevrolet,Silverado 1500,"AT, 4WD, 6L80",1519,93000,JG-1102,3 months,"Used, tested",,,available
+Engine,2013,Chevrolet,Malibu,"2.5L, VIN A (8th digit)",1639,72000,JG-1103,3 months,"Used, tested",,,available
+Transmission,2013,Chevrolet,Malibu,"AT, FWD, 6T40",899,125000,JG-1104,3 months,"Used, tested",,,available
+Engine,2014,Chevrolet,Malibu,"2.5L, VIN A (8th digit)",1209,151000,JG-1105,3 months,"Used, tested",,,available
+Transmission,2014,Chevrolet,Malibu,"AT, FWD, 6T40",1059,92000,JG-1106,3 months,"Used, tested",,,available
+Engine,2015,Chevrolet,Malibu,"2.5L, VIN A (8th digit)",1539,76000,JG-1107,3 months,"Used, tested",,,available
+Transmission,2015,Chevrolet,Malibu,"AT, FWD, 6T40",1179,77000,JG-1108,3 months,"Used, tested",,,available
+Engine,2012,Chevrolet,Equinox,"2.4L, VIN K (8th digit)",1289,127000,JG-1109,3 months,"Used, tested",,,available
+Transmission,2012,Chevrolet,Equinox,"AT, FWD, 6T45",709,155000,JG-1110,3 months,"Used, tested",,,available
+Engine,2013,Chevrolet,Equinox,"2.4L, VIN K (8th digit)",1119,164000,JG-1111,3 months,"Used, tested",,,available
+Transmission,2013,Chevrolet,Equinox,"AT, FWD, 6T45",1009,92000,JG-1112,3 months,"Used, tested",,,available
+Engine,2011,Chevrolet,Equinox,"2.4L, VIN K (8th digit)",1579,63000,JG-1113,3 months,"Used, tested",,,available
+Engine,2011,Chevrolet,Equinox,"2.4L, VIN K (8th digit)",1149,148000,JG-1114,3 months,"Used, tested",,,available
+Transmission,2011,Chevrolet,Equinox,"AT, FWD, 6T45",779,144000,JG-1115,3 months,"Used, tested",,,available
+Engine,2014,Jeep,Grand Cherokee,"3.6L V6, VIN G (8th digit)",2059,90000,JG-1116,3 months,"Used, tested",,,available
+Engine,2014,Jeep,Grand Cherokee,"3.6L V6, VIN G (8th digit)",1859,150000,JG-1117,3 months,"Used, tested",,,available
+Engine,2014,Jeep,Grand Cherokee,"5.7L V8 Hemi, VIN T",2039,107000,JG-1118,3 months,"Used, tested",,,available
+Transmission,2014,Jeep,Grand Cherokee,"AT, 4WD, 8-speed",1289,143000,JG-1119,3 months,"Used, tested",,,available
+Engine,2012,Jeep,Grand Cherokee,"3.6L V6, VIN G (8th digit)",2139,68000,JG-1120,3 months,"Used, tested",,,available
+Engine,2012,Jeep,Grand Cherokee,"3.6L V6, VIN G (8th digit)",2119,64000,JG-1121,3 months,"Used, tested",,,available
+Engine,2012,Jeep,Grand Cherokee,"5.7L V8 Hemi, VIN T",1879,123000,JG-1122,3 months,"Used, tested",,,available
+Transmission,2012,Jeep,Grand Cherokee,"AT, 4WD, 8-speed",1209,151000,JG-1123,3 months,"Used, tested",,,available
+Engine,2017,Jeep,Grand Cherokee,"3.6L V6, VIN G (8th digit)",1929,153000,JG-1124,3 months,"Used, tested",,,available
+Engine,2017,Jeep,Grand Cherokee,"3.6L V6, VIN G (8th digit)",2219,108000,JG-1125,3 months,"Used, tested",,,available
+Engine,2017,Jeep,Grand Cherokee,"5.7L V8 Hemi, VIN T",2439,67000,JG-1126,3 months,"Used, tested",,,available
+Transmission,2017,Jeep,Grand Cherokee,"AT, 4WD, 8-speed",1489,118000,JG-1127,3 months,"Used, tested",,,available
+Engine,2011,Dodge,Charger,"3.6L V6, VIN G",1589,143000,JG-1128,3 months,"Used, tested",,,available
+Engine,2011,Dodge,Charger,"3.6L V6, VIN G",1839,103000,JG-1129,3 months,"Used, tested",,,available
+Engine,2011,Dodge,Charger,"5.7L V8 Hemi, VIN T",2169,51000,JG-1130,3 months,"Used, tested",,,available
+Transmission,2011,Dodge,Charger,"AT, RWD, 8-speed",1469,75000,JG-1131,3 months,"Used, tested",,,available
+Engine,2017,Dodge,Charger,"3.6L V6, VIN G",2379,78000,JG-1132,3 months,"Used, tested",,,available
+Engine,2017,Dodge,Charger,"3.6L V6, VIN G",1999,123000,JG-1133,3 months,"Used, tested",,,available
+Engine,2017,Dodge,Charger,"5.7L V8 Hemi, VIN T",2059,117000,JG-1134,3 months,"Used, tested",,,available
+Transmission,2017,Dodge,Charger,"AT, RWD, 8-speed",1299,154000,JG-1135,3 months,"Used, tested",,,available
+Engine,2016,Dodge,Charger,"3.6L V6, VIN G",1819,164000,JG-1136,3 months,"Used, tested",,,available
+Engine,2016,Dodge,Charger,"5.7L V8 Hemi, VIN T",1759,162000,JG-1137,3 months,"Used, tested",,,available
+Transmission,2016,Dodge,Charger,"AT, RWD, 8-speed",1469,132000,JG-1138,3 months,"Used, tested",,,available
+Engine,2017,Ram,1500,"5.7L V8 Hemi, VIN T (8th digit)",2829,67000,JG-1139,3 months,"Used, tested",,,available
+Engine,2017,Ram,1500,"5.7L V8 Hemi, VIN T (8th digit)",2429,113000,JG-1140,3 months,"Used, tested",,,available
+Engine,2017,Ram,1500,"3.6L V6, VIN G",2259,147000,JG-1141,3 months,"Used, tested",,,available
+Transmission,2017,Ram,1500,"AT, 4WD, 8HP70",1629,125000,JG-1142,3 months,"Used, tested",,,available
+Engine,2016,Ram,1500,"5.7L V8 Hemi, VIN T (8th digit)",2679,70000,JG-1143,3 months,"Used, tested",,,available
+Engine,2016,Ram,1500,"3.6L V6, VIN G",2479,127000,JG-1144,3 months,"Used, tested",,,available
+Transmission,2016,Ram,1500,"AT, 4WD, 8HP70",1989,63000,JG-1145,3 months,"Used, tested",,,available
+Engine,2014,Ram,1500,"5.7L V8 Hemi, VIN T (8th digit)",2619,89000,JG-1146,3 months,"Used, tested",,,available
+Engine,2014,Ram,1500,"3.6L V6, VIN G",2429,115000,JG-1147,3 months,"Used, tested",,,available
+Engine,2014,Ram,1500,"3.6L V6, VIN G",2529,109000,JG-1148,3 months,"Used, tested",,,available
+Transmission,2014,Ram,1500,"AT, 4WD, 8HP70",1479,147000,JG-1149,3 months,"Used, tested",,,available
+Engine,2012,Toyota,Tacoma,"4.0L V6, VIN U",3079,53000,JG-1150,3 months,"Used, tested",,,available
+Engine,2012,Toyota,Tacoma,"2.7L, VIN N",2639,112000,JG-1151,3 months,"Used, tested",,,available
+Transmission,2012,Toyota,Tacoma,"AT, 4WD",1609,119000,JG-1152,3 months,"Used, tested",,,available
+Engine,2015,Toyota,Tacoma,"4.0L V6, VIN U",2779,104000,JG-1153,3 months,"Used, tested",,,available
+Engine,2015,Toyota,Tacoma,"2.7L, VIN N",2799,112000,JG-1154,3 months,"Used, tested",,,available
+Engine,2015,Toyota,Tacoma,"2.7L, VIN N",2689,113000,JG-1155,3 months,"Used, tested",,,available
+Transmission,2015,Toyota,Tacoma,"AT, 4WD",1699,136000,JG-1156,3 months,"Used, tested",,,available
+Engine,2014,Toyota,Tacoma,"4.0L V6, VIN U",2739,113000,JG-1157,3 months,"Used, tested",,,available
+Engine,2014,Toyota,Tacoma,"2.7L, VIN N",2669,112000,JG-1158,3 months,"Used, tested",,,available
+Transmission,2014,Toyota,Tacoma,"AT, 4WD",1719,137000,JG-1159,3 months,"Used, tested",,,available
+Engine,2014,Subaru,Outback,"2.5L, VIN C (6th digit)",1999,65000,JG-1160,3 months,"Used, tested",,,available
+Transmission,2014,Subaru,Outback,"CVT, AWD",1589,63000,JG-1161,3 months,"Used, tested",,,available
+Engine,2016,Subaru,Outback,"2.5L, VIN C (6th digit)",1849,88000,JG-1162,3 months,"Used, tested",,,available
+Transmission,2016,Subaru,Outback,"CVT, AWD",1329,133000,JG-1163,3 months,"Used, tested",,,available
+Engine,2013,Subaru,Outback,"2.5L, VIN C (6th digit)",1949,57000,JG-1164,3 months,"Used, tested",,,available
+Transmission,2013,Subaru,Outback,"CVT, AWD",1259,133000,JG-1165,3 months,"Used, tested",,,available
+Transfer Case,2014,Ford,F150,"4WD, electronic shift",489,98000,JG-2001,3 months,"Used, tested",,,available
+Transfer Case,2015,Chevrolet,Silverado 1500,"4WD, NP-8",459,121000,JG-2002,3 months,"Used, tested",,,available
+Rear Axle Assembly,2016,Ram,1500,"3.21 ratio, 4WD",649,87000,JG-2003,3 months,"Used, tested",,,available
+Turbocharger,2015,Ford,F150,"3.5L EcoBoost, driver side",399,76000,JG-2004,3 months,"Used, tested",,,available

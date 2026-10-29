@@ -1,0 +1,6 @@
+# never upload private business data or local databases
+data/private/
+*.db
+.env
+.env.*
+!.env.example

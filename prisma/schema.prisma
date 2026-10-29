@@ -1,0 +1,88 @@
+// Postgres everywhere: local Docker (docker-compose.yml) in development, Neon on Vercel.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled connection (app)
+  directUrl = env("DATABASE_URL_UNPOOLED") // direct connection (migrations)
+}
+
+// One row = one physical unit you can sell (an engine, a transmission, ...).
+model Part {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  stockNo     String?  @unique
+  partType    String // "Engine" | "Transmission" | other part names
+  year        Int
+  make        String
+  model       String
+  spec        String   @default("") // e.g. "2.4L, VIN C (8th digit)" or "AT, FWD"
+  title       String
+  description String   @default("")
+  price       Int // whole US dollars
+  mileage     Int?
+  warranty    String   @default("3 months")
+  condition   String   @default("Used, tested")
+  imageUrl    String?
+  status      String   @default("available") // available | reserved | sold
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([year, make, model, partType])
+  @@index([status])
+}
+
+model Lead {
+  id             String        @id @default(cuid())
+  name           String
+  phone          String // E.164, e.g. +19044815300
+  email          String?
+  vin            String?
+  vehicle        String? // decoded or typed vehicle description
+  partType       String?
+  notes          String?
+  contactPrefs   String        @default("text")
+  smsConsent     Boolean       @default(false)
+  sourcePage     String?
+  gclid          String?
+  status         String        @default("new") // new | quoted | won | lost
+  createdAt      DateTime      @default(now())
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
+}
+
+// One text-message thread per customer phone number.
+model Conversation {
+  id            String    @id @default(cuid())
+  phone         String    @unique
+  name          String?
+  vin           String?
+  vehicle       String?
+  partType      String?
+  unread        Boolean   @default(true)
+  optedOut      Boolean   @default(false)
+  aiDraft       String?
+  aiDraftNote   String?
+  aiDraftParts  String? // JSON array of Part ids the draft suggests
+  aiDraftAt     DateTime?
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  messages      Message[]
+  leads         Lead[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction      String // in | out | note
+  author         String // customer | staff | auto | system
+  body           String
+  status         String       @default("sent") // received | sent | simulated | failed
+  providerId     String?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}

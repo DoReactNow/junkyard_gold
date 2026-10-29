@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local database
+*.db
+*.db-journal
+
+# private business data (vendor prices)
+data/private/
+!.env.example
