@@ -23,7 +23,7 @@ async function main() {
     const res = convertSalesRows(rows);
     console.log(
       `Sales sheet: ${res.stats.rows} sales → ${res.stats.listings} listings ` +
-        `(${res.stats.mergedDuplicates} repeat sales merged, ${res.stats.pricedFromVendor} priced from vendor cost, ${res.skipped.length} rows skipped)`,
+        `(${res.stats.mergedDuplicates} repeat sales merged, ${res.stats.pricedFromVendor} priced from vendor cost, ${res.stats.raisedToFloor} raised to the cost + $300 floor, ${res.skipped.length} rows skipped)`,
     );
     for (const s of res.skipped) console.log(`  skipped${s.line ? ` line ${s.line}` : ""}: ${s.reason}`);
     rows = res.listings;

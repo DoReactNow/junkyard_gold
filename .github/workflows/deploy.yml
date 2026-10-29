@@ -1,0 +1,217 @@
+name: Build & Deploy Junkyard Gold
+
+# Every push to main: check → build the Docker image → deploy to the VPS (/opt/junkyard_gold).
+# Deploys only run once the repository variable DEPLOY_ENABLED is set to "true"
+# (Settings → Secrets and variables → Actions → Variables), so the first cutover is deliberate.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  DEPLOY_PATH: /opt/junkyard_gold
+
+jobs:
+  # ─────────────────────────────────────────────
+  # JOB 0: Quality check (lint, typecheck, migrations + build against a real Postgres)
+  # ─────────────────────────────────────────────
+  quality-check:
+    name: Quality Check (Lint, Typecheck, Build)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: junkyard
+          POSTGRES_PASSWORD: junkyard
+          POSTGRES_DB: junkyard_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U junkyard"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_URL: postgresql://junkyard:junkyard@localhost:5432/junkyard_test
+      DATABASE_URL_UNPOOLED: postgresql://junkyard:junkyard@localhost:5432/junkyard_test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript Check
+        run: npm run typecheck
+
+      - name: Apply migrations and build (npm run build = prisma generate + migrate deploy + next build)
+        run: npm run build
+
+  # ─────────────────────────────────────────────
+  # JOB 1: Build the Docker image on GitHub's servers
+  # ─────────────────────────────────────────────
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: quality-check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          # :sha tags make rollbacks possible (set IMAGE_TAG in the VPS .env to an older sha)
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─────────────────────────────────────────────
+  # JOB 2: Deploy the new image to the VPS
+  # ─────────────────────────────────────────────
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: [quality-check, build]
+    if: vars.DEPLOY_ENABLED == 'true'
+
+    steps:
+      - name: Checkout code (to copy the compose file to the VPS)
+        uses: actions/checkout@v4
+
+      - name: Copy compose file to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: docker-compose.prod.yml
+          target: ${{ env.DEPLOY_PATH }}/
+          strip_components: 0
+
+      - name: Deploy on VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RINGCENTRAL_CLIENT_ID: ${{ secrets.RINGCENTRAL_CLIENT_ID }}
+          RINGCENTRAL_CLIENT_SECRET: ${{ secrets.RINGCENTRAL_CLIENT_SECRET }}
+          RINGCENTRAL_JWT: ${{ secrets.RINGCENTRAL_JWT }}
+          RINGCENTRAL_WEBHOOK_TOKEN: ${{ secrets.RINGCENTRAL_WEBHOOK_TOKEN }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STAFF_ALERT_PHONE: ${{ secrets.STAFF_ALERT_PHONE }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: IMAGE_TAG,GHCR_USER,GHCR_TOKEN,DB_PASSWORD,ADMIN_PASSWORD,SESSION_SECRET,ANTHROPIC_API_KEY,RINGCENTRAL_CLIENT_ID,RINGCENTRAL_CLIENT_SECRET,RINGCENTRAL_JWT,RINGCENTRAL_WEBHOOK_TOKEN,SMTP_PASS,STRIPE_SECRET_KEY,STRIPE_WEBHOOK_SECRET,STAFF_ALERT_PHONE
+          script: |
+            set -e
+            cd /opt/junkyard_gold
+            mkdir -p backups
+
+            # 1. Back up the database before anything changes (keeps the last 14)
+            DB_CONTAINER=$(docker ps --filter "label=com.docker.compose.project=junkyard_gold" --filter "label=com.docker.compose.service=db" -q | head -n1)
+            if [ -n "$DB_CONTAINER" ]; then
+              docker exec "$DB_CONTAINER" pg_dump -U junkyard junkyard | gzip > "backups/pre-deploy-$(date +%Y%m%d-%H%M%S).sql.gz"
+              ls -1t backups/pre-deploy-*.sql.gz | tail -n +15 | xargs -r rm -f
+            fi
+
+            # 2. One time only: move the v1 site files out of the way (moved, not deleted)
+            if [ -f docker-compose.yml ]; then
+              ARCHIVE="_v1_archive_$(date +%Y%m%d-%H%M%S)"
+              mkdir -p "$ARCHIVE"
+              find . -mindepth 1 -maxdepth 1 ! -name docker-compose.prod.yml ! -name backups ! -name "_v1_archive_*" -exec mv {} "$ARCHIVE"/ \;
+              echo "v1 files moved to /opt/junkyard_gold/$ARCHIVE"
+            fi
+
+            # 3. Write the production .env (overwritten on every deploy; secrets come from GitHub)
+            umask 077
+            {
+              printf 'IMAGE_TAG=%s\n' "$IMAGE_TAG"
+              printf 'DB_PASSWORD=%s\n' "$DB_PASSWORD"
+              printf 'SITE_URL=%s\n' "https://junkyardgold.com"
+              printf 'SITE_HOST=%s\n' "junkyardgold.com"
+              printf 'TRAEFIK_NETWORK=%s\n' "root_default"
+              printf 'TRAEFIK_ENTRYPOINT=%s\n' "websecure"
+              printf 'TRAEFIK_CERTRESOLVER=%s\n' "mytlschallenge"
+              printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD"
+              printf 'SESSION_SECRET=%s\n' "$SESSION_SECRET"
+              printf 'ANTHROPIC_API_KEY=%s\n' "$ANTHROPIC_API_KEY"
+              printf 'RINGCENTRAL_SERVER=%s\n' "https://platform.ringcentral.com"
+              printf 'RINGCENTRAL_CLIENT_ID=%s\n' "$RINGCENTRAL_CLIENT_ID"
+              printf 'RINGCENTRAL_CLIENT_SECRET=%s\n' "$RINGCENTRAL_CLIENT_SECRET"
+              printf 'RINGCENTRAL_JWT=%s\n' "$RINGCENTRAL_JWT"
+              printf 'RINGCENTRAL_FROM_NUMBER=%s\n' "+19044815300"
+              printf 'RINGCENTRAL_WEBHOOK_TOKEN=%s\n' "$RINGCENTRAL_WEBHOOK_TOKEN"
+              printf 'STAFF_ALERT_PHONE=%s\n' "$STAFF_ALERT_PHONE"
+              printf 'SMTP_HOST=%s\n' "smtp.zoho.com"
+              printf 'SMTP_PORT=%s\n' "465"
+              printf 'SMTP_USER=%s\n' "support@junkyardgold.com"
+              printf 'SMTP_PASS=%s\n' "$SMTP_PASS"
+              printf 'NOTIFY_TO=%s\n' "support@junkyardgold.com"
+              printf 'STRIPE_SECRET_KEY=%s\n' "$STRIPE_SECRET_KEY"
+              printf 'STRIPE_WEBHOOK_SECRET=%s\n' "$STRIPE_WEBHOOK_SECRET"
+            } > .env
+
+            # 4. Pull the new image and start it. --remove-orphans retires v1's web + api containers;
+            #    the db container and its data volume are reused as they are.
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker compose -f docker-compose.prod.yml pull app
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            # 5. Wait until the app answers (migrations run on start)
+            for i in $(seq 1 30); do
+              if docker exec junkyard_gold_app node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; then
+                echo "✅ Junkyard Gold is up (image $IMAGE_TAG)"
+                docker image prune -f
+                exit 0
+              fi
+              sleep 4
+            done
+            echo "❌ App did not become healthy. Last logs:"
+            docker logs --tail 80 junkyard_gold_app
+            exit 1

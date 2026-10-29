@@ -10,6 +10,7 @@ import { importParts } from "@/lib/import-parts";
 import { convertSalesRows, isSalesSheet, readTable } from "@/lib/sales-import";
 import { normalizePhone } from "@/lib/phone";
 import { recordInbound } from "@/lib/inbound";
+import { stopFollowups } from "@/lib/followups";
 
 export async function login(_: unknown, form: FormData) {
   if (!checkPassword(String(form.get("password") || ""))) return { error: "Wrong password" };
@@ -49,18 +50,20 @@ export async function markRead(conversationId: string) {
 export async function setLeadStatus(conversationId: string, status: string) {
   await requireAdmin();
   await db.lead.updateMany({ where: { conversationId }, data: { status } });
+  if (status === "won" || status === "lost") await stopFollowups(conversationId, `lead marked ${status}`);
   revalidatePath("/admin");
 }
 
-/** Demo mode only: pretend a customer texted us, to try the flow without Twilio. */
+/** Demo mode only: pretend a customer texted us, to try the flow without RingCentral. */
 export async function simulateInbound(form: FormData) {
   await requireAdmin();
   if (smsLive()) return;
   const phone = normalizePhone(String(form.get("phone") || ""));
   const body = String(form.get("body") || "").trim();
   if (!phone || !body) return;
-  const { convo, stopped } = await recordInbound(phone, body, null);
-  if (!stopped) await refreshDraft(convo.id);
+  const { convo, needsReply } = await recordInbound(phone, body, null);
+  if (!convo) return;
+  if (needsReply) await refreshDraft(convo.id);
   revalidatePath("/admin");
   redirect(`/admin?c=${convo.id}`);
 }

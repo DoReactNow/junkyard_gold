@@ -1,13 +1,21 @@
 import Link from "next/link";
 import type { Part } from "@prisma/client";
 import { money, partUrl } from "@/lib/inventory";
+import { pickPhotos } from "@/lib/photos";
 
-export function partImage(p: Pick<Part, "imageUrl" | "partType">) {
-  if (p.imageUrl) return p.imageUrl;
-  if (p.partType === "Engine") return "/img/engine.svg";
-  if (p.partType === "Transmission") return "/img/transmission.svg";
-  return "/img/part.svg";
+type ImgPart = Pick<Part, "imageUrl" | "partType" | "make" | "model" | "spec">;
+
+/** Photos for a listing: its own photo, else example photos of a similar unit, else an illustration. */
+export function partImages(p: ImgPart): { files: string[]; kind: "own" | "example" | "illustration" } {
+  if (p.imageUrl) return { files: [p.imageUrl], kind: "own" };
+  const match = pickPhotos(p);
+  if (match.files.length) return { files: match.files, kind: "example" };
+  if (p.partType === "Engine") return { files: ["/img/engine.svg"], kind: "illustration" };
+  if (p.partType === "Transmission") return { files: ["/img/transmission.svg"], kind: "illustration" };
+  return { files: ["/img/part.svg"], kind: "illustration" };
 }
+
+export const partImage = (p: ImgPart) => partImages(p).files[0];
 
 export function PartCard({ part }: { part: Part }) {
   return (
@@ -16,7 +24,7 @@ export function PartCard({ part }: { part: Part }) {
       className="group flex flex-col overflow-hidden rounded-lg border border-line bg-white transition hover:-translate-y-0.5 hover:border-gold hover:shadow-lg"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={partImage(part)} alt="" className="aspect-[4/3] w-full object-cover" loading="lazy" />
+      <img src={partImage(part)} alt="" className="aspect-[4/3] w-full bg-white object-contain" loading="lazy" />
       <div className="flex flex-1 flex-col p-4">
         <span className="text-xs font-semibold uppercase tracking-wide text-gold-dark">{part.partType}</span>
         <h3 className="mt-1 font-semibold leading-snug">

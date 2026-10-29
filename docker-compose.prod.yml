@@ -1,0 +1,55 @@
+# Production stack on the VPS: /opt/junkyard_gold (replaces v1's web + api containers).
+# The database service, volume and credentials are the same as v1, so the existing Postgres data is kept.
+name: junkyard_gold
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: junkyard
+      POSTGRES_USER: junkyard
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U junkyard -d junkyard"]
+      interval: 3s
+      retries: 20
+    networks: [internal]          # private: not reachable from Traefik or the internet
+
+  app:
+    image: ghcr.io/doreactnow/junkyard_gold:${IMAGE_TAG:-latest}
+    container_name: junkyard_gold_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      # v2 keeps its tables in the "app" schema; v1's old tables stay untouched in "public"
+      DATABASE_URL: postgresql://junkyard:${DB_PASSWORD}@db:5432/junkyard?schema=app
+      DATABASE_URL_UNPOOLED: postgresql://junkyard:${DB_PASSWORD}@db:5432/junkyard?schema=app
+    networks: [internal, traefik]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-root_default}
+      # HTTPS site (apex + www → apex)
+      - traefik.http.routers.jg-app.rule=Host(`${SITE_HOST:-junkyardgold.com}`) || Host(`www.${SITE_HOST:-junkyardgold.com}`)
+      - traefik.http.routers.jg-app.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
+      - traefik.http.routers.jg-app.tls=true
+      - traefik.http.routers.jg-app.tls.certresolver=${TRAEFIK_CERTRESOLVER:-mytlschallenge}
+      - traefik.http.routers.jg-app.middlewares=jg-nowww
+      - traefik.http.middlewares.jg-nowww.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.jg-nowww.redirectregex.replacement=https://$${1}
+      - traefik.http.middlewares.jg-nowww.redirectregex.permanent=true
+      - traefik.http.services.jg-app.loadbalancer.server.port=3000
+
+networks:
+  internal:
+  traefik:
+    name: ${TRAEFIK_NETWORK:-root_default}
+    external: true
+
+volumes:
+  pgdata:

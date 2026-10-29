@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { money } from "@/lib/inventory";
 import { BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
 import { PageShell } from "@/components/site-chrome";
-import { PartCard, partImage } from "@/components/part-card";
+import { PartCard, partImages } from "@/components/part-card";
 import { VinCheck } from "@/components/vin-check";
 import { CameraIcon, ChatIcon, PhoneIcon, ShieldIcon, TruckIcon } from "@/components/icons";
 
@@ -32,6 +32,7 @@ export default async function PartPage({ params }: { params: Params }) {
     take: 6,
   });
   const sold = part.status !== "available";
+  const images = partImages(part);
   const name = `${part.year} ${part.make} ${part.model} ${part.partType}`;
   const smsBody = `Hi, I'm interested in the ${name} (stock ${part.stockNo || part.slug}). Can you send photos? My VIN is: `;
 
@@ -62,13 +63,23 @@ export default async function PartPage({ params }: { params: Params }) {
 
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-6 lg:grid-cols-2">
         <div>
-          <div className="relative overflow-hidden rounded-xl border border-line bg-ink">
+          <div className={`relative overflow-hidden rounded-xl border border-line ${images.kind === "illustration" ? "bg-ink" : "bg-white"}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={partImage(part)} alt={part.title} className="aspect-[4/3] w-full object-cover" />
-            {!part.imageUrl && (
-              <span className="absolute left-3 top-3 rounded bg-white/90 px-2 py-1 text-xs font-semibold">Illustration</span>
+            <img src={images.files[0]} alt={images.kind === "own" ? part.title : `Example ${part.partType.toLowerCase()} photo`} className="aspect-[4/3] w-full object-contain" />
+            {images.kind !== "own" && (
+              <span className="absolute left-3 top-3 rounded bg-ink/85 px-2 py-1 text-xs font-semibold text-white">
+                {images.kind === "example" ? "Example photo" : "Illustration"}
+              </span>
             )}
           </div>
+          {images.files.length > 1 && (
+            <div className="mt-2 grid grid-cols-4 gap-2">
+              {images.files.slice(1, 5).map((f) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={f} src={f} alt="" loading="lazy" className="aspect-square w-full rounded-md border border-line bg-white object-contain" />
+              ))}
+            </div>
+          )}
           <a href={smsWithBody(smsBody)} className="mt-3 flex items-center gap-3 rounded-lg border border-line bg-white p-4 hover:border-gold">
             <CameraIcon className="size-6 text-gold-dark" />
             <span className="text-sm">

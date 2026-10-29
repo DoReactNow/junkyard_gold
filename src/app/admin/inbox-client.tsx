@@ -47,7 +47,7 @@ export function Composer({
       const res = await sendReply(conversationId, text);
       if ("error" in res) setResult(res.error ?? "");
       else {
-        setResult(res.status === "simulated" ? "Saved (demo mode: no real SMS sent)" : res.status === "failed" ? "Send FAILED, check Twilio" : "Sent ✓");
+        setResult(res.status === "simulated" ? "Saved (demo mode: no real SMS sent)" : res.status === "failed" ? "Send FAILED, check RingCentral" : "Sent ✓");
         setDirty(false);
         setText("");
       }

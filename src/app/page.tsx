@@ -157,7 +157,7 @@ export default async function Home() {
           </p>
           <QuoteForm />
         </div>
-        <div>
+        <div id="faq" className="scroll-mt-28">
           <span className="text-xs font-semibold uppercase tracking-wide text-gold-dark">Questions</span>
           <h2 className="font-display text-3xl font-semibold uppercase">Straight answers</h2>
           <div className="mt-4 divide-y divide-line rounded-lg border border-line bg-white">

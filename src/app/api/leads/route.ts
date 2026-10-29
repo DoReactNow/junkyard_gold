@@ -4,8 +4,11 @@ import { db } from "@/lib/db";
 import { normalizePhone, formatPhone } from "@/lib/phone";
 import { cleanVin, decodeVin, isVin } from "@/lib/vin";
 import { refreshDraft } from "@/lib/ai";
-import { alertStaff, sendText } from "@/lib/sms";
-import { BUSINESS, isOpenNow, siteUrl } from "@/lib/business";
+import { alertStaff } from "@/lib/sms";
+import { startLeadTexts } from "@/lib/followups";
+import { emailStaff } from "@/lib/email";
+import { CONSENT_TEXT } from "@/lib/consent";
+import { siteUrl } from "@/lib/business";
 
 const Body = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(80),
@@ -75,7 +78,9 @@ export async function POST(req: Request) {
   const lead = await db.lead.create({
     data: {
       name: b.name, phone, email: b.email || null, vin, vehicle, partType, notes: b.notes || null,
-      smsConsent: true, sourcePage: b.sourcePage || null, gclid: b.gclid || null, conversationId: convo.id,
+      smsConsent: true, consentText: CONSENT_TEXT, consentAt: new Date(), consentIp: ip,
+      userAgent: req.headers.get("user-agent")?.slice(0, 300) || null,
+      sourcePage: b.sourcePage || null, gclid: b.gclid || null, conversationId: convo.id,
     },
   });
 
@@ -88,31 +93,18 @@ export async function POST(req: Request) {
     b.notes && `Notes: ${b.notes}`,
     b.sourcePage && `Page: ${b.sourcePage}`,
   ].filter(Boolean).join("\n");
-  await db.message.create({ data: { conversationId: convo.id, direction: "note", author: "system", body: summary, status: "received" } });
+  await db.message.create({ data: { conversationId: convo.id, direction: "note", author: "system", kind: "note", body: summary, status: "received" } });
 
-  const first = b.name.split(" ")[0];
-  await sendText({
-    conversationId: convo.id,
-    to: phone,
-    author: "auto",
-    body: `Hi ${first}, this is ${BUSINESS.name} in Bradenton, FL. We got your request${vehicle ? ` for your ${vehicle}` : ""}. ${isOpenNow() ? "A parts specialist is checking stock now and will text you options shortly." : `We're open ${BUSINESS.hours} and a parts specialist will text you options as soon as we're back.`} Reply STOP to opt out.`,
-  });
+  // instant text now (or at 10 AM if it's late), then follow-ups at 3 h, 1 day and 3 days
+  await startLeadTexts({ conversationId: convo.id, name: b.name, vehicle, partType });
 
   after(async () => {
     await refreshDraft(convo.id).catch((e) => console.error("draft failed", e));
     await alertStaff(`New lead: ${b.name} ${formatPhone(phone)} – ${vehicle || "no vehicle"} – ${partType || "part"}. ${siteUrl()}/admin?c=${convo.id}`);
-    if (process.env.WEB3FORMS_ACCESS_KEY) {
-      await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          access_key: process.env.WEB3FORMS_ACCESS_KEY,
-          subject: `New parts request – ${vehicle || b.name}`,
-          from_name: `${BUSINESS.name} website`,
-          name: b.name, phone: formatPhone(phone), message: summary, lead_id: lead.id,
-        }),
-      }).catch((e) => console.error("email copy failed", e));
-    }
+    await emailStaff(
+      `New parts request – ${vehicle || b.name}`,
+      `${summary}\nPhone: ${formatPhone(phone)}${b.email ? `\nEmail: ${b.email}` : ""}\n\nOpen in the inbox: ${siteUrl()}/admin?c=${convo.id}\nLead id: ${lead.id}`,
+    );
   });
 
   return NextResponse.json({ ok: true });

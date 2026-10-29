@@ -8,19 +8,23 @@ Website and staff text inbox for Junkyard Gold (2727 75th St W, Bradenton, FL 34
 Customer ─► website: Year/Make/Model finder, VIN check, "Text me my options" form
                │
                ├─ VIN decoded free by NHTSA ─► matching units from YOUR inventory shown instantly
-               └─ form ─► lead saved ─► instant auto-text to customer
+               └─ form ─► lead + consent proof saved ─► instant text, follow-ups at 3 h / 1 day / 3 days
+                                        (only 10 AM–8 PM Eastern; a reply cancels the rest)
                                         ─► AI (Claude) drafts a reply with 2–3 matching units + links
-                                        ─► optional text alert to a staff cell / email copy
+                                        ─► email alert to support@junkyardgold.com (Zoho) / optional staff text
 
-Customer texts 904-481-5300 directly ─► Twilio ─► same inbox, same AI draft
+Customer texts 904-481-5300 directly ─► RingCentral ─► same inbox, same AI draft
 
 Staff open /admin ─► review/edit the draft ─► Send (goes out as a real SMS)
                   ─► "+ Pay link" inserts a Stripe checkout link for that unit
 Customer pays ─► Stripe webhook marks the unit SOLD and notes it in the thread
 ```
 
-Nothing is ever sent to a customer by the AI on its own. The only automatic text is the
-"we got your request" confirmation.
+Nothing is ever sent to a customer by the AI on its own. The automatic texts are the
+"we got your request" confirmation and the three follow-ups (same wording as v1), plus the
+STOP / START / HELP replies carriers require.
+
+**Deploying:** see [DEPLOY.md](DEPLOY.md) (GitHub Actions → Docker → VPS behind Traefik, replaces v1).
 
 ## Run it on your computer
 
@@ -47,13 +51,13 @@ Sales Amount, Vendor Price). Upload it as is at `/admin/parts` (.xlsx or .csv), 
 How a sales row becomes a listing (`src/lib/sales-import.ts`):
 
 - **One listing per vehicle + part + specification.** Repeat sales of the same item are merged.
-- **Price** = median of what customers paid, rounded to end in 9 ($1,697.91 → $1,699). If a row
-  has no sale amount, vendor price × 1.40 (your median markup). Canadian-dollar amounts are ignored.
+- **Price** = median of what customers paid, rounded to end in 9 ($1,697.91 → $1,699), but never
+  below vendor cost + $300 (same rule as v1). If a row has no sale amount, vendor price × 1.40.
+  Canadian-dollar amounts are ignored.
   **Vendor prices are never saved or shown.**
 - **Mileage** (the sheet has none), per the owner's rule, newer vehicles toward the low end:
   2015–2025 → 10k–80k · 2000–2014 → 70k–110k · 1999 and older → 80k–130k · never above 130k.
-  The site shows the listed figure (e.g. "73,000 mi"). The unit bought from the vendor is within
-  ±5,000 miles; staff text the customer the actual mileage before delivery.
+  The site shows the listed figure (e.g. "73,000 mi").
 - **Skipped:** rows without a readable year/make/model, cells naming two vehicles, multi-item
   packages (e.g. "Engine + Wiring Harness"), cores and reman units, and non-engine/transmission
   parts under $300. The import prints every skipped row and why.
@@ -69,22 +73,13 @@ search and the AI draft give an *approximate* price range from similar parts you
 The private sheet lives in `data/private/` (git-ignored). `npm run seed` still loads the old
 made-up sample parts, for demos only; don't run it on the live database.
 
-**Photos:** listings show an illustration marked "Illustration", and every page invites the
-customer to text for real photos of the exact unit. Don't copy photos from Car-Part.com or other
-sellers' listings (copyright / terms of service). Add your own photo URLs in `image_url` any time.
+**Photos:** listings use your v1 product photos (same model, else same make, else the engine/gearbox
+family), labeled "Example photo", and every page offers real photos of the exact unit by text. A listing's
+own `image_url` overrides them. Don't copy photos from Car-Part.com or other sellers' listings.
 
-## Going live — checklist
+## Going live
 
-| Step | What to do | Time |
-|---|---|---|
-| 1. Hosting | On vercel.com, sign in with GitHub → **Add New → Project** → import `junkyardgold`. In the project's **Storage** tab add **Neon (Postgres)** and connect it to all environments; it sets `DATABASE_URL` and `DATABASE_URL_UNPOOLED`. Every deploy runs the database migrations automatically. | 15 min |
-| 2. Domain | Project → Settings → Domains → add `junkyardgold.com` and `www.junkyardgold.com`, then add the DNS records Vercel shows at your domain registrar. Set `SITE_URL=https://junkyardgold.com`. | 15 min + DNS |
-| 3. Staff login | In Settings → Environment Variables set a long `ADMIN_PASSWORD` and a random `SESSION_SECRET` (`openssl rand -hex 32`), then redeploy. Log in at `/admin` and upload the sales sheet at `/admin/parts`. | 5 min |
-| 4. Texting | Create a Twilio account. **Host 904-481-5300 for SMS on Twilio** (keeps voice calls with your current carrier) or port it. Register for **A2P 10DLC** (brand + "Customer care / quotes" campaign) — carriers block unregistered business texting. Use `/terms` and `/privacy` URLs in the registration; they already have the required SMS wording. Set the number's "A message comes in" webhook to `https://junkyardgold.com/api/sms/inbound`. Fill the `TWILIO_*` variables. | 1–3 weeks for approval |
-| 5. AI drafts | Create an API key at console.anthropic.com, set `ANTHROPIC_API_KEY`. Uses Claude Opus 5.5. | 5 min |
-| 6. Payments | Create a Stripe account, set `STRIPE_SECRET_KEY`. Add a webhook to `https://junkyardgold.com/api/stripe/webhook` for `checkout.session.completed` and set `STRIPE_WEBHOOK_SECRET`. | 30 min |
-| 7. Alerts (optional) | `STAFF_ALERT_PHONE` = a staff cell to get a text for every new lead. `WEB3FORMS_ACCESS_KEY` (free at web3forms.com) to also email each lead to support@junkyardgold.com. | 10 min |
-| 8. Review policies | Read `/warranty`, `/shipping-returns`, `/terms`, `/privacy` and adjust to how you actually operate. Business hours (Mon–Fri 10 AM–6 PM ET) are in `src/lib/business.ts`; outside them the instant text tells customers when you'll reply. No pickup is offered anywhere. | 30 min |
+See **[DEPLOY.md](DEPLOY.md)**: GitHub secrets, the one-time switch from v1, RingCentral setup and rollback.
 
 ## Where things live
 
@@ -92,6 +87,8 @@ sellers' listings (copyright / terms of service). Add your own photo URLs in `im
 - `src/lib/vin.ts` — NHTSA VIN decoding
 - `src/lib/inventory.ts` — fitment matching (year + make + model, engine size from VIN)
 - `src/lib/ai.ts` — Claude draft prompt and rules (only quotes units from your inventory, exact prices)
-- `src/lib/sms.ts` — Twilio send / demo mode
-- `src/app/api/leads` — website form handler · `src/app/api/sms/inbound` — Twilio webhook
+- `src/lib/sms.ts` — send queue, 10 AM–8 PM window, demo mode · `src/lib/ringcentral.ts` — RingCentral API · `src/lib/followups.ts` — instant + 3 follow-ups
+- `src/lib/consent.ts` — the SMS consent wording stored with every lead · `src/lib/email.ts` — Zoho lead alerts
+- `src/lib/photos.ts` — matches listings to the v1 product photos (`public/img/parts`, shown as "Example photo")
+- `src/app/api/leads` — website form handler · `src/app/api/sms/inbound` — RingCentral webhook · `src/instrumentation.ts` — the every-minute text worker
 - `src/app/admin` — staff inbox and inventory screens

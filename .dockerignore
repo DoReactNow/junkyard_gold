@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.github
+data/private
+.env
+.env.*
+!.env.example
+*.db
+docker-compose*.yml
+README.md

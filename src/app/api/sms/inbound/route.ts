@@ -1,32 +1,52 @@
 import { after } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { refreshDraft } from "@/lib/ai";
 import { recordInbound } from "@/lib/inbound";
-import { alertStaff, validateTwilioRequest } from "@/lib/sms";
+import { alertStaff } from "@/lib/sms";
+import { rcMessageText } from "@/lib/ringcentral";
 import { formatPhone, normalizePhone } from "@/lib/phone";
 import { siteUrl } from "@/lib/business";
 
-const twiml = () =>
-  new Response(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, { headers: { "Content-Type": "text/xml" } });
+type Notification = {
+  event?: string;
+  body?: { id?: string | number; type?: string; direction?: string; subject?: string; from?: { phoneNumber?: string } };
+};
 
-/** Twilio "A message comes in" webhook: POST {SITE_URL}/api/sms/inbound */
+function tokenOk(got: string | null) {
+  const want = process.env.RINGCENTRAL_WEBHOOK_TOKEN;
+  if (!want) return true;
+  if (!got) return false;
+  const a = Buffer.from(got);
+  const b = Buffer.from(want);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/** RingCentral webhook for incoming texts: POST {SITE_URL}/api/sms/inbound */
 export async function POST(req: Request) {
-  const form = await req.formData();
-  const params = Object.fromEntries([...form.entries()].map(([k, v]) => [k, String(v)]));
-  if (!validateTwilioRequest(req.headers.get("x-twilio-signature"), `${siteUrl()}/api/sms/inbound`, params)) {
-    return new Response("Invalid signature", { status: 403 });
+  // Subscription handshake: echo the Validation-Token header back within 3 seconds.
+  const validation = req.headers.get("validation-token");
+  if (validation) {
+    return new Response("", { status: 200, headers: { "Validation-Token": validation, "Content-Type": "application/json" } });
   }
+  if (!tokenOk(req.headers.get("verification-token"))) return new Response("Forbidden", { status: 403 });
 
-  const from = normalizePhone(params.From) || params.From;
-  const body = (params.Body || "").trim();
-  if (!from || !body) return twiml();
+  const note = (await req.json().catch(() => ({}))) as Notification;
+  const msg = note.body;
+  if (!msg || msg.type !== "SMS" || (msg.direction && msg.direction !== "Inbound")) return Response.json({ ok: true });
 
-  const { convo, stopped } = await recordInbound(from, body, params.MessageSid || null);
-  // On STOP, Twilio sends the carrier-required opt-out confirmation itself.
-  if (!stopped) {
+  const from = normalizePhone(msg.from?.phoneNumber) || msg.from?.phoneNumber;
+  if (!from || from === process.env.RINGCENTRAL_FROM_NUMBER) return Response.json({ ok: true });
+  const id = msg.id != null ? String(msg.id) : null;
+  let text = (msg.subject || "").trim();
+  if (!text && id) text = (await rcMessageText(id).catch(() => "")).trim();
+  if (!text) return Response.json({ ok: true });
+
+  const { convo, needsReply } = await recordInbound(from, text, id);
+  if (convo && needsReply) {
     after(async () => {
       await refreshDraft(convo.id).catch((e) => console.error("draft failed", e));
-      await alertStaff(`Text from ${formatPhone(from)}: "${body.slice(0, 80)}" ${siteUrl()}/admin?c=${convo.id}`);
+      await alertStaff(`Text from ${formatPhone(from)}: "${text.slice(0, 80)}" ${siteUrl()}/admin?c=${convo.id}`);
     });
   }
-  return twiml();
+  return Response.json({ ok: true });
 }

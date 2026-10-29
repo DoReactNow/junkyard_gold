@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BUSINESS } from "@/lib/business";
+import { CONSENT_TEXT } from "@/lib/consent";
 import { CheckIcon } from "./icons";
 
 const TYPES = ["Engine", "Transmission", "Other"] as const;
@@ -126,8 +127,7 @@ export function QuoteForm({
       <label className={`flex items-start gap-2.5 text-xs leading-snug ${dark ? "text-white/65" : "text-steel"}`}>
         <input type="checkbox" name="smsConsent" className="mt-0.5 size-4 shrink-0 accent-gold" />
         <span>
-          I agree to receive text messages from {BUSINESS.name} about my parts request. Message frequency varies.
-          Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. See our{" "}
+          {CONSENT_TEXT} See our{" "}
           <a href="/terms" className="underline">SMS policy</a> and <a href="/privacy" className="underline">privacy policy</a>.
         </span>
       </label>

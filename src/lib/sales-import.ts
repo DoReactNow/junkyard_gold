@@ -10,7 +10,8 @@ import { titleMake } from "./vin";
  */
 
 export const LIST_MARKUP_WHEN_NO_SALE = 1.4; // median sale ÷ vendor price in the 2025-26 sheet
-export const MIN_OTHER_PART_PRICE = 300; // smaller parts aren't listed online
+export const MIN_OTHER_PART_PRICE = 300;
+export const MIN_MARGIN = 300; // list price is at least vendor cost + this // smaller parts aren't listed online
 export const MAX_MILES = 130_000;
 
 /** Reads an uploaded .xlsx or .csv into rows keyed by snake_case header. */
@@ -183,7 +184,7 @@ export function stockNoFor(key: string) {
 export type ConvertResult = {
   listings: Record<string, string>[];
   skipped: { line: number; reason: string }[];
-  stats: { rows: number; listings: number; mergedDuplicates: number; pricedFromVendor: number };
+  stats: { rows: number; listings: number; mergedDuplicates: number; pricedFromVendor: number; raisedToFloor: number };
 };
 
 export function convertSalesRows(rows: Record<string, string>[]): ConvertResult {
@@ -212,12 +213,21 @@ export function convertSalesRows(rows: Record<string, string>[]): ConvertResult 
 
   const listings: Record<string, string>[] = [];
   let pricedFromVendor = 0;
+  let raisedToFloor = 0;
   for (const [key, g] of groups) {
     let price: number | null = null;
     if (g.sales.length) price = median(g.sales);
     else if (g.vendor.length) {
       price = median(g.vendor) * LIST_MARKUP_WHEN_NO_SALE;
       pricedFromVendor++;
+    }
+    // Owner's rule (same as v1): never list below vendor cost + $300
+    if (price && g.vendor.length) {
+      const floor = median(g.vendor) + MIN_MARGIN;
+      if (price < floor) {
+        price = floor;
+        raisedToFloor++;
+      }
     }
     if (!price) {
       skipped.push({ line: 0, reason: `${g.v.year} ${g.v.make} ${g.v.model} ${g.partType}: no usable price` });
@@ -242,6 +252,6 @@ export function convertSalesRows(rows: Record<string, string>[]): ConvertResult 
   return {
     listings,
     skipped,
-    stats: { rows: used, listings: listings.length, mergedDuplicates: used - groups.size, pricedFromVendor },
+    stats: { rows: used, listings: listings.length, mergedDuplicates: used - groups.size, pricedFromVendor, raisedToFloor },
   };
 }
