@@ -27,8 +27,9 @@ Nothing is ever sent to a customer by the AI on its own. The only automatic text
 ```bash
 npm install
 cp .env.example .env        # then edit ADMIN_PASSWORD
-npm run db:push             # creates the local database
-npm run seed                # loads 169 SAMPLE parts (replace with yours, below)
+docker compose up -d        # local Postgres on port 5433
+npm run db:push             # creates the tables (Prisma migrations)
+npm run import -- data/private/sales.xlsx   # your listings (or upload at /admin/parts)
 npm run dev                 # http://localhost:3000  ·  staff inbox: http://localhost:3000/admin
 ```
 
@@ -76,9 +77,9 @@ sellers' listings (copyright / terms of service). Add your own photo URLs in `im
 
 | Step | What to do | Time |
 |---|---|---|
-| 1. Hosting | Deploy to Vercel (free/hobby is fine to start). Switch `prisma/schema.prisma` provider to `postgresql` and set `DATABASE_URL` to a Supabase/Neon/Vercel Postgres database, then `npm run db:push`. | 1 hr |
-| 2. Domain | Point junkyardgold.com at Vercel. Set `SITE_URL=https://junkyardgold.com`. | 15 min |
-| 3. Staff login | Set a long `ADMIN_PASSWORD` and a random `SESSION_SECRET` (`openssl rand -hex 32`). | 5 min |
+| 1. Hosting | On vercel.com, sign in with GitHub → **Add New → Project** → import `junkyardgold`. In the project's **Storage** tab add **Neon (Postgres)** and connect it to all environments; it sets `DATABASE_URL` and `DATABASE_URL_UNPOOLED`. Every deploy runs the database migrations automatically. | 15 min |
+| 2. Domain | Project → Settings → Domains → add `junkyardgold.com` and `www.junkyardgold.com`, then add the DNS records Vercel shows at your domain registrar. Set `SITE_URL=https://junkyardgold.com`. | 15 min + DNS |
+| 3. Staff login | In Settings → Environment Variables set a long `ADMIN_PASSWORD` and a random `SESSION_SECRET` (`openssl rand -hex 32`), then redeploy. Log in at `/admin` and upload the sales sheet at `/admin/parts`. | 5 min |
 | 4. Texting | Create a Twilio account. **Host 904-481-5300 for SMS on Twilio** (keeps voice calls with your current carrier) or port it. Register for **A2P 10DLC** (brand + "Customer care / quotes" campaign) — carriers block unregistered business texting. Use `/terms` and `/privacy` URLs in the registration; they already have the required SMS wording. Set the number's "A message comes in" webhook to `https://junkyardgold.com/api/sms/inbound`. Fill the `TWILIO_*` variables. | 1–3 weeks for approval |
 | 5. AI drafts | Create an API key at console.anthropic.com, set `ANTHROPIC_API_KEY`. Uses Claude Opus 5.5. | 5 min |
 | 6. Payments | Create a Stripe account, set `STRIPE_SECRET_KEY`. Add a webhook to `https://junkyardgold.com/api/stripe/webhook` for `checkout.session.completed` and set `STRIPE_WEBHOOK_SECRET`. | 30 min |
