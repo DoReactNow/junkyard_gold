@@ -18,8 +18,8 @@ export function Logo({ light = false }: { light?: boolean }) {
 }
 
 const NAV = [
-  { href: "/parts?type=Engine", label: "Engines" },
-  { href: "/parts?type=Transmission", label: "Transmissions" },
+  { href: "/used-engines", label: "Engines" },
+  { href: "/used-transmissions", label: "Transmissions" },
   { href: "/parts?type=Other", label: "Other Parts" },
   { href: "/#how", label: "How It Works" },
   { href: "/warranty", label: "Warranty" },
@@ -85,8 +85,8 @@ export function Footer() {
         <div>
           <h3 className="font-display text-lg uppercase text-white">Shop</h3>
           <ul className="mt-3 space-y-2 text-sm">
-            <li><Link href="/parts?type=Engine" className="hover:text-gold">Used Engines</Link></li>
-            <li><Link href="/parts?type=Transmission" className="hover:text-gold">Used Transmissions</Link></li>
+            <li><Link href="/used-engines" className="hover:text-gold">Used Engines</Link></li>
+            <li><Link href="/used-transmissions" className="hover:text-gold">Used Transmissions</Link></li>
             <li><Link href="/parts?type=Other" className="hover:text-gold">Other Parts</Link></li>
             <li><Link href="/warranty" className="hover:text-gold">Warranty</Link></li>
             <li><Link href="/shipping-returns" className="hover:text-gold">Shipping &amp; Returns</Link></li>

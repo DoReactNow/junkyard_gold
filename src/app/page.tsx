@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { BUSINESS, SMS_HREF, TEL_HREF, smsWithBody } from "@/lib/business";
 import { MAIN_TYPES, money } from "@/lib/inventory";
+import { catalogPath, makesFor } from "@/lib/catalog";
 import { PageShell } from "@/components/site-chrome";
 import { PartFinder } from "@/components/part-finder";
 import { VinCheck } from "@/components/vin-check";
@@ -27,9 +28,11 @@ const FAQ = [
 ];
 
 export default async function Home() {
-  const [featured, counts] = await Promise.all([
+  const [featured, counts, engineMakes, transMakes] = await Promise.all([
     db.part.findMany({ where: { status: "available", partType: { in: MAIN_TYPES } }, orderBy: [{ year: "desc" }, { price: "asc" }], distinct: ["make", "model", "partType"], take: 8 }),
     db.part.groupBy({ by: ["partType"], where: { status: "available" }, _count: true, _min: { price: true } }),
+    makesFor("used-engines"),
+    makesFor("used-transmissions"),
   ]);
   const stat = (t: string) => counts.find((c) => c.partType === t);
   const engines = stat("Engine");
@@ -109,6 +112,32 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* SHOP BY MAKE */}
+      <section className="mx-auto max-w-6xl px-4 pt-14">
+        <span className="text-xs font-semibold uppercase tracking-wide text-gold-dark">Shop by make</span>
+        <div className="mt-2 grid gap-8 md:grid-cols-2">
+          {([["used-engines", "Used engines", engineMakes], ["used-transmissions", "Used transmissions", transMakes]] as const).map(([kind, label, list]) => (
+            <div key={kind}>
+              <h2 className="font-display text-3xl font-semibold uppercase">
+                <Link href={catalogPath(kind)} className="hover:text-gold-dark">{label}</Link>
+              </h2>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {list.slice(0, 16).map((m) => (
+                  <li key={m.slug}>
+                    <Link href={catalogPath(kind, m.name)} className="inline-block rounded-full border border-line bg-white px-3 py-1.5 text-sm hover:border-gold">
+                      {m.name} <span className="text-steel">({m.count})</span>
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link href={catalogPath(kind)} className="inline-block px-2 py-1.5 text-sm font-semibold underline">All makes →</Link>
+                </li>
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* INVENTORY */}
       <section className="mx-auto max-w-6xl px-4 py-14">
         <div className="flex flex-wrap items-end justify-between gap-4">
@@ -117,8 +146,8 @@ export default async function Home() {
             <h2 className="font-display text-4xl font-semibold uppercase">Popular engines &amp; transmissions</h2>
           </div>
           <div className="flex gap-2">
-            <Link href="/parts?type=Engine" className="btn-ghost !py-2 text-sm">All engines ({engines?._count ?? 0})</Link>
-            <Link href="/parts?type=Transmission" className="btn-ghost !py-2 text-sm">All transmissions ({trans?._count ?? 0})</Link>
+            <Link href="/used-engines" className="btn-ghost !py-2 text-sm">All engines ({engines?._count ?? 0})</Link>
+            <Link href="/used-transmissions" className="btn-ghost !py-2 text-sm">All transmissions ({trans?._count ?? 0})</Link>
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

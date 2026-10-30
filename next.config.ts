@@ -11,10 +11,8 @@ const nextConfig: NextConfig = {
   async redirects() {
     const r = (source: string, destination: string) => ({ source, destination, permanent: true });
     return [
-      r("/used-engines", "/parts?type=Engine"),
-      r("/used-engines.html", "/parts?type=Engine"),
-      r("/used-transmissions", "/parts?type=Transmission"),
-      r("/used-transmissions.html", "/parts?type=Transmission"),
+      r("/used-engines.html", "/used-engines"),
+      r("/used-transmissions.html", "/used-transmissions"),
       r("/about", "/#how"),
       r("/about.html", "/#how"),
       r("/faq", "/#faq"),

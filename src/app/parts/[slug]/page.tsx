@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { money } from "@/lib/inventory";
+import { catalogPath } from "@/lib/catalog";
 import { BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
 import { PageShell } from "@/components/site-chrome";
 import { PartCard, partImages } from "@/components/part-card";
@@ -33,6 +34,7 @@ export default async function PartPage({ params }: { params: Params }) {
   });
   const sold = part.status !== "available";
   const images = partImages(part);
+  const kind = part.partType === "Engine" ? "used-engines" : part.partType === "Transmission" ? "used-transmissions" : null;
   const name = `${part.year} ${part.make} ${part.model} ${part.partType}`;
   const smsBody = `Hi, I'm interested in the ${name} (stock ${part.stockNo || part.slug}). Can you send photos? My VIN is: `;
 
@@ -55,10 +57,21 @@ export default async function PartPage({ params }: { params: Params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="mx-auto max-w-6xl px-4 pt-6 text-sm text-steel">
         <Link href="/" className="hover:text-ink">Home</Link> /{" "}
-        <Link href={`/parts?type=${part.partType === "Engine" || part.partType === "Transmission" ? part.partType : "Other"}`} className="hover:text-ink">{part.partType}s</Link> /{" "}
-        <Link href={`/parts?year=${part.year}&make=${encodeURIComponent(part.make)}&model=${encodeURIComponent(part.model)}`} className="hover:text-ink">
-          {part.year} {part.make} {part.model}
-        </Link>
+        {kind ? (
+          <>
+            <Link href={catalogPath(kind)} className="hover:text-ink">{part.partType}s</Link> /{" "}
+            <Link href={catalogPath(kind, part.make)} className="hover:text-ink">{part.make}</Link> /{" "}
+            <Link href={catalogPath(kind, part.make, part.model)} className="hover:text-ink">{part.model}</Link> /{" "}
+            <Link href={catalogPath(kind, part.make, part.model, part.year)} className="hover:text-ink">{part.year}</Link>
+          </>
+        ) : (
+          <>
+            <Link href="/parts?type=Other" className="hover:text-ink">Other parts</Link> /{" "}
+            <Link href={`/parts?year=${part.year}&make=${encodeURIComponent(part.make)}&model=${encodeURIComponent(part.model)}`} className="hover:text-ink">
+              {part.year} {part.make} {part.model}
+            </Link>
+          </>
+        )}
       </div>
 
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-6 lg:grid-cols-2">
