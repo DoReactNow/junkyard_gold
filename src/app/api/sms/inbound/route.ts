@@ -1,11 +1,8 @@
 import { after } from "next/server";
 import { timingSafeEqual } from "crypto";
-import { refreshDraft } from "@/lib/ai";
-import { recordInbound } from "@/lib/inbound";
-import { alertStaff } from "@/lib/sms";
+import { afterInbound, recordInbound } from "@/lib/inbound";
 import { rcMessageText } from "@/lib/ringcentral";
-import { formatPhone, normalizePhone } from "@/lib/phone";
-import { siteUrl } from "@/lib/business";
+import { normalizePhone } from "@/lib/phone";
 
 type Notification = {
   event?: string;
@@ -43,10 +40,7 @@ export async function POST(req: Request) {
 
   const { convo, needsReply } = await recordInbound(from, text, id);
   if (convo && needsReply) {
-    after(async () => {
-      await refreshDraft(convo.id).catch((e) => console.error("draft failed", e));
-      await alertStaff(`Text from ${formatPhone(from)}: "${text.slice(0, 80)}" ${siteUrl()}/admin?c=${convo.id}`);
-    });
+    after(() => afterInbound(convo.id, from, text));
   }
   return Response.json({ ok: true });
 }

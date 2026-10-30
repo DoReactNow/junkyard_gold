@@ -55,6 +55,15 @@ export async function rcMessageText(id: string) {
   return msg.subject || "";
 }
 
+export type RcInbound = { id: string | number; from?: { phoneNumber?: string }; subject?: string; creationTime?: string };
+
+/** Incoming texts on the signed-in extension since a time, newest first. */
+export async function rcInboundSince(since: Date) {
+  const q = new URLSearchParams({ messageType: "SMS", direction: "Inbound", dateFrom: since.toISOString(), perPage: "100" });
+  const list = await api<{ records: RcInbound[] }>(`/account/~/extension/~/message-store?${q}`);
+  return list.records;
+}
+
 export const webhookUrl = () => `${siteUrl()}/api/sms/inbound`;
 const EVENT_FILTER = "/restapi/v1.0/account/~/extension/~/message-store/instant?type=SMS";
 const WEEK = 7 * 24 * 3600;

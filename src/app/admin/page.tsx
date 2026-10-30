@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { inboundHealth } from "@/lib/inbound";
 import { formatPhone } from "@/lib/phone";
 import { money } from "@/lib/inventory";
 import { payLink } from "@/lib/payments";
@@ -43,6 +44,7 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<{ 
   const suggestedIds: string[] = active?.aiDraftParts ? JSON.parse(active.aiDraftParts) : [];
   const suggested = suggestedIds.length ? await db.part.findMany({ where: { id: { in: suggestedIds } } }) : [];
   const demo = !smsLive();
+  const inbound = inboundHealth();
 
   return (
     <div className="flex h-screen flex-col bg-paper">
@@ -51,6 +53,13 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<{ 
       <div className="grid min-h-0 flex-1 md:grid-cols-[320px_1fr] lg:grid-cols-[340px_1fr_300px]">
         {/* Conversation list */}
         <aside className="min-h-0 overflow-y-auto border-r border-line bg-white">
+          {!demo && (inbound.webhookError || inbound.pollError) && (
+            <div className="space-y-1 break-words border-b border-line bg-bad/10 p-3 text-xs text-bad">
+              <b className="block">Incoming texts have a problem</b>
+              {inbound.webhookError && <p>Webhook: {inbound.webhookError}</p>}
+              {inbound.pollError && <p>Backup check: {inbound.pollError}</p>}
+            </div>
+          )}
           {demo && (
             <form action={simulateInbound} className="space-y-2 border-b border-line bg-gold/10 p-3">
               <div className="text-xs font-semibold uppercase text-gold-dark">Demo: simulate a customer text</div>

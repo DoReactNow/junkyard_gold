@@ -9,6 +9,7 @@ export async function register() {
 
   const { processDueTexts } = await import("./lib/sms");
   const { ensureInboundSubscription } = await import("./lib/ringcentral");
+  const { noteInbound, pollInbound } = await import("./lib/inbound");
 
   const tick = () => processDueTexts().catch((e) => console.error("text queue failed", e));
   setInterval(tick, 60_000);
@@ -16,8 +17,24 @@ export async function register() {
 
   const keepSubscription = () =>
     ensureInboundSubscription()
-      .then((r) => console.log(`[ringcentral] ${r}`))
-      .catch((e) => console.error("[ringcentral] subscription check failed", e));
-  setInterval(keepSubscription, 6 * 3600_000);
+      .then((r) => {
+        console.log(`[ringcentral] ${r}`);
+        noteInbound({ webhook: r, webhookError: "" });
+      })
+      .catch((e) => {
+        console.error("[ringcentral] subscription check failed", e);
+        noteInbound({ webhookError: String(e instanceof Error ? e.message : e).slice(0, 400) });
+      });
+  setInterval(keepSubscription, 3600_000);
   setTimeout(keepSubscription, 30_000);
+
+  const poll = () =>
+    pollInbound()
+      .then(() => noteInbound({ pollError: "", polledAt: new Date().toISOString() }))
+      .catch((e) => {
+        console.error("[ringcentral] inbound check failed", e);
+        noteInbound({ pollError: String(e instanceof Error ? e.message : e).slice(0, 400) });
+      });
+  setInterval(poll, 60_000);
+  setTimeout(poll, 45_000);
 }
