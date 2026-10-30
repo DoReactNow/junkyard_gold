@@ -3,22 +3,19 @@ import { PageHero, PageShell } from "@/components/site-chrome";
 import { Reveal } from "@/components/reveal";
 import { GuaranteeSeal } from "@/components/trust";
 import { ADDRESS_LINE, BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
-import { roundedPlus, salesSummary } from "@/lib/site-data";
 import { ChatIcon, PhoneIcon } from "@/components/icons";
 
-export const dynamic = "force-dynamic";
 export const metadata = {
   title: "About us",
   description: `${BUSINESS.name} supplies quality used engines and transmissions from Bradenton, Florida to all 50 states.`,
 };
 
-export default async function Page() {
-  const sales = await salesSummary();
+export default function Page() {
   const facts = [
     [String(BUSINESS.founded), "founded in Bradenton, Florida"],
-    [BUSINESS.networkSize, "engines & transmissions in our supplier network"],
-    ...(sales ? [[roundedPlus(sales.totalSold), "parts sold and shipped this year"]] : []),
+    [BUSINESS.soldSince, `parts sold since ${BUSINESS.founded}`],
     ["50", "states we deliver to"],
+    [BUSINESS.warrantyAdj, "warranty on every used part"],
   ];
   return (
     <PageShell>

@@ -2,7 +2,6 @@ import { BUSINESS, isOpenNow } from "@/lib/business";
 import { money } from "@/lib/inventory";
 import { cutout, pickPhotos } from "@/lib/photos";
 import type { SalesSummary } from "@/lib/sales-import";
-import { roundedPlus } from "@/lib/site-data";
 import { Reveal } from "./reveal";
 
 /** "Open now · until 6 PM ET" / "Closed · opens Mon 10 AM ET", from the real business hours. */
@@ -50,8 +49,6 @@ export function SoldShowcase({ summary }: { summary: SalesSummary }) {
   while (items.length < 28 && queues.some((q) => q.length)) for (const q of queues) if (q.length && items.length < 28) items.push(q.shift()!);
   const top = summary.byMake.slice(0, 6);
   const max = top[0]?.count ?? 1;
-  const engines = summary.byType.Engine ?? 0;
-  const trans = summary.byType.Transmission ?? 0;
   return (
     <section className="relative overflow-hidden bg-ink text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_70%_at_15%_10%,rgb(201_150_47/0.14),transparent_70%)]" />
@@ -59,20 +56,20 @@ export function SoldShowcase({ summary }: { summary: SalesSummary }) {
         <Reveal>
           <div className="text-[12px] font-medium uppercase tracking-[0.22em] text-gold-2">Our track record</div>
           <h2 className="font-serif mt-4 text-[2.8rem] leading-[1.02] sm:text-[3.8rem]">
-            <span className="text-gold-grad">{roundedPlus(summary.totalSold)}</span> parts sold and shipped this year.
+            <span className="text-gold-grad">{BUSINESS.soldSince}</span> parts sold and shipped since {BUSINESS.founded}.
           </h2>
           <p className="mt-6 max-w-xl text-[16.5px] leading-relaxed text-white/60">
             Every one matched to a VIN, crated on a pallet and delivered to a driveway or a repair shop. Here&apos;s a
-            look at what customers have bought from us.
+            look at some of what customers have bought from us recently.
           </p>
           <dl className="mt-10 grid max-w-lg grid-cols-2 gap-6">
             <div className="border-l border-gold/40 pl-5">
-              <dt className="text-[12px] uppercase tracking-[0.14em] text-white/45">Engines sold</dt>
-              <dd className="font-serif mt-1 text-[2.6rem] leading-none">{engines.toLocaleString()}</dd>
+              <dt className="text-[12px] uppercase tracking-[0.14em] text-white/45">In business since</dt>
+              <dd className="font-serif mt-1 text-[2.6rem] leading-none">{BUSINESS.founded}</dd>
             </div>
             <div className="border-l border-gold/40 pl-5">
-              <dt className="text-[12px] uppercase tracking-[0.14em] text-white/45">Transmissions sold</dt>
-              <dd className="font-serif mt-1 text-[2.6rem] leading-none">{trans.toLocaleString()}</dd>
+              <dt className="text-[12px] uppercase tracking-[0.14em] text-white/45">Delivered to</dt>
+              <dd className="font-serif mt-1 text-[2.6rem] leading-none">50 states</dd>
             </div>
           </dl>
         </Reveal>
@@ -80,15 +77,12 @@ export function SoldShowcase({ summary }: { summary: SalesSummary }) {
           <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-6 sm:p-7">
             <div className="flex items-baseline justify-between">
               <h3 className="font-semibold">Most-requested makes</h3>
-              <span className="text-[12px] text-white/40">parts sold this year</span>
+              <span className="text-[12px] text-white/40">share of recent orders</span>
             </div>
             <ul className="mt-5 space-y-3.5">
               {top.map((m) => (
                 <li key={m.make}>
-                  <div className="flex justify-between text-[14px]">
-                    <span>{m.make}</span>
-                    <span className="tabular-nums text-white/55">{m.count.toLocaleString()}</span>
-                  </div>
+                  <div className="text-[14px]">{m.make}</div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
                     <div className="h-full rounded-full bg-gold-grad" style={{ width: `${Math.max(6, (m.count / max) * 100)}%` }} />
                   </div>
@@ -100,7 +94,7 @@ export function SoldShowcase({ summary }: { summary: SalesSummary }) {
       </div>
 
       {items.length > 0 && (
-        <div className="relative pb-24" aria-label="Parts we sold this year">
+        <div className="relative pb-24" aria-label="Parts we sold recently">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-ink to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-ink to-transparent" />
           <div className="marquee flex w-max gap-4 [animation-duration:110s]">

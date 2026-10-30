@@ -11,7 +11,7 @@ import { PartCard } from "@/components/part-card";
 import { Stage } from "@/components/stage";
 import { Reveal } from "@/components/reveal";
 import { Comparison, GuaranteeSeal, SoldShowcase } from "@/components/trust";
-import { roundedPlus, salesSummary } from "@/lib/site-data";
+import { salesSummary } from "@/lib/site-data";
 import { CameraIcon, ChatIcon, PhoneIcon, ReturnIcon, SearchIcon, ShieldIcon, TruckIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -139,11 +139,10 @@ export default async function Home() {
       <section className="border-b border-line bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 px-4 md:grid-cols-4 md:divide-x md:divide-line md:px-6">
           {[
-            [BUSINESS.networkSize, "engines & transmissions in our network"],
-            ...(sales ? [[roundedPlus(sales.totalSold), "parts sold & shipped this year"]] : []),
+            [BUSINESS.soldSince, `parts sold since ${BUSINESS.founded}`],
             ["All makes", "cars, SUVs to heavy-duty trucks"],
             ["3 mo.", "warranty on every part"],
-            ...(sales ? [] : [["50", "states we ship to"]]),
+            ["50", "states we ship to"],
           ].map(([n, t]) => (
             <div key={t} className="px-2 py-8 md:px-8">
               <div className="font-serif text-[2.7rem] leading-none">{n}</div>

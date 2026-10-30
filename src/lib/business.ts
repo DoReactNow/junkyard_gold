@@ -14,6 +14,8 @@ export const BUSINESS = {
   // Engines & transmissions available through our vendor network (what we can source, not what is listed online)
   networkSize: "100K+",
   founded: 2022,
+  // Parts sold since founding (owner figure)
+  soldSince: "100K+",
 } as const;
 
 export const ADDRESS_LINE = `${BUSINESS.street}, ${BUSINESS.city}, ${BUSINESS.state} ${BUSINESS.zip}`;
