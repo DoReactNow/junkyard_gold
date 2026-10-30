@@ -53,8 +53,7 @@ export default async function Home() {
   const stat = (t: string) => counts.find((c) => c.partType === t);
   const engines = stat("Engine");
   const trans = stat("Transmission");
-  const total = counts.reduce((n, c) => n + c._count, 0);
-  const makes = [...new Map([...engineMakes, ...transMakes].map((m) => [m.slug, m])).values()].sort((a, b) => b.count - a.count);
+    const makes = [...new Map([...engineMakes, ...transMakes].map((m) => [m.slug, m])).values()].sort((a, b) => b.count - a.count);
 
   // Lead with listings photographed as the same model, at typical prices, one per make
   const withPhoto = featured.filter((p) => pickPhotos(p).level === "exact");
@@ -89,8 +88,8 @@ export default async function Home() {
                 <em className="text-gold-grad">done right.</em>
               </h1>
               <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-white/65">
-                Quality used engines and transmissions, matched to your VIN, backed by a {BUSINESS.warrantyAdj} warranty,
-                with photos of the exact unit before you pay.
+                {BUSINESS.networkSize} quality used engines and transmissions for every make, matched to your VIN, backed by a{" "}
+                {BUSINESS.warrantyAdj} warranty, with photos of the exact unit before you pay.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-[54px] !px-7 text-[15.5px]">
@@ -137,8 +136,8 @@ export default async function Home() {
       <section className="border-b border-line bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 px-4 md:grid-cols-4 md:divide-x md:divide-line md:px-6">
           {[
-            [total.toLocaleString(), "engines & transmissions listed"],
-            [String(makes.length), "makes, cars to heavy-duty trucks"],
+            [BUSINESS.networkSize, "engines & transmissions in our network"],
+            ["All makes", "cars, SUVs to heavy-duty trucks"],
             ["3 mo.", "warranty on every part"],
             ["50", "states we ship to"],
           ].map(([n, t]) => (
@@ -164,10 +163,10 @@ export default async function Home() {
         <div className="mt-12 grid gap-6 lg:grid-cols-2">
           {(
             [
-              ["used-engines", "Used engines", engines, engineMakes, heroImg],
-              ["used-transmissions", "Used transmissions", trans, transMakes, transImg],
+              ["used-engines", "Used engines", engines, heroImg],
+              ["used-transmissions", "Used transmissions", trans, transImg],
             ] as const
-          ).map(([kind, label, s, list, img], i) => (
+          ).map(([kind, label, s, img], i) => (
             <Reveal key={kind} delay={i * 120}>
               <Link href={catalogPath(kind)} className="group block overflow-hidden rounded-[28px] bg-ink text-white shadow-lift">
                 <Stage src={img} gold className="aspect-[16/10]" imgClassName="p-10 transition duration-700 group-hover:scale-[1.05]" />
@@ -175,7 +174,7 @@ export default async function Home() {
                   <div>
                     <h3 className="font-serif text-[2.2rem] leading-none">{label}</h3>
                     <p className="mt-2 text-[14px] text-white/55">
-                      {s?._count.toLocaleString()} listed · {list.length} makes · from {s?._min.price ? money(s._min.price) : "—"}
+                      Every make and model · from {s?._min.price ? money(s._min.price) : "—"}
                     </p>
                   </div>
                   <span className="grid size-12 shrink-0 place-items-center rounded-full border border-white/15 text-gold-2 transition group-hover:border-gold group-hover:bg-gold-grad group-hover:text-ink" aria-hidden>

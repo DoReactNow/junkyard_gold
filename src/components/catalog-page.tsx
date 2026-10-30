@@ -124,7 +124,7 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PageHero crumbs={crumbs} eyebrow={`Used ${k.plural.toLowerCase()}`} title={<>{title} <span className="text-gold-grad">for sale</span></>}>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-[15px]">
-          <span><b className="text-white">{total.toLocaleString()}</b> available</span>
+          <span><b className="text-white">{total.toLocaleString()}</b> listed online · more via our {BUSINESS.networkSize} network</span>
           <span>From <b className="text-gold-light">{money(from)}</b></span>
           <span>{BUSINESS.warrantyAdj} warranty</span>
           <span>Ships to all 50 states</span>

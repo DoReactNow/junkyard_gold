@@ -45,6 +45,7 @@ export function Header() {
           <span className="flex items-center gap-5">
             <span className="flex items-center gap-1.5"><ShieldIcon className="size-3.5 text-gold-2" /> {BUSINESS.warrantyAdj} warranty on every part</span>
             <span className="flex items-center gap-1.5"><TruckIcon className="size-3.5 text-gold-2" /> Ships to all 50 states</span>
+            <span className="hidden items-center gap-1.5 lg:flex">{BUSINESS.networkSize} engines &amp; transmissions · every make</span>
           </span>
           <span className="flex items-center gap-5">
             <span>{BUSINESS.hours}</span>

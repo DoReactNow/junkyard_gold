@@ -11,6 +11,8 @@ export const BUSINESS = {
   warranty: "3 months",
   warrantyAdj: "3-month",
   hours: "Mon–Fri 10:00 AM – 6:00 PM ET",
+  // Engines & transmissions available through our vendor network (what we can source, not what is listed online)
+  networkSize: "100K+",
 } as const;
 
 export const ADDRESS_LINE = `${BUSINESS.street}, ${BUSINESS.city}, ${BUSINESS.state} ${BUSINESS.zip}`;
