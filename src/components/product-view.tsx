@@ -34,8 +34,8 @@ const INCLUDED: [string, string][] = [
   ["Photos before you pay", "Text us and we'll send real photos of your unit"],
   [`${BUSINESS.warrantyAdj} warranty`, "Against internal defects, in writing"],
   [`${BUSINESS.replacementDays}-day replacement`, "A problem with the part? We pick it up and send a replacement at our cost, or refund you if we don't have one"],
-  ["Free delivery to shops", `Home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price`],
-  [`Delivered in ${BUSINESS.deliveryDays}`, "By freight, to the lower 48 states"],
+  ["Free delivery to shops", "In the lower 48 states. Home delivery is quoted by text"],
+  [`Delivered in ${BUSINESS.deliveryDays}`, "By freight, to all 50 states"],
 ];
 
 const STEPS: [string, string][] = [
@@ -53,7 +53,7 @@ function faqs(word: string): { q: string; a: string; href: string; link: string 
     { q: "Can I see photos before I buy?", a: "Yes. Text us and we'll send real photos of your unit before you pay. The photos on this page are examples unless they're labeled otherwise.", href: "/our-process", link: "Our process" },
     { q: "What does the warranty cover?", a: `For ${BUSINESS.warranty} from the day you receive it, we cover internal mechanical defects that keep the part from working as designed. Labor, towing, fluids and bolt-on accessories aren't covered.`, href: "/warranty", link: "Full warranty" },
     { q: "How do I keep the warranty valid?", a: "Have a qualified mechanic install the part, replace the fluids and filters at installation and keep the receipts. Don't take the part apart without our written approval.", href: "/warranty", link: "Warranty requirements" },
-    { q: "How much is delivery, and how long does it take?", a: `Delivery to a repair shop address is free. Home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price, and we text you the exact cost before it ships. We don't deliver to Alaska or Hawaii. Delivery usually takes ${BUSINESS.deliveryDays}. We ship every order and don't offer pickup.`, href: "/shipping-returns", link: "Shipping details" },
+    { q: "How much is delivery, and how long does it take?", a: `Delivery to a repair shop in the lower 48 states is free. Home delivery, and delivery to Alaska and Hawaii, is quoted by text before the part ships. Delivery usually takes ${BUSINESS.deliveryDays}. We ship every order and don't offer pickup.`, href: "/shipping-returns", link: "Shipping details" },
     { q: "What should I do on delivery day?", a: "Inspect the shipment when it arrives and note any visible damage on the delivery receipt before you sign.", href: "/shipping-returns", link: "Shipping details" },
     { q: "What if there's a problem with it?", a: `Tell us within ${BUSINESS.replacementDays} days of delivery. We pick up the part and send you a replacement at our cost. If we don't have a replacement, we refund you.`, href: "/shipping-returns", link: "Return policy" },
     { q: "What if I change my mind?", a: "All sales are final unless something goes wrong with the part. We don't offer change-of-mind returns, so check the fit and ask for photos before you pay.", href: "/shipping-returns", link: "Return policy" },
@@ -235,8 +235,8 @@ export function ProductView(p: ProductViewProps) {
               rows={[
                 ["Method", "Freight, on a pallet"],
                 ["Delivers to", BUSINESS.coverage],
-                ["Repair shop delivery", "Free"],
-                ["Home delivery", `${BUSINESS.homeDeliveryFee}, based on part price`],
+                ["Repair shop delivery", "Free, lower 48 states"],
+                ["Home delivery", "Quoted by text"],
                 ["Estimated delivery", delivery],
                 ["Tracking", "By text"],
               ]}

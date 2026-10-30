@@ -6,7 +6,7 @@ import { ChatIcon } from "@/components/icons";
 
 export const metadata = {
   title: "Shipping & Returns",
-  description: `Free delivery to repair shops, home delivery for ${BUSINESS.homeDeliveryFee}, usually in ${BUSINESS.deliveryDays}. ${BUSINESS.replacementDays}-day pickup and replacement at our cost.`,
+  description: `Free delivery to repair shops, home delivery available, usually in ${BUSINESS.deliveryDays}. ${BUSINESS.replacementDays}-day pickup and replacement at our cost.`,
 };
 
 const REPLACE = [
@@ -23,7 +23,7 @@ export default function Page() {
         eyebrow="Shipping & returns"
         title={<>Delivered in {BUSINESS.deliveryDays}. <span className="text-gold-grad">Covered for {BUSINESS.replacementDays} days.</span></>}
       >
-        Free delivery to repair shops, home delivery for {BUSINESS.homeDeliveryFee}, and pickup and replacement at our cost if there&apos;s a problem.
+        Free delivery to repair shops, home delivery available, and pickup and replacement at our cost if there&apos;s a problem.
       </PageHero>
 
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
@@ -31,8 +31,8 @@ export default function Page() {
         <div className="mt-8"><DeliveryChoices /></div>
         <div className="prose-jg mt-10 max-w-3xl">
           <p>Engines and transmissions ship on a pallet by freight carrier. You&apos;ll get tracking by text. We ship every order and don&apos;t offer pickup.</p>
-          <p>Choose shop or home delivery when you order. Home delivery is {BUSINESS.homeDeliveryFee}, based on the price of the part, and we text you the exact cost before it ships.</p>
-          <p>We deliver to the lower 48 states. We don&apos;t deliver to Alaska or Hawaii.</p>
+          <p>Choose shop or home delivery when you order. Home delivery is quoted by text before the part ships.</p>
+          <p>We deliver to all 50 states. Free shop delivery covers the lower 48 states; delivery to Alaska and Hawaii is quoted by text.</p>
           <p><b>On delivery day:</b> inspect the shipment and note any visible damage on the delivery receipt before you sign.</p>
         </div>
       </section>

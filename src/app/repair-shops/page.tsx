@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 const WHY = [
-  { i: <TruckIcon className="size-5" />, t: "Free delivery to your shop", d: `Usually ${BUSINESS.deliveryDays} by freight, in the lower 48 states. Tracking comes by text.` },
+  { i: <TruckIcon className="size-5" />, t: "Free delivery to your shop", d: `Usually ${BUSINESS.deliveryDays} by freight, in the lower 48 states. Alaska and Hawaii are quoted by text. Tracking comes by text.` },
   { i: <SearchIcon className="size-5" />, t: "Matched to your customer's VIN", d: "Send the VIN and we check it against the unit before anything ships." },
   { i: <CameraIcon className="size-5" />, t: "Photos for your customer", d: "Ask for real photos of the unit before you commit, and pass them along." },
   { i: <ShieldIcon className="size-5" />, t: `${BUSINESS.warrantyAdj} warranty`, d: "Written terms you can hand to your customer." },

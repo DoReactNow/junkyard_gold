@@ -23,14 +23,14 @@ const GROUPS: { title: string; items: [string, string][] }[] = [
     items: [
       ["Can I see the part before I buy?", "Yes. Text us your unit's reference and we'll send real photos before you pay."],
       ["Why are there three prices?", "Each is a unit with different mileage. Lower mileage costs more. Pick the one that suits your vehicle and budget."],
-      ["Is there anything on top of the price?", `Delivery to a repair shop is free. Home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price, and we text you the exact cost before it ships.`],
+      ["Is there anything on top of the price?", "Delivery to a repair shop in the lower 48 states is free. Home delivery, and delivery to Alaska and Hawaii, is quoted by text before the part ships."],
     ],
   },
   {
     title: "Delivery",
     items: [
       ["How long does delivery take?", `Usually ${BUSINESS.deliveryDays} from your order.`],
-      ["Where do you deliver?", "The lower 48 states, to a repair shop or a home, by freight on a pallet. We don't deliver to Alaska or Hawaii."],
+      ["Where do you deliver?", "All 50 states, to a repair shop or a home, by freight on a pallet. Free shop delivery covers the lower 48 states."],
       ["Can I pick it up?", "No. We ship every order, wherever you're located."],
       ["What do I do when it arrives?", "Inspect the shipment and note any visible damage on the delivery receipt before you sign."],
     ],

@@ -43,7 +43,7 @@ export async function startCheckout(item: CheckoutItem) {
     phone_number_collection: { enabled: true },
     shipping_address_collection: { allowed_countries: ["US"] },
     custom_text: {
-      submit: { message: item.delivery === "home" ? "We deliver to the lower 48 states. We confirm fitment with your VIN and text you the home delivery cost ($200–$500, based on the part price) before the part ships. All sales are final unless something goes wrong with the part." : "We deliver to the lower 48 states. We confirm fitment with your VIN before the part ships. Delivery to your repair shop is free. All sales are final unless something goes wrong with the part." },
+      submit: { message: item.delivery === "home" ? "We confirm fitment with your VIN and text you the delivery quote before the part ships. All sales are final unless something goes wrong with the part." : "We confirm fitment with your VIN before the part ships. Delivery to a repair shop in the lower 48 states is free; Alaska and Hawaii are quoted by text. All sales are final unless something goes wrong with the part." },
     },
     metadata: { ...item.metadata, delivery: deliveryLine(item.delivery) },
     success_url: `${siteUrl()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,

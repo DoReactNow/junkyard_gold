@@ -69,7 +69,7 @@ export function SoldShowcase({ summary }: { summary: SalesSummary }) {
             </div>
             <div className="border-l border-gold/40 pl-5">
               <dt className="text-[12px] uppercase tracking-[0.14em] text-white/45">We deliver to</dt>
-              <dd className="font-serif mt-1 text-[2.6rem] leading-none">48 states</dd>
+              <dd className="font-serif mt-1 text-[2.6rem] leading-none">50 states</dd>
             </div>
           </dl>
         </Reveal>
@@ -154,7 +154,7 @@ const ROWS: [string, string, string, string][] = [
   ["Matched to your VIN", "Yes, every order", "Up to you", "Yes"],
   ["Photos of the actual unit", "Yes, before you pay", "Rarely", "Not applicable"],
   ["Warranty", `${BUSINESS.warrantyAdj}, in writing`, "Often sold as-is", "Yes"],
-  ["Delivered", `Free to shops, in ${BUSINESS.deliveryDays}, lower 48 states`, "Usually pickup only", "Through your shop"],
+  ["Delivered", `Free to shops, in ${BUSINESS.deliveryDays}, all 50 states`, "Usually pickup only", "Through your shop"],
   ["A specialist who answers", BUSINESS.contactHours, "Counter service", "Parts counter"],
 ];
 

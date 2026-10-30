@@ -22,14 +22,14 @@ const STEPS = [
   { t: "Send your VIN", d: "Text it or enter it above. Your VIN tells us exactly which engine and transmission your vehicle left the factory with." },
   { t: "Get matched options", d: "A parts specialist texts you the units that fit, with price, mileage and warranty for each, usually within minutes." },
   { t: "See the actual part", d: "Ask for photos of the exact unit before you pay. You know precisely what's on the truck." },
-  { t: "Delivered to you", d: `Strapped to a pallet and shipped by freight, usually in ${BUSINESS.deliveryDays}. Free to your repair shop, or to your home for ${BUSINESS.homeDeliveryFee}.` },
+  { t: "Delivered to you", d: `Strapped to a pallet and shipped by freight, usually in ${BUSINESS.deliveryDays}. Free to your repair shop, or to your home by quote.` },
 ];
 
 const PROMISES = [
   { i: <SearchIcon className="size-5" />, t: "VIN-matched", d: "Engine code, drivetrain and options checked against your VIN before anything ships." },
   { i: <CameraIcon className="size-5" />, t: "Photos before you pay", d: "Real photos of the exact unit, sent to your phone on request." },
   { i: <ShieldIcon className="size-5" />, t: `${BUSINESS.warrantyAdj} warranty`, d: "Every used part is covered against defects, in writing." },
-  { i: <TruckIcon className="size-5" />, t: "Free delivery to shops", d: `Palletized, strapped and wrapped, usually delivered in ${BUSINESS.deliveryDays}. Home delivery is ${BUSINESS.homeDeliveryFee}.` },
+  { i: <TruckIcon className="size-5" />, t: "Free delivery to shops", d: `Palletized, strapped and wrapped, usually delivered in ${BUSINESS.deliveryDays}. Home delivery is also available.` },
   { i: <ChatIcon className="size-5" />, t: "A real specialist", d: `${BUSINESS.contactHours}. No ticket queues.` },
   { i: <ReturnIcon className="size-5" />, t: `${BUSINESS.replacementDays}-day replacement`, d: "A problem with the part? We pick it up and send a replacement at our cost." },
 ];
@@ -37,7 +37,7 @@ const PROMISES = [
 const FAQ = [
   { q: "Do I need my VIN?", a: "It's the fastest way to get the right part. If you don't have it, text us the year, make, model and engine size and we'll work from that." },
   { q: "What warranty do I get?", a: `Every used part comes with a ${BUSINESS.warrantyAdj} warranty against defects. See the warranty page for the details.` },
-  { q: "How does shipping work?", a: `Engines and transmissions ship on a pallet by freight carrier, usually in ${BUSINESS.deliveryDays}. Delivery to a repair shop is free. Home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price. We deliver to the lower 48 states.` },
+  { q: "How does shipping work?", a: `Engines and transmissions ship on a pallet by freight carrier, usually in ${BUSINESS.deliveryDays}. Delivery to a repair shop in the lower 48 states is free. Home delivery, and delivery to Alaska and Hawaii, is quoted by text before it ships.` },
   { q: "Can I see photos first?", a: "Yes. Ask for photos of the exact unit by text and we'll send them before you buy." },
   { q: "What if there's a problem?", a: `We match every order to your VIN before it ships. If there's a problem within ${BUSINESS.replacementDays} days, we pick up the part and send a replacement at our cost, or refund you if we don't have one.` },
 ];

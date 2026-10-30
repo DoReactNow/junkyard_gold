@@ -19,8 +19,8 @@ export const BUSINESS = {
   contactHours: "Calls Mon–Fri 10 AM – 6 PM ET · Texts 7 days a week",
   deliveryDays: "5–7 days",
   replacementDays: 90,
-  homeDeliveryFee: "$200–$500", // set by the price of the part
-  coverage: "Lower 48 states", // no Alaska or Hawaii
+  coverage: "All 50 states",
+  freeDeliveryArea: "lower 48 states", // Alaska and Hawaii shop delivery is quoted
   // Engines & transmissions available through our vendor network (what we can source, not what is listed online)
   networkSize: "100K+",
   founded: 2022,
@@ -42,7 +42,7 @@ export const siteUrl = () => (process.env.SITE_URL || "http://localhost:3000").r
 
 export type Delivery = "shop" | "home";
 export const parseDelivery = (v: unknown): Delivery => (v === "home" ? "home" : "shop");
-export const deliveryLine = (d: Delivery) => (d === "home" ? `Home delivery (${BUSINESS.homeDeliveryFee} based on the part price, confirmed by text before it ships)` : "Free delivery to repair shop");
+export const deliveryLine = (d: Delivery) => (d === "home" ? "Home delivery (quoted by text before it ships)" : "Free delivery to repair shop");
 
 /** True during phone hours: Mon–Fri, 10:00–18:00 Florida (Eastern) time. */
 export function isOpenNow(now = new Date()) {

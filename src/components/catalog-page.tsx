@@ -40,7 +40,7 @@ export async function catalogMetadata(kind: Kind, p: Params): Promise<Metadata> 
   const from = facet ? ` from ${money(facet.from)}` : "";
   return {
     title: `${title} for Sale${from}`,
-    description: `${vehicle ? `${vehicle} used ${k.singular}s` : `Used ${k.singular}s`}${from}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and real photos before you buy. Shipped to the lower 48 states from ${BUSINESS.name}, Bradenton FL.`,
+    description: `${vehicle ? `${vehicle} used ${k.singular}s` : `Used ${k.singular}s`}${from}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and real photos before you buy. Shipped nationwide from ${BUSINESS.name}, Bradenton FL.`,
     alternates: { canonical: catalogPath(kind, r.make?.name, r.model?.name, r.year) },
   };
 }
@@ -98,10 +98,10 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
     },
     {
       q: `How much is a used ${what}?`,
-      a: `Our used ${what}s start at ${money(from)}. Each listing shows the price, mileage and the ${BUSINESS.warrantyAdj} warranty. Delivery to a repair shop is free; home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price.`,
+      a: `Our used ${what}s start at ${money(from)}. Each listing shows the price, mileage and the ${BUSINESS.warrantyAdj} warranty. Delivery to a repair shop in the lower 48 states is free; home delivery is quoted by text.`,
     },
     { q: "Can I see the actual part?", a: "Yes. Text us and we'll send photos of the exact unit before you pay." },
-    { q: "How long does delivery take?", a: `Usually ${BUSINESS.deliveryDays} from your order, by freight, to the lower 48 states.` },
+    { q: "How long does delivery take?", a: `Usually ${BUSINESS.deliveryDays} from your order, by freight, to all 50 states.` },
     { q: "What if there's a problem with it?", a: `Tell us within ${BUSINESS.replacementDays} days of delivery. We pick up the part and send a replacement at our cost, or refund you if we don't have one.` },
   ];
   const jsonLd = [
@@ -141,7 +141,7 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
           <p className="max-w-3xl text-[16.5px] leading-relaxed text-ink/75">
             {vehicle
               ? `Looking for a used ${what}? Every ${k.singular} below is matched to your VIN before it ships, comes with a ${BUSINESS.warrantyAdj} warranty, and we'll text you photos of the exact unit before you pay. Prices start at ${money(from)}.`
-              : `Quality used ${k.singular}s for cars, trucks and SUVs, delivered free to repair shops or to your home for ${BUSINESS.homeDeliveryFee}. Pick your make below, or check your VIN to see what fits. Every ${k.singular} carries a ${BUSINESS.warrantyAdj} warranty.`}
+              : `Quality used ${k.singular}s for cars, trucks and SUVs, delivered free to repair shops or to your home by quote. Pick your make below, or check your VIN to see what fits. Every ${k.singular} carries a ${BUSINESS.warrantyAdj} warranty.`}
           </p>
 
           {facets && (

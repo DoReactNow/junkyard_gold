@@ -118,7 +118,7 @@ export function Footer() {
           <div>
             <Logo light />
             <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-white/60">
-              Quality used engines, transmissions and major parts, matched to your VIN and shipped across the lower 48 states from
+              Quality used engines, transmissions and major parts, matched to your VIN and shipped nationwide from
               Bradenton, Florida. Every part carries a {BUSINESS.warrantyAdj} warranty and {BUSINESS.replacementDays}-day pickup and replacement at our cost.
             </p>
           </div>

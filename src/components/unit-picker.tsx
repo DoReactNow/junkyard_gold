@@ -83,8 +83,8 @@ export function UnitPicker({
         <legend className="text-[13px] font-bold uppercase tracking-[0.14em]">Deliver to</legend>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {([
-            ["shop", "Repair shop", "Free", "Delivered free to your shop's address"],
-            ["home", "Home", BUSINESS.homeDeliveryFee, "Based on the part price. We text you the exact cost before it ships"],
+            ["shop", "Repair shop", "Free", "Free to your shop in the lower 48 states"],
+            ["home", "Home", "By quote", "We text you the delivery quote before it ships"],
           ] as const).map(([value, title, cost, text]) => (
             <label key={value} className={`cursor-pointer rounded-xl border p-3.5 transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gold ${dest === value ? "border-gold bg-gold-light/15 shadow-[0_0_0_1px_var(--color-gold)]" : "border-line bg-white hover:border-ink/30"}`}>
               <input type="radio" name="deliver-to" value={value} checked={dest === value} onChange={() => setDest(value)} className="sr-only" />

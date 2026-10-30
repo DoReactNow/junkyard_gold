@@ -33,7 +33,7 @@ export function AssuranceStrip() {
 /** Shop versus home delivery, side by side. */
 export function DeliveryChoices() {
   const rows: [string, string, string][] = [
-    ["Cost", "Free", `${BUSINESS.homeDeliveryFee}, based on the part price`],
+    ["Cost", `Free in the ${BUSINESS.freeDeliveryArea}`, "Quoted by text before it ships"],
     ["Delivery time", `Usually ${BUSINESS.deliveryDays}`, `Usually ${BUSINESS.deliveryDays}`],
     ["Coverage", BUSINESS.coverage, BUSINESS.coverage],
     ["Tracking", "By text", "By text"],
@@ -61,7 +61,7 @@ const BUY_STEPS = [
   { i: <SearchIcon className="size-5" />, t: "Find your exact spec", d: "Choose year, make, model, part and spec. Each priced option shows its mileage and warranty." },
   { i: <CheckIcon className="size-5" />, t: "Check the fit for free", d: "Enter your VIN on the product page. A specialist checks it again before anything ships." },
   { i: <CameraIcon className="size-5" />, t: "See real photos", d: "Text us your unit's reference and we'll send photos before you pay." },
-  { i: <TruckIcon className="size-5" />, t: "Pick where it goes", d: `Free to your repair shop, or to your home for ${BUSINESS.homeDeliveryFee}. Usually delivered in ${BUSINESS.deliveryDays}.` },
+  { i: <TruckIcon className="size-5" />, t: "Pick where it goes", d: `Free to your repair shop, or to your home by quote. Usually delivered in ${BUSINESS.deliveryDays}.` },
 ];
 
 /** Answers "can I do this without calling?" on the homepage. */
