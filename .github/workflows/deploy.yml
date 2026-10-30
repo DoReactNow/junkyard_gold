@@ -185,7 +185,7 @@ jobs:
               printf 'RINGCENTRAL_CLIENT_ID=%s\n' "$RINGCENTRAL_CLIENT_ID"
               printf 'RINGCENTRAL_CLIENT_SECRET=%s\n' "$RINGCENTRAL_CLIENT_SECRET"
               printf 'RINGCENTRAL_JWT=%s\n' "$RINGCENTRAL_JWT"
-              printf 'RINGCENTRAL_FROM_NUMBER=%s\n' "+18479298737"
+              printf 'RINGCENTRAL_FROM_NUMBER=%s\n' "+18478745972"
               printf 'RINGCENTRAL_WEBHOOK_TOKEN=%s\n' "$RINGCENTRAL_WEBHOOK_TOKEN"
               printf 'STAFF_ALERT_PHONE=%s\n' "$STAFF_ALERT_PHONE"
               printf 'SMTP_HOST=%s\n' "smtp.zoho.com"

@@ -5,8 +5,8 @@ export const BUSINESS = {
   phoneDisplay: "904-481-5300",
   phoneE164: "+19044815300",
   // texts (the RingCentral number; also RINGCENTRAL_FROM_NUMBER in deploy.yml)
-  smsDisplay: "847-929-8737",
-  smsE164: "+18479298737",
+  smsDisplay: "847-874-5972",
+  smsE164: "+18478745972",
   email: "support@junkyardgold.com",
   street: "2727 75th St W",
   city: "Bradenton",
