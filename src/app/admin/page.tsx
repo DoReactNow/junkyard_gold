@@ -20,6 +20,8 @@ function ago(d: Date) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+const TIME = { hour: "numeric", minute: "2-digit", month: "short", day: "numeric", timeZone: "America/New_York" } as const;
+
 export default async function Inbox({ searchParams }: { searchParams: Promise<{ c?: string }> }) {
   await requireAdmin();
   const { c } = await searchParams;
@@ -110,10 +112,15 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<{ 
                         <div className="whitespace-pre-line">{m.body}</div>
                         <div className={`mt-1 text-[10px] ${m.direction === "out" ? "text-white/50" : "text-steel"}`}>
                           {m.author === "auto" ? "Auto-reply · " : m.author === "staff" ? "Staff · " : ""}
-                          {m.createdAt.toLocaleString("en-US", { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}
+                          {m.status === "queued" && m.scheduledAt
+                            ? `Scheduled, not sent yet · ${m.scheduledAt.toLocaleString("en-US", TIME)} ET`
+                            : m.status === "cancelled"
+                              ? "Cancelled, not sent"
+                              : `${m.createdAt.toLocaleString("en-US", TIME)} ET`}
                           {m.status === "simulated" && " · simulated (no SMS sent)"}
                           {m.status === "failed" && " · FAILED"}
                         </div>
+                        {m.status === "failed" && m.error && <div className="mt-1.5 break-words rounded-md bg-bad/90 px-2 py-1.5 text-[11px] leading-snug text-white">{m.error}</div>}
                       </div>
                     </div>
                   ),

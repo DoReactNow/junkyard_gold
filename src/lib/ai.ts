@@ -58,7 +58,7 @@ function templateDraft(
   const hi = `Hi${name ? ` ${name.split(" ")[0]}` : ""}, thanks for reaching out to ${BUSINESS.name}!`;
   if (!matches.length) {
     const est = estimates.length
-      ? ` A ${estimates.map((e) => `${e.partType.toLowerCase()} for it usually runs about ${e.text.replace(/ \(.*\)$/, "")}`).join(", and a ")}.`
+      ? ` ${estimates.map((e, i) => { const part = e.partType.toLowerCase(); const a = /^[aeiou]/.test(part) ? "an" : "a"; return `${i ? a : a[0].toUpperCase() + a.slice(1)} ${part} for it usually runs about ${e.text.replace(/ \(.*\)$/, "")}`; }).join(", and ")}.`
       : "";
     return {
       reply: `${hi} We're checking our yard and partner network for ${vehicle || "your vehicle"}.${est} Text us the 17-digit VIN (or call ${BUSINESS.phoneDisplay}) and we'll send your exact quote. – ${BUSINESS.name}`,
