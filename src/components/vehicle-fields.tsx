@@ -18,7 +18,6 @@ async function load(params: Record<string, string>): Promise<Option[]> {
 }
 
 const label = "mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-steel";
-const optionText = (o: Option) => (o.inStock ? `${o.name}  ·  in stock` : o.name);
 
 /**
  * Part → Year → Make → Model, covering every US-market vehicle. Submitting opens the search
@@ -108,14 +107,14 @@ export function VehicleFields({
         <span className={label}>Make</span>
         <select className="field" value={make} disabled={!year || loading === "makes"} onChange={(e) => pickMake(e.target.value)}>
           <option value="">{loading === "makes" ? "Loading…" : "Make"}</option>
-          {makes.map((m) => <option key={m.name} value={m.name}>{optionText(m)}</option>)}
+          {makes.map((m) => <option key={m.name} value={m.name}>{m.name}</option>)}
         </select>
       </label>
       <label className="block">
         <span className={label}>Model</span>
         <select className="field" value={model} disabled={!make || loading === "models"} onChange={(e) => setModel(e.target.value)}>
           <option value="">{loading === "models" ? "Loading…" : make ? "Any model" : "Model"}</option>
-          {models.map((m) => <option key={m.name} value={m.name}>{optionText(m)}</option>)}
+          {models.map((m) => <option key={m.name} value={m.name}>{m.name}</option>)}
         </select>
       </label>
       <button disabled={!year || !make} className={`btn-gold !h-12 ${row ? "md:!px-7" : "mt-1 w-full"}`}>
