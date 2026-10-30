@@ -94,6 +94,7 @@ export async function uploadCsv(_: unknown, form: FormData) {
     summary = `Sales sheet: ${conv.stats.rows} sales → ${conv.stats.listings} listings (${conv.stats.mergedDuplicates} repeats merged). `;
     skipped = conv.skipped;
     rows = conv.listings;
+    await db.siteData.upsert({ where: { key: "sales" }, create: { key: "sales", value: conv.summary }, update: { value: conv.summary } });
   }
   const res = await importParts(rows);
   let retired = 0;

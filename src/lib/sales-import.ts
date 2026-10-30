@@ -181,7 +181,17 @@ export function stockNoFor(key: string) {
 
 // ---------- conversion ----------
 
+/** Public summary of the sales sheet (no customer data, no vendor costs). Shown as proof of business. */
+export type SalesSummary = {
+  totalSold: number;
+  byType: Record<string, number>;
+  byMake: { make: string; count: number }[];
+  sold: { year: number; make: string; model: string; partType: string; spec: string; price: number }[];
+  importedAt: string;
+};
+
 export type ConvertResult = {
+  summary: SalesSummary;
   listings: Record<string, string>[];
   skipped: { line: number; reason: string }[];
   stats: { rows: number; listings: number; mergedDuplicates: number; pricedFromVendor: number; raisedToFloor: number };
@@ -192,6 +202,7 @@ export function convertSalesRows(rows: Record<string, string>[]): ConvertResult 
   const groups = new Map<string, Acc>();
   const skipped: ConvertResult["skipped"] = [];
   let used = 0;
+  const soldRows: { v: Vehicle; partType: string; spec: string; sale: number | null }[] = [];
 
   rows.forEach((r, i) => {
     const line = i + 2;
@@ -208,6 +219,7 @@ export function convertSalesRows(rows: Record<string, string>[]): ConvertResult 
     if (sale) g.sales.push(sale);
     if (vendor) g.vendor.push(vendor);
     groups.set(key, g);
+    soldRows.push({ v, partType, spec, sale });
     used++;
   });
 
@@ -260,7 +272,35 @@ export function convertSalesRows(rows: Record<string, string>[]): ConvertResult 
       status: "available",
     });
   }
+  const byType: Record<string, number> = {};
+  const byMakeMap = new Map<string, number>();
+  for (const r of soldRows) {
+    byType[r.partType] = (byType[r.partType] ?? 0) + 1;
+    byMakeMap.set(r.v.make, (byMakeMap.get(r.v.make) ?? 0) + 1);
+  }
+  // Latest rows in the sheet first; engines and transmissions with a real sale amount
+  const sold = soldRows
+    .filter((r) => r.sale && (r.partType === "Engine" || r.partType === "Transmission"))
+    .reverse()
+    .slice(0, 120)
+    .map((r) => ({
+      year: r.v.year,
+      make: r.v.make,
+      model: canonical(r.v.make, r.v.model),
+      partType: r.partType,
+      spec: r.spec.split(/[,(/]/)[0].trim().slice(0, 40),
+      price: Math.round(r.sale!),
+    }));
+  const summary: SalesSummary = {
+    totalSold: soldRows.length,
+    byType,
+    byMake: [...byMakeMap.entries()].map(([make, count]) => ({ make, count })).sort((a, b) => b.count - a.count),
+    sold,
+    importedAt: new Date().toISOString(),
+  };
+
   return {
+    summary,
     listings,
     skipped,
     stats: { rows: used, listings: listings.length, mergedDuplicates: used - groups.size, pricedFromVendor, raisedToFloor },

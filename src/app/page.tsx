@@ -10,6 +10,8 @@ import { QuoteForm } from "@/components/quote-form";
 import { PartCard } from "@/components/part-card";
 import { Stage } from "@/components/stage";
 import { Reveal } from "@/components/reveal";
+import { Comparison, GuaranteeSeal, SoldShowcase } from "@/components/trust";
+import { roundedPlus, salesSummary } from "@/lib/site-data";
 import { CameraIcon, ChatIcon, PhoneIcon, ReturnIcon, SearchIcon, ShieldIcon, TruckIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +41,7 @@ const FAQ = [
 ];
 
 export default async function Home() {
-  const [featured, counts, engineMakes, transMakes] = await Promise.all([
+  const [featured, counts, engineMakes, transMakes, sales] = await Promise.all([
     db.part.findMany({
       where: { status: "available", partType: { in: MAIN_TYPES } },
       orderBy: [{ year: "desc" }, { price: "asc" }],
@@ -49,6 +51,7 @@ export default async function Home() {
     db.part.groupBy({ by: ["partType"], where: { status: "available" }, _count: true, _min: { price: true } }),
     makesFor("used-engines"),
     makesFor("used-transmissions"),
+    salesSummary(),
   ]);
   const stat = (t: string) => counts.find((c) => c.partType === t);
   const engines = stat("Engine");
@@ -119,7 +122,7 @@ export default async function Home() {
                   <span className="size-2 rounded-full bg-ok shadow-[0_0_0_4px_rgb(31_122_74/0.25)]" />
                   <span>
                     <span className="block text-[13px] font-semibold">{hero.year} {hero.make} {hero.model} engine</span>
-                    <span className="block text-[12px] text-white/55">{money(hero.price)} · {hero.mileage?.toLocaleString()} mi · in stock</span>
+                    <span className="block text-[12px] text-white/55">{money(hero.price)} · {hero.mileage?.toLocaleString()} mi · ready to ship</span>
                   </span>
                 </Link>
               )}
@@ -137,9 +140,10 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl grid-cols-2 px-4 md:grid-cols-4 md:divide-x md:divide-line md:px-6">
           {[
             [BUSINESS.networkSize, "engines & transmissions in our network"],
+            ...(sales ? [[roundedPlus(sales.totalSold), "parts sold & shipped this year"]] : []),
             ["All makes", "cars, SUVs to heavy-duty trucks"],
             ["3 mo.", "warranty on every part"],
-            ["50", "states we ship to"],
+            ...(sales ? [] : [["50", "states we ship to"]]),
           ].map(([n, t]) => (
             <div key={t} className="px-2 py-8 md:px-8">
               <div className="font-serif text-[2.7rem] leading-none">{n}</div>
@@ -226,6 +230,36 @@ export default async function Home() {
         </div>
       </section>
 
+      {sales && <SoldShowcase summary={sales} />}
+
+      {/* ───────── PROMISE ───────── */}
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-7xl gap-16 px-4 py-24 md:px-6 lg:grid-cols-2 lg:items-center">
+          <Reveal>
+            <Stage src={promiseImg} gold className="aspect-square rounded-[32px] shadow-lift" imgClassName="p-14" />
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="eyebrow">The Junkyard Gold standard</div>
+            <h2 className="font-serif mt-3 text-[2.8rem] leading-[1.02] sm:text-[3.4rem]">Buying a used engine shouldn&apos;t feel like a gamble.</h2>
+            <p className="mt-5 max-w-lg text-[16.5px] leading-relaxed text-steel">
+              You&apos;re spending real money on a part you can&apos;t inspect yourself. So we match it to your VIN, show you
+              the actual unit, put the warranty in writing, and answer the phone.
+            </p>
+            <ul className="mt-10 grid gap-x-10 gap-y-7 sm:grid-cols-2">
+              {PROMISES.map((x) => (
+                <li key={x.t} className="flex gap-4">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full border border-gold/40 text-gold-dark">{x.i}</span>
+                  <div>
+                    <h3 className="font-semibold">{x.t}</h3>
+                    <p className="mt-1 text-[14px] leading-relaxed text-steel">{x.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ───────── PROCESS ───────── */}
       <section id="how" className="relative scroll-mt-28 overflow-hidden bg-ink text-white">
         <div className="grain pointer-events-none absolute inset-0 opacity-60" />
@@ -254,30 +288,35 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ───────── PROMISE ───────── */}
+      <Comparison />
+
+      {/* ───────── GUARANTEE ───────── */}
       <section className="bg-white">
-        <div className="mx-auto grid max-w-7xl gap-16 px-4 py-24 md:px-6 lg:grid-cols-2 lg:items-center">
-          <Reveal>
-            <Stage src={promiseImg} gold className="aspect-square rounded-[32px] shadow-lift" imgClassName="p-14" />
+        <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 py-24 md:px-6 lg:grid-cols-[0.8fr_1.2fr]">
+          <Reveal className="mx-auto w-full max-w-[340px]">
+            <GuaranteeSeal className="drop-shadow-[0_30px_40px_rgb(0_0_0/0.25)]" />
           </Reveal>
           <Reveal delay={120}>
-            <div className="eyebrow">The Junkyard Gold standard</div>
-            <h2 className="font-serif mt-3 text-[2.8rem] leading-[1.02] sm:text-[3.4rem]">Buying a used engine shouldn&apos;t feel like a gamble.</h2>
-            <p className="mt-5 max-w-lg text-[16.5px] leading-relaxed text-steel">
-              You&apos;re spending real money on a part you can&apos;t inspect yourself. So we match it to your VIN, show you
-              the actual unit, put the warranty in writing, and answer the phone.
-            </p>
-            <ul className="mt-10 grid gap-x-10 gap-y-7 sm:grid-cols-2">
-              {PROMISES.map((x) => (
-                <li key={x.t} className="flex gap-4">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full border border-gold/40 text-gold-dark">{x.i}</span>
-                  <div>
-                    <h3 className="font-semibold">{x.t}</h3>
-                    <p className="mt-1 text-[14px] leading-relaxed text-steel">{x.d}</p>
-                  </div>
-                </li>
+            <div className="eyebrow">Our written guarantee</div>
+            <h2 className="font-serif mt-3 text-[2.8rem] leading-[1.02] sm:text-[3.4rem]">
+              The right part, as described, <em className="text-gold-grad">or we make it right.</em>
+            </h2>
+            <div className="mt-10 grid gap-8 sm:grid-cols-3">
+              {[
+                ["Matched to your VIN", "We confirm engine code, drivetrain and options against your VIN before anything ships."],
+                [`${BUSINESS.warrantyAdj} warranty`, "Covered against defects from the day it arrives. The terms are written down, not promised over the phone."],
+                ["Return freight on us", "If we send the wrong part or it's defective under warranty, we exchange or refund it and cover the freight."],
+              ].map(([t, d], i) => (
+                <div key={t} className="border-t border-gold/40 pt-5">
+                  <div className="font-serif text-[1.9rem] leading-none text-gold-dark">0{i + 1}</div>
+                  <h3 className="mt-3 font-semibold">{t}</h3>
+                  <p className="mt-1.5 text-[14px] leading-relaxed text-steel">{d}</p>
+                </div>
               ))}
-            </ul>
+            </div>
+            <Link href="/warranty" className="mt-9 inline-flex items-center gap-2 text-[15px] font-semibold underline decoration-gold underline-offset-4 hover:text-gold-dark">
+              Read the full warranty →
+            </Link>
           </Reveal>
         </div>
       </section>

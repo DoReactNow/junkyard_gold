@@ -27,6 +27,7 @@ async function main() {
     );
     for (const s of res.skipped) console.log(`  skipped${s.line ? ` line ${s.line}` : ""}: ${s.reason}`);
     rows = res.listings;
+    if (!dry) await db.siteData.upsert({ where: { key: "sales" }, create: { key: "sales", value: res.summary }, update: { value: res.summary } });
   }
 
   if (dry) {

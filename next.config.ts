@@ -13,8 +13,7 @@ const nextConfig: NextConfig = {
     return [
       r("/used-engines.html", "/used-engines"),
       r("/used-transmissions.html", "/used-transmissions"),
-      r("/about", "/#how"),
-      r("/about.html", "/#how"),
+      r("/about.html", "/about"),
       r("/faq", "/#faq"),
       r("/faq.html", "/#faq"),
       r("/index.html", "/"),

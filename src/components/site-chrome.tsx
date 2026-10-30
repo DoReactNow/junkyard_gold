@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ADDRESS_LINE, BUSINESS, SMS_HREF, TEL_HREF, smsWithBody } from "@/lib/business";
 import { ChatIcon, MailIcon, PhoneIcon, PinIcon, ShieldIcon, TruckIcon } from "./icons";
+import { OpenStatus } from "./trust";
 
 /** JG monogram + wordmark. `light` = on a dark background. */
 export function Logo({ light = false, compact = false }: { light?: boolean; compact?: boolean }) {
@@ -32,8 +33,8 @@ const NAV = [
   { href: "/used-engines", label: "Engines" },
   { href: "/used-transmissions", label: "Transmissions" },
   { href: "/parts?type=Other", label: "Other parts" },
-  { href: "/#how", label: "How it works" },
-  { href: "/warranty", label: "Warranty" },
+  { href: "/our-process", label: "How it works" },
+  { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -48,7 +49,7 @@ export function Header() {
             <span className="hidden items-center gap-1.5 lg:flex">{BUSINESS.networkSize} engines &amp; transmissions · every make</span>
           </span>
           <span className="flex items-center gap-5">
-            <span>{BUSINESS.hours}</span>
+            <OpenStatus />
             <a href={`mailto:${BUSINESS.email}`} className="hover:text-white">{BUSINESS.email}</a>
           </span>
         </div>
@@ -112,7 +113,7 @@ export function Footer() {
         </div>
       </div>
       <div className="mx-auto max-w-7xl px-4 pb-10 pt-16 md:px-6">
-        <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.8fr_0.8fr_1.2fr]">
           <div>
             <Logo light />
             <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-white/60">
@@ -126,7 +127,14 @@ export function Footer() {
               <li><Link href="/used-engines" className={col}>Used engines</Link></li>
               <li><Link href="/used-transmissions" className={col}>Used transmissions</Link></li>
               <li><Link href="/parts?type=Other" className={col}>Other parts</Link></li>
-              <li><Link href="/#how" className={col}>How it works</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.16em] text-gold-2">Company</h3>
+            <ul className="mt-4 space-y-2.5">
+              <li><Link href="/about" className={col}>About us</Link></li>
+              <li><Link href="/our-process" className={col}>How it works</Link></li>
+              <li><Link href="/guides" className={col}>Guides</Link></li>
             </ul>
           </div>
           <div>

@@ -94,3 +94,10 @@ model Message {
   @@index([conversationId, createdAt])
   @@index([status, scheduledAt])
 }
+
+// Small site-wide facts computed at import time, e.g. the yearly sales summary (key "sales").
+model SiteData {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
