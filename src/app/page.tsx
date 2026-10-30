@@ -3,30 +3,31 @@ import { db } from "@/lib/db";
 import { BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
 import { MAIN_TYPES, money, partUrl } from "@/lib/inventory";
 import { catalogPath, makesFor } from "@/lib/catalog";
-import { pickPhotos } from "@/lib/photos";
+import { cutout, pickPhotos } from "@/lib/photos";
 import { PageShell } from "@/components/site-chrome";
-import { PartFinder } from "@/components/part-finder";
-import { VinCheck } from "@/components/vin-check";
+import { HeroSearch } from "@/components/hero-search";
 import { QuoteForm } from "@/components/quote-form";
 import { PartCard } from "@/components/part-card";
-import { CameraIcon, ChatIcon, CheckIcon, PhoneIcon, ReturnIcon, SearchIcon, ShieldIcon, TruckIcon } from "@/components/icons";
+import { Stage } from "@/components/stage";
+import { Reveal } from "@/components/reveal";
+import { CameraIcon, ChatIcon, PhoneIcon, ReturnIcon, SearchIcon, ShieldIcon, TruckIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
 const STEPS = [
-  { t: "Send your VIN", d: "Text it or enter it here. Your VIN tells us exactly which engine and transmission your vehicle came with." },
+  { t: "Send your VIN", d: "Text it or enter it above. Your VIN tells us exactly which engine and transmission your vehicle left the factory with." },
   { t: "Get matched options", d: "A parts specialist texts you the units that fit, with price, mileage and warranty for each, usually within minutes." },
-  { t: "See the actual part", d: "Ask for photos of the exact unit before you pay. You know what you're getting before it ships." },
-  { t: "Delivered to you", d: "Pay securely, and we ship it palletized by freight to your door or repair shop, anywhere in the US." },
+  { t: "See the actual part", d: "Ask for photos of the exact unit before you pay. You know precisely what's on the truck." },
+  { t: "Delivered to you", d: "Strapped to a pallet and shipped by freight to your door or repair shop, anywhere in the US." },
 ];
 
 const PROMISES = [
-  { i: <SearchIcon className="size-5" />, t: "VIN-matched, every time", d: "We check every order against your VIN before it ships, so you get the right engine code, drivetrain and options." },
-  { i: <CameraIcon className="size-5" />, t: "Photos before you pay", d: "Ask and we'll text you photos of the exact unit. No surprises when the truck shows up." },
-  { i: <ShieldIcon className="size-5" />, t: `${BUSINESS.warrantyAdj} warranty`, d: "Every used part we sell is covered against defects. Clear terms, in writing." },
-  { i: <TruckIcon className="size-5" />, t: "Freight to your door", d: "Strapped and wrapped on a pallet, shipped to a home or shop in all 50 states, with tracking by text." },
-  { i: <ChatIcon className="size-5" />, t: "A real person on the phone", d: `Talk or text with a parts specialist, ${BUSINESS.hours}. No ticket queues.` },
-  { i: <ReturnIcon className="size-5" />, t: "We make it right", d: "Wrong part or defective under warranty? We exchange it or refund you, return freight included." },
+  { i: <SearchIcon className="size-5" />, t: "VIN-matched", d: "Engine code, drivetrain and options checked against your VIN before anything ships." },
+  { i: <CameraIcon className="size-5" />, t: "Photos before you pay", d: "Real photos of the exact unit, sent to your phone on request." },
+  { i: <ShieldIcon className="size-5" />, t: `${BUSINESS.warrantyAdj} warranty`, d: "Every used part is covered against defects, with clear terms in writing." },
+  { i: <TruckIcon className="size-5" />, t: "Freight to your door", d: "Palletized, strapped and wrapped. Homes and shops in all 50 states." },
+  { i: <ChatIcon className="size-5" />, t: "A real specialist", d: `Talk or text with a person, ${BUSINESS.hours}. No ticket queues.` },
+  { i: <ReturnIcon className="size-5" />, t: "We make it right", d: "Wrong or defective under warranty? Exchange or refund, return freight included." },
 ];
 
 const FAQ = [
@@ -53,11 +54,10 @@ export default async function Home() {
   const engines = stat("Engine");
   const trans = stat("Transmission");
   const total = counts.reduce((n, c) => n + c._count, 0);
-  const makeCount = new Set([...engineMakes, ...transMakes].map((m) => m.slug)).size;
+  const makes = [...new Map([...engineMakes, ...transMakes].map((m) => [m.slug, m])).values()].sort((a, b) => b.count - a.count);
 
-  // Lead with listings that have a photo of the same model
+  // Lead with listings photographed as the same model, at typical prices, one per make
   const withPhoto = featured.filter((p) => pickPhotos(p).level === "exact");
-  // Typical prices, one per make, alternating engines and transmissions
   const typical = withPhoto.filter((p) => p.price >= 800 && p.price <= 3500 && p.year >= 2008);
   const pick = (type: string) => {
     const seen = new Set<string>();
@@ -65,255 +65,264 @@ export default async function Home() {
   };
   const [eng, tra] = [pick("Engine"), pick("Transmission")];
   const popular = Array.from({ length: 4 }, (_, i) => [eng[i], tra[i]]).flat().filter((p) => p !== undefined);
-  const heroPart =
-    withPhoto.find((p) => p.partType === "Engine" && p.price >= 1200 && p.price <= 3000 && p.year <= 2020) ??
-    withPhoto[0] ?? popular[0];
-  const heroPhoto = heroPart ? pickPhotos(heroPart).files[0] : null;
-  const gallery = withPhoto.slice(0, 4).map((p) => pickPhotos(p).files[0]);
+  const hero = withPhoto.find((p) => p.partType === "Engine" && p.make === "Ford" && /f150/i.test(p.model)) ?? eng[0] ?? withPhoto[0];
+  const heroImg = hero ? cutout(pickPhotos(hero).files[0]) : "/img/parts-cut/ford-f150-engine-1.webp";
+  // Hand-picked, sharpest photos for the large showcase spots
+  const transImg = "/img/parts-cut/any-aisin-transmission-3.webp";
+  const promiseImg = "/img/parts-cut/any-zf-transmission-2.webp";
 
   return (
     <PageShell>
       {/* ───────── HERO ───────── */}
       <section className="relative overflow-hidden bg-ink text-white">
-        <div className="grain pointer-events-none absolute inset-0" />
-        <div className="pointer-events-none absolute -left-40 top-20 size-[560px] rounded-full bg-gold/10 blur-[120px]" />
-        <div className="pointer-events-none absolute -right-32 -top-32 size-[480px] rounded-full bg-gold/[0.07] blur-[100px]" />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-16 pt-12 md:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-20">
-          <div className="min-w-0">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-gold/30 bg-gold/10 px-3.5 py-1.5 text-[12.5px] font-medium text-gold-light">
-              <span className="size-1.5 rounded-full bg-gold-2 shadow-[0_0_0_3px_rgb(230_189_92/0.25)]" />
-              {total.toLocaleString()} engines &amp; transmissions listed
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_60%_at_75%_35%,rgb(201_150_47/0.16),transparent_70%)]" />
+        <div className="grain pointer-events-none absolute inset-0 opacity-60" />
+        <div className="relative mx-auto max-w-7xl px-4 md:px-6">
+          <div className="grid items-center gap-6 pb-10 pt-14 lg:grid-cols-[1fr_1.05fr] lg:pb-14 lg:pt-20">
+            <div className="relative z-10 min-w-0">
+              <div className="flex items-center gap-3 text-[12px] font-medium uppercase tracking-[0.22em] text-gold-2">
+                <span className="h-px w-8 bg-gold-2" /> Bradenton, Florida · Nationwide
+              </div>
+              <h1 className="font-serif mt-6 text-[3.4rem] leading-[0.98] sm:text-[4.6rem] lg:text-[5.6rem]">
+                Used engines,
+                <br />
+                <em className="text-gold-grad">done right.</em>
+              </h1>
+              <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-white/65">
+                Quality used engines and transmissions, matched to your VIN, backed by a {BUSINESS.warrantyAdj} warranty,
+                with photos of the exact unit before you pay.
+              </p>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-[54px] !px-7 text-[15.5px]">
+                  <ChatIcon /> Text your VIN
+                </a>
+                <a href={TEL_HREF} className="btn-outline-light !h-[54px] !px-7 text-[15.5px]">
+                  <PhoneIcon /> {BUSINESS.phoneDisplay}
+                </a>
+              </div>
             </div>
-            <h1 className="mt-6 font-display text-[2.6rem] font-bold leading-[1.02] sm:text-6xl lg:text-[4.1rem]">
-              Used engines &amp; transmissions, <span className="text-gold-grad">matched to your VIN.</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-white/70">
-              Quality used powertrains with a {BUSINESS.warrantyAdj} warranty, photos of the exact unit before you pay,
-              and freight delivery to your door or shop. From Bradenton, Florida, to all 50 states.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-[52px] !px-6 text-base">
-                <ChatIcon /> Text your VIN
-              </a>
-              <a href={TEL_HREF} className="btn-outline-light !h-[52px] !px-6 text-base">
-                <PhoneIcon /> {BUSINESS.phoneDisplay}
-              </a>
+
+            <div className="relative min-w-0">
+              <div className="pointer-events-none absolute inset-x-[10%] bottom-[7%] h-[12%] rounded-[50%] bg-black/80 blur-2xl" />
+              <div className="pointer-events-none absolute left-1/2 top-1/2 size-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/20 blur-[90px]" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={heroImg}
+                alt={hero ? `${hero.year} ${hero.make} ${hero.model} engine` : "Used engine"}
+                className="floaty relative mx-auto w-full max-w-[620px] drop-shadow-[0_40px_50px_rgb(0_0_0/0.7)]"
+                fetchPriority="high"
+              />
+              {hero && (
+                <Link
+                  href={partUrl(hero)}
+                  className="absolute bottom-[6%] right-0 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/55 py-2.5 pl-3 pr-4 backdrop-blur-md transition hover:border-gold/50 sm:right-6"
+                >
+                  <span className="size-2 rounded-full bg-ok shadow-[0_0_0_4px_rgb(31_122_74/0.25)]" />
+                  <span>
+                    <span className="block text-[13px] font-semibold">{hero.year} {hero.make} {hero.model} engine</span>
+                    <span className="block text-[12px] text-white/55">{money(hero.price)} · {hero.mileage?.toLocaleString()} mi · in stock</span>
+                  </span>
+                </Link>
+              )}
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-white/65">
-              {["VIN-matched before shipping", "Photos before you pay", "Real people, not bots"].map((t) => (
-                <li key={t} className="flex items-center gap-2">
-                  <CheckIcon className="size-4 text-gold-2" /> {t}
-                </li>
-              ))}
-            </ul>
-            <dl className="mt-12 grid max-w-xl grid-cols-3 divide-x divide-white/10 border-t border-white/10 pt-6">
-              {[
-                ["Engines from", engines?._min.price ? money(engines._min.price) : "—"],
-                ["Transmissions from", trans?._min.price ? money(trans._min.price) : "—"],
-                ["Makes covered", String(makeCount)],
-              ].map(([k, v], i) => (
-                <div key={k} className={i ? "pl-4 sm:pl-6" : ""}>
-                  <dt className="text-[12px] uppercase tracking-[0.12em] text-white/45">{k}</dt>
-                  <dd className="mt-1 font-display text-2xl font-semibold text-gold-light sm:text-3xl">{v}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
 
-          <div className="relative min-w-0">
-            {heroPart && heroPhoto && (
-              <Link
-                href={partUrl(heroPart)}
-                className="absolute -top-8 right-0 z-10 hidden w-52 rotate-[2deg] overflow-hidden rounded-2xl bg-white text-ink shadow-lift transition hover:rotate-0 xl:block"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={heroPhoto} alt="" className="aspect-[4/3] w-full object-contain p-2" />
-                <div className="border-t border-line px-3.5 py-2.5">
-                  <div className="truncate text-[12.5px] font-semibold">{heroPart.year} {heroPart.make} {heroPart.model} {heroPart.partType}</div>
-                  <div className="text-[12px] text-steel">{money(heroPart.price)} · {heroPart.mileage?.toLocaleString()} mi</div>
-                </div>
-              </Link>
-            )}
-            <div className="relative rounded-3xl bg-white p-6 text-ink shadow-lift sm:p-7 xl:mr-28 xl:mt-24">
-              <div className="eyebrow">Find your part</div>
-              <h2 className="mt-1.5 font-display text-2xl font-bold">What are you driving?</h2>
-              <p className="mb-5 mt-1 text-sm text-steel">Choose your vehicle, or check by VIN below.</p>
-              <PartFinder />
-              <div className="my-5 flex items-center gap-3 text-[11.5px] font-semibold uppercase tracking-[0.14em] text-steel">
-                <span className="h-px flex-1 bg-line" /> or check by VIN <span className="h-px flex-1 bg-line" />
-              </div>
-              <VinCheck />
-            </div>
+          <div className="relative z-10 pb-10 lg:pb-14">
+            <HeroSearch />
           </div>
         </div>
-        <div className="hairline-gold" />
       </section>
 
-      {/* ───────── ASSURANCES ───────── */}
+      {/* ───────── PROOF STRIP ───────── */}
       <section className="border-b border-line bg-white">
-        <div className="mx-auto grid max-w-7xl gap-x-6 gap-y-6 px-4 py-9 sm:grid-cols-2 md:px-6 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 px-4 md:grid-cols-4 md:divide-x md:divide-line md:px-6">
           {[
-            { i: <ShieldIcon />, t: `${BUSINESS.warrantyAdj} warranty`, d: "On every used part" },
-            { i: <SearchIcon className="size-5" />, t: "VIN-matched", d: "Checked before it ships" },
-            { i: <CameraIcon />, t: "Real photos first", d: "Of the exact unit" },
-            { i: <TruckIcon />, t: "Ships nationwide", d: "Freight to your door or shop" },
-          ].map((x) => (
-            <div key={x.t} className="flex items-center gap-4">
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-ink text-gold-2">{x.i}</span>
-              <div>
-                <div className="font-semibold">{x.t}</div>
-                <div className="text-sm text-steel">{x.d}</div>
-              </div>
+            [total.toLocaleString(), "engines & transmissions listed"],
+            [String(makes.length), "makes, cars to heavy-duty trucks"],
+            ["3 mo.", "warranty on every part"],
+            ["50", "states we ship to"],
+          ].map(([n, t]) => (
+            <div key={t} className="px-2 py-8 md:px-8">
+              <div className="font-serif text-[2.7rem] leading-none">{n}</div>
+              <div className="mt-2 text-[13.5px] text-steel">{t}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ───────── SHOP BY MAKE ───────── */}
-      <section className="mx-auto max-w-7xl px-4 pt-20 md:px-6">
-        <div className="max-w-2xl">
-          <div className="eyebrow">Shop by make</div>
-          <h2 className="mt-2 font-display text-4xl font-bold sm:text-[2.75rem]">Parts for {makeCount} makes, from daily drivers to work trucks.</h2>
-        </div>
-        <div className="mt-10 grid gap-6 lg:grid-cols-2">
-          {([["used-engines", "Used engines", engineMakes, engines?._count ?? 0], ["used-transmissions", "Used transmissions", transMakes, trans?._count ?? 0]] as const).map(([kind, label, list, n]) => (
-            <div key={kind} className="card p-6 sm:p-7">
-              <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-display text-2xl font-bold">
-                  <Link href={catalogPath(kind)} className="hover:text-gold-dark">{label}</Link>
-                </h3>
-                <span className="text-sm text-steel">{n.toLocaleString()} listed</span>
-              </div>
-              <ul className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {list.slice(0, 12).map((m) => (
-                  <li key={m.slug}>
-                    <Link href={catalogPath(kind, m.name)} className="group flex items-center justify-between rounded-lg border border-line px-3 py-2.5 text-[14px] transition hover:border-gold hover:bg-paper">
-                      <span className="font-medium">{m.name}</span>
-                      <span className="text-[12px] text-steel group-hover:text-gold-dark">{m.count}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <Link href={catalogPath(kind)} className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink hover:text-gold-dark">
-                All {list.length} makes <span aria-hidden>→</span>
+      {/* ───────── CATEGORIES ───────── */}
+      <section className="mx-auto max-w-7xl px-4 pt-24 md:px-6">
+        <Reveal className="flex flex-wrap items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="eyebrow">Shop the catalog</div>
+            <h2 className="font-serif mt-3 text-[2.8rem] leading-[1.02] sm:text-[3.6rem]">Powertrains for the vehicles people actually drive.</h2>
+          </div>
+          <p className="max-w-sm text-[15.5px] leading-relaxed text-steel">
+            Daily drivers, work trucks and performance cars. Browse by make, or let us match it to your VIN.
+          </p>
+        </Reveal>
+        <div className="mt-12 grid gap-6 lg:grid-cols-2">
+          {(
+            [
+              ["used-engines", "Used engines", engines, engineMakes, heroImg],
+              ["used-transmissions", "Used transmissions", trans, transMakes, transImg],
+            ] as const
+          ).map(([kind, label, s, list, img], i) => (
+            <Reveal key={kind} delay={i * 120}>
+              <Link href={catalogPath(kind)} className="group block overflow-hidden rounded-[28px] bg-ink text-white shadow-lift">
+                <Stage src={img} gold className="aspect-[16/10]" imgClassName="p-10 transition duration-700 group-hover:scale-[1.05]" />
+                <div className="flex items-end justify-between gap-4 border-t border-white/10 p-7">
+                  <div>
+                    <h3 className="font-serif text-[2.2rem] leading-none">{label}</h3>
+                    <p className="mt-2 text-[14px] text-white/55">
+                      {s?._count.toLocaleString()} listed · {list.length} makes · from {s?._min.price ? money(s._min.price) : "—"}
+                    </p>
+                  </div>
+                  <span className="grid size-12 shrink-0 place-items-center rounded-full border border-white/15 text-gold-2 transition group-hover:border-gold group-hover:bg-gold-grad group-hover:text-ink" aria-hidden>
+                    →
+                  </span>
+                </div>
               </Link>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
-      {/* ───────── POPULAR PARTS ───────── */}
-      <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+      {/* ───────── MAKES MARQUEE ───────── */}
+      <section className="overflow-hidden py-14" aria-label="Makes we carry">
+        <div className="marquee flex w-max gap-3">
+          {[...makes, ...makes].map((m, i) => (
+            <Link
+              key={`${m.slug}-${i}`}
+              href={catalogPath(engineMakes.some((e) => e.slug === m.slug) ? "used-engines" : "used-transmissions", m.name)}
+              className="flex items-center gap-3 rounded-full border border-line bg-white px-5 py-3 text-[15px] font-medium shadow-card transition hover:border-gold"
+              tabIndex={i >= makes.length ? -1 : undefined}
+              aria-hidden={i >= makes.length ? true : undefined}
+            >
+              {m.name}
+              <span className="text-[12px] text-steel">{m.count}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ───────── FEATURED ───────── */}
+      <section className="mx-auto max-w-7xl px-4 pb-24 md:px-6">
+        <Reveal className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="eyebrow">Available now</div>
-            <h2 className="mt-2 font-display text-4xl font-bold sm:text-[2.75rem]">Popular engines &amp; transmissions</h2>
+            <div className="eyebrow">In stock now</div>
+            <h2 className="font-serif mt-3 text-[2.6rem] leading-none sm:text-[3.2rem]">This week&apos;s picks</h2>
           </div>
           <div className="flex gap-2">
             <Link href="/used-engines" className="btn-ghost !h-11 text-sm">All engines</Link>
             <Link href="/used-transmissions" className="btn-ghost !h-11 text-sm">All transmissions</Link>
           </div>
-        </div>
+        </Reveal>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {popular.map((p) => <PartCard key={p.id} part={p} />)}
+          {popular.map((p, i) => (
+            <Reveal key={p.id} delay={(i % 4) * 80}>
+              <PartCard part={p} />
+            </Reveal>
+          ))}
         </div>
       </section>
 
-      {/* ───────── HOW IT WORKS ───────── */}
+      {/* ───────── PROCESS ───────── */}
       <section id="how" className="relative scroll-mt-28 overflow-hidden bg-ink text-white">
-        <div className="grain pointer-events-none absolute inset-0" />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 md:px-6">
-          <div className="max-w-2xl">
-            <div className="text-[12px] font-semibold uppercase tracking-[0.18em] text-gold-2">How it works</div>
-            <h2 className="mt-2 font-display text-4xl font-bold sm:text-[2.75rem]">From your VIN to your driveway in four steps.</h2>
-          </div>
-          <ol className="mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        <div className="grain pointer-events-none absolute inset-0 opacity-60" />
+        <div className="relative mx-auto grid max-w-7xl gap-14 px-4 py-24 md:px-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <Reveal className="lg:sticky lg:top-36 lg:self-start">
+            <div className="text-[12px] font-medium uppercase tracking-[0.22em] text-gold-2">How it works</div>
+            <h2 className="font-serif mt-4 text-[2.8rem] leading-[1.02] sm:text-[3.6rem]">
+              From your VIN to your driveway, <em className="text-gold-grad">in four steps.</em>
+            </h2>
+            <p className="mt-6 max-w-md text-[16px] leading-relaxed text-white/60">
+              No guesswork and no runaround. One specialist handles your order from the first text to delivery.
+            </p>
+            <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold mt-9"><ChatIcon /> Start with your VIN</a>
+          </Reveal>
+          <ol className="divide-y divide-white/10 border-y border-white/10">
             {STEPS.map((s, i) => (
-              <li key={s.t} className="relative">
-                <div className="flex items-center gap-4">
-                  <span className="grid size-12 place-items-center rounded-full border border-gold/40 font-display text-lg font-bold text-gold-light">{i + 1}</span>
-                  {i < STEPS.length - 1 && <span className="hidden h-px flex-1 bg-gradient-to-r from-gold/40 to-transparent lg:block" />}
+              <Reveal as="li" key={s.t} delay={i * 90} className="grid grid-cols-[72px_1fr] gap-4 py-9 sm:grid-cols-[96px_1fr]">
+                <span className="font-serif text-[3.2rem] leading-none text-gold-2/90">0{i + 1}</span>
+                <div>
+                  <h3 className="text-[21px] font-semibold tracking-tight">{s.t}</h3>
+                  <p className="mt-2 max-w-md text-[15.5px] leading-relaxed text-white/60">{s.d}</p>
                 </div>
-                <h3 className="mt-5 text-lg font-semibold">{s.t}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-white/60">{s.d}</p>
-              </li>
+              </Reveal>
             ))}
           </ol>
-          <div className="mt-14 flex flex-wrap items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-            <div className="mr-auto">
-              <div className="font-semibold">Have your VIN handy?</div>
-              <div className="text-sm text-white/60">Text it to {BUSINESS.phoneDisplay} and a specialist will reply with options.</div>
-            </div>
-            <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold"><ChatIcon /> Text your VIN</a>
-          </div>
         </div>
       </section>
 
-      {/* ───────── WHY US ───────── */}
-      <section className="bg-sand/60">
-        <div className="mx-auto grid max-w-7xl gap-14 px-4 py-20 md:px-6 lg:grid-cols-[1fr_1.15fr]">
-          <div>
-            <div className="eyebrow">Why Junkyard Gold</div>
-            <h2 className="mt-2 font-display text-4xl font-bold sm:text-[2.75rem]">Buying a used engine shouldn&apos;t feel like a gamble.</h2>
-            <p className="mt-5 max-w-lg text-[16.5px] leading-relaxed text-ink/70">
-              You&apos;re about to spend real money on a part you can&apos;t inspect yourself. So we match it to your VIN,
-              show you the actual unit, put the warranty in writing, and pick up the phone when you call.
+      {/* ───────── PROMISE ───────── */}
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-7xl gap-16 px-4 py-24 md:px-6 lg:grid-cols-2 lg:items-center">
+          <Reveal>
+            <Stage src={promiseImg} gold className="aspect-square rounded-[32px] shadow-lift" imgClassName="p-14" />
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="eyebrow">The Junkyard Gold standard</div>
+            <h2 className="font-serif mt-3 text-[2.8rem] leading-[1.02] sm:text-[3.4rem]">Buying a used engine shouldn&apos;t feel like a gamble.</h2>
+            <p className="mt-5 max-w-lg text-[16.5px] leading-relaxed text-steel">
+              You&apos;re spending real money on a part you can&apos;t inspect yourself. So we match it to your VIN, show you
+              the actual unit, put the warranty in writing, and answer the phone.
             </p>
-            {gallery.length === 4 && (
-              <div className="mt-8 grid max-w-lg grid-cols-2 gap-3">
-                {gallery.map((src) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={src} src={src} alt="" loading="lazy" className="aspect-square w-full rounded-2xl border border-line bg-white object-contain p-3" />
-                ))}
-              </div>
-            )}
-          </div>
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {PROMISES.map((x) => (
-              <li key={x.t} className="card p-6">
-                <span className="grid size-11 place-items-center rounded-xl bg-ink text-gold-2">{x.i}</span>
-                <h3 className="mt-4 text-[17px] font-semibold">{x.t}</h3>
-                <p className="mt-1.5 text-[14.5px] leading-relaxed text-steel">{x.d}</p>
-              </li>
-            ))}
-          </ul>
+            <ul className="mt-10 grid gap-x-10 gap-y-7 sm:grid-cols-2">
+              {PROMISES.map((x) => (
+                <li key={x.t} className="flex gap-4">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full border border-gold/40 text-gold-dark">{x.i}</span>
+                  <div>
+                    <h3 className="font-semibold">{x.t}</h3>
+                    <p className="mt-1 text-[14px] leading-relaxed text-steel">{x.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
         </div>
       </section>
 
       {/* ───────── QUOTE + FAQ ───────── */}
-      <section id="quote" className="mx-auto grid max-w-7xl scroll-mt-28 gap-12 px-4 py-20 md:px-6 lg:grid-cols-[1.05fr_1fr]">
-        <div className="card relative overflow-hidden p-7 sm:p-9">
-          <div className="absolute inset-x-0 top-0 h-1 bg-gold-grad" />
-          <div className="eyebrow">Free quote · no obligation</div>
-          <h2 className="mt-2 font-display text-3xl font-bold">Get your options by text</h2>
-          <p className="mb-7 mt-2 text-[15px] text-steel">
-            Tell us what you need. A specialist texts you matching parts with prices, mileage and photos.
-          </p>
-          <QuoteForm />
-        </div>
-        <div id="faq" className="scroll-mt-28">
-          <div className="eyebrow">Questions</div>
-          <h2 className="mt-2 font-display text-3xl font-bold">Straight answers</h2>
-          <div className="mt-6 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
-            {FAQ.map((f) => (
-              <details key={f.q} className="group px-6 py-5 open:bg-paper/60">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold [&::-webkit-details-marker]:hidden">
-                  {f.q}
-                  <span className="grid size-7 shrink-0 place-items-center rounded-full border border-line text-gold-dark transition group-open:rotate-45">+</span>
-                </summary>
-                <p className="mt-3 text-[15px] leading-relaxed text-steel">{f.a}</p>
-              </details>
-            ))}
-          </div>
-          <div className="mt-6 flex items-center gap-4 rounded-2xl bg-ink p-5 text-white">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/jg-mark-sm.png" alt="" className="h-9 w-auto" />
-            <div className="mr-auto">
-              <div className="font-semibold">Talk to a parts specialist</div>
-              <div className="text-sm text-white/60">{BUSINESS.hours}</div>
+      <section id="quote" className="scroll-mt-28 bg-paper">
+        <div className="mx-auto grid max-w-7xl gap-14 px-4 py-24 md:px-6 lg:grid-cols-[1.05fr_1fr]">
+          <Reveal>
+            <div className="card relative overflow-hidden rounded-[28px] p-7 sm:p-10">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gold-grad" />
+              <div className="eyebrow">Free quote · no obligation</div>
+              <h2 className="font-serif mt-3 text-[2.4rem] leading-none">Get your options by text</h2>
+              <p className="mb-8 mt-3 text-[15px] text-steel">
+                Tell us what you need. A specialist texts you matching parts with prices, mileage and photos.
+              </p>
+              <QuoteForm />
             </div>
-            <a href={TEL_HREF} className="btn-gold !h-11 text-sm"><PhoneIcon /> Call</a>
-          </div>
+          </Reveal>
+          <Reveal delay={120}>
+            <div id="faq" className="scroll-mt-28">
+              <div className="eyebrow">Questions</div>
+              <h2 className="font-serif mt-3 text-[2.4rem] leading-none">Straight answers</h2>
+              <div className="mt-8 divide-y divide-line border-y border-line">
+                {FAQ.map((f) => (
+                  <details key={f.q} className="group py-5">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-semibold [&::-webkit-details-marker]:hidden">
+                      {f.q}
+                      <span className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-gold-dark transition group-open:rotate-45 group-open:border-gold">+</span>
+                    </summary>
+                    <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-steel">{f.a}</p>
+                  </details>
+                ))}
+              </div>
+              <div className="mt-8 flex items-center gap-4 rounded-2xl bg-ink p-5 text-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/brand/jg-mark-sm.png" alt="" className="h-9 w-auto" />
+                <div className="mr-auto">
+                  <div className="font-semibold">Talk to a parts specialist</div>
+                  <div className="text-sm text-white/55">{BUSINESS.hours}</div>
+                </div>
+                <a href={TEL_HREF} className="btn-gold !h-11 text-sm"><PhoneIcon /> Call</a>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
     </PageShell>

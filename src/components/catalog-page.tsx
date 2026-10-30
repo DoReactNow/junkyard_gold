@@ -48,7 +48,7 @@ function FacetLinks({ title, items, href }: { title: string; items: Facet[]; hre
   if (!items.length) return null;
   return (
     <section className="mt-10">
-      <h2 className="font-display text-2xl font-semibold">{title}</h2>
+      <h2 className="font-serif text-[2rem] leading-none">{title}</h2>
       <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {items.map((f) => (
           <li key={f.slug}>
@@ -149,7 +149,7 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
 
           <section className="mt-10">
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-display text-2xl font-semibold">{vehicle ? `${vehicle} ${k.plural}` : `Latest ${k.plural}`}</h2>
+              <h2 className="font-serif text-[2rem] leading-none">{vehicle ? `${vehicle} ${k.plural}` : `Latest ${k.plural}`}</h2>
               {total > listings.length && <Link href={allHref} className="text-sm font-semibold underline">See all {total.toLocaleString()} →</Link>}
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -158,7 +158,7 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
           </section>
 
           <section className="mt-12">
-            <h2 className="font-display text-2xl font-semibold">Questions</h2>
+            <h2 className="font-serif text-[2rem] leading-none">Questions</h2>
             <div className="mt-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
               {faq.map((x) => (
                 <div key={x.q} className="p-5">

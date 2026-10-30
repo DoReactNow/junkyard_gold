@@ -69,3 +69,6 @@ export function pickPhotos(p: { make: string; model: string; partType: string; s
   if (any) return { files: any.files, level: "generic" };
   return { files: [], level: "none" };
 }
+
+/** The background-free version of a product photo (made by scripts/cutout-photos.py). */
+export const cutout = (src: string) => src.replace(/^\/img\/parts\/(.+)\.jpe?g$/i, "/img/parts-cut/$1.webp");

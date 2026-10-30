@@ -98,6 +98,18 @@ export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-ink text-white">
       <div className="hairline-gold" />
+      <div className="relative overflow-hidden border-b border-white/10">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_80%_0%,rgb(201_150_47/0.14),transparent_70%)]" />
+        <div className="relative mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-8 px-4 py-16 md:px-6 md:py-20">
+          <h2 className="font-serif max-w-3xl text-[2.6rem] leading-[1.02] sm:text-[3.6rem]">
+            Have your VIN handy? <em className="text-gold-grad">Let&apos;s find your part.</em>
+          </h2>
+          <div className="flex flex-wrap gap-3">
+            <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-[54px] !px-7"><ChatIcon /> Text {BUSINESS.phoneDisplay}</a>
+            <a href={TEL_HREF} className="btn-outline-light !h-[54px] !px-7"><PhoneIcon /> Call us</a>
+          </div>
+        </div>
+      </div>
       <div className="mx-auto max-w-7xl px-4 pb-10 pt-16 md:px-6">
         <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
           <div>
@@ -106,10 +118,6 @@ export function Footer() {
               Quality used engines, transmissions and major parts, matched to your VIN and shipped nationwide from
               Bradenton, Florida. Every part carries a {BUSINESS.warrantyAdj} warranty.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-11 text-sm"><ChatIcon /> Text your VIN</a>
-              <a href={TEL_HREF} className="btn-outline-light !h-11 text-sm"><PhoneIcon /> Call us</a>
-            </div>
           </div>
           <div>
             <h3 className="text-[12px] font-semibold uppercase tracking-[0.16em] text-gold-2">Shop</h3>
@@ -188,7 +196,7 @@ export function PageHero({
           </nav>
         )}
         {eyebrow && <div className="mt-6 text-[12px] font-semibold uppercase tracking-[0.18em] text-gold-2">{eyebrow}</div>}
-        <h1 className="mt-3 max-w-4xl font-display text-[2.4rem] font-bold leading-[1.05] sm:text-5xl md:text-[3.4rem]">{title}</h1>
+        <h1 className="font-serif mt-4 max-w-4xl text-[2.9rem] leading-[1] sm:text-[3.8rem] md:text-[4.4rem]">{title}</h1>
         {children && <div className="mt-4 max-w-3xl text-[16.5px] leading-relaxed text-white/70">{children}</div>}
       </div>
       <div className="hairline-gold" />

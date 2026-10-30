@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Inter_Tight } from "next/font/google";
+import { Inter, Inter_Tight, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { BUSINESS } from "@/lib/business";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+const serif = Instrument_Serif({ variable: "--font-serif", subsets: ["latin"], weight: "400", style: ["normal", "italic"] });
 const interTight = Inter_Tight({ variable: "--font-inter-tight", subsets: ["latin"], weight: ["500", "600", "700", "800"] });
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${interTight.variable} font-sans antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${interTight.variable} ${serif.variable} font-sans antialiased`}>{children}</body>
     </html>
   );
 }

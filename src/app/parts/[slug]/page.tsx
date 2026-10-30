@@ -8,6 +8,7 @@ import { BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
 import { PageShell } from "@/components/site-chrome";
 import { PartCard, partImages } from "@/components/part-card";
 import { VinCheck } from "@/components/vin-check";
+import { Stage } from "@/components/stage";
 import { CameraIcon, ChatIcon, PhoneIcon, ShieldIcon, TruckIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -80,20 +81,19 @@ export default async function PartPage({ params }: { params: Params }) {
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-10 md:px-6 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
         <div className="lg:sticky lg:top-32 lg:self-start">
-          <div className={`relative overflow-hidden rounded-3xl border border-line shadow-card ${images.kind === "illustration" ? "bg-ink" : "bg-white"}`}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={images.files[0]} alt={images.kind === "own" ? part.title : `Example ${part.partType.toLowerCase()} photo`} className="aspect-[4/3] w-full object-contain p-6" />
-            {images.kind !== "own" && (
-              <span className="absolute left-4 top-4 rounded-full bg-ink/90 px-3 py-1.5 text-[12px] font-semibold text-gold-light">
-                {images.kind === "example" ? "Example photo" : "Illustration"}
-              </span>
-            )}
-          </div>
+          <Stage
+            src={images.files[0]}
+            alt={images.kind === "own" ? part.title : `Example ${part.partType.toLowerCase()} photo`}
+            gold
+            eager
+            className="aspect-[4/3] rounded-[28px] shadow-lift"
+            imgClassName="p-10"
+            label={images.kind === "example" ? "Example photo" : images.kind === "illustration" ? "Illustration" : undefined}
+          />
           {images.files.length > 1 && (
             <div className="mt-3 grid grid-cols-4 gap-3">
               {images.files.slice(1, 5).map((f) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={f} src={f} alt="" loading="lazy" className="aspect-square w-full rounded-xl border border-line bg-white object-contain p-1.5" />
+                <Stage key={f} src={f} className="aspect-square rounded-2xl" imgClassName="p-2" />
               ))}
             </div>
           )}
@@ -119,13 +119,13 @@ export default async function PartPage({ params }: { params: Params }) {
               </span>
             )}
           </div>
-          <h1 className="mt-4 font-display text-[2.2rem] font-bold leading-[1.08] sm:text-[2.6rem]">{name}</h1>
+          <h1 className="font-serif mt-4 text-[2.6rem] leading-[1.02] sm:text-[3.3rem]">{name}</h1>
           {part.spec && <p className="mt-2 text-[17px] text-steel">{part.spec}</p>}
 
           <div className="card mt-7 p-6 sm:p-7">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <div className="font-display text-5xl font-bold leading-none">{money(part.price)}</div>
+                <div className="font-serif text-[3.6rem] leading-none">{money(part.price)}</div>
                 <div className="mt-2 text-[14px] text-steel">Includes a {warrantyAdj(part.warranty)} warranty · freight quoted to your ZIP</div>
               </div>
             </div>
@@ -183,7 +183,7 @@ export default async function PartPage({ params }: { params: Params }) {
         <section className="border-t border-line bg-sand/50">
           <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
             <div className="eyebrow">More options</div>
-            <h2 className="mt-2 font-display text-3xl font-bold">More {part.year} {part.make} {part.model} {part.partType.toLowerCase()}s</h2>
+            <h2 className="font-serif mt-2 text-[2.4rem] leading-none">More {part.year} {part.make} {part.model} {part.partType.toLowerCase()}s</h2>
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {siblings.map((p) => <PartCard key={p.id} part={p} />)}
             </div>

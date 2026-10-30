@@ -77,6 +77,13 @@ made-up sample parts, for demos only; don't run it on the live database.
 family), labeled "Example photo", and every page offers real photos of the exact unit by text. A listing's
 own `image_url` overrides them. Don't copy photos from Car-Part.com or other sellers' listings.
 
+The site shows those photos **cut out** on a dark, lit backdrop (`public/img/parts-cut/*.webp`). After adding new
+photos to `public/img/parts/`, regenerate the cutouts (needs Python with Pillow):
+
+```bash
+python3 -I scripts/cutout-photos.py public/img/parts public/img/parts-cut
+```
+
 ## Going live
 
 See **[DEPLOY.md](DEPLOY.md)**: GitHub secrets, the one-time switch from v1, RingCentral setup and rollback.
