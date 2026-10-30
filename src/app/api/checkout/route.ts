@@ -4,7 +4,7 @@ import { siteUrl } from "@/lib/business";
 import { BUSINESS } from "@/lib/business";
 import { createCheckout, paymentsLive, startCheckout } from "@/lib/payments";
 import { specsFor } from "@/lib/specs";
-import { unitOptions, unitRef } from "@/lib/unit-options";
+import { listedOptions, unitOptions, unitRef } from "@/lib/unit-options";
 
 async function go(slug: string | null) {
   const part = slug ? await db.part.findUnique({ where: { slug } }) : null;
@@ -50,10 +50,38 @@ async function goUnit(form: FormData) {
   }
 }
 
+/** A lower-mileage option offered on a listed part's page. The listing itself stays available. */
+async function goListedTier(slug: string, tier: number) {
+  const part = await db.part.findUnique({ where: { slug } });
+  const unit = part?.status === "available" ? listedOptions(part).find((o) => o.tier === tier) : null;
+  if (!part || !unit) return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?reason=sold`, 303);
+
+  const line = `${unit.miles.toLocaleString()} miles`;
+  const ref = `${part.stockNo || part.slug}-${tier}`;
+  const unavailable = () => NextResponse.redirect(`${siteUrl()}/checkout/unavailable?${new URLSearchParams({ slug: `${part.title}, ${line} at $${unit.price.toLocaleString("en-US")} (ref ${ref})` })}`, 303);
+  if (!paymentsLive()) return unavailable();
+  try {
+    const url = await startCheckout({
+      title: part.title,
+      price: unit.price,
+      description: `${line} · ${BUSINESS.warrantyAdj} warranty · Ref ${ref}`,
+      metadata: { item: `${part.title}, ${line}`, stockNo: ref },
+      cancelPath: `/parts/${part.slug}`,
+    });
+    return NextResponse.redirect(url, 303);
+  } catch (err) {
+    console.error("Stripe checkout failed", err);
+    return unavailable();
+  }
+}
+
 // From the "Buy Now" button
 export async function POST(req: Request) {
   const form = await req.formData();
-  if (form.has("tier")) return goUnit(form);
+  const slug = String(form.get("slug") || "");
+  const tier = parseInt(String(form.get("tier") || "0"), 10);
+  if (slug && tier > 0) return goListedTier(slug, tier);
+  if (!slug && form.has("tier")) return goUnit(form);
   return go(String(form.get("slug") || ""));
 }
 

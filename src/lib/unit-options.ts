@@ -43,6 +43,24 @@ function tierMiles(v: Vehicle) {
   return [centre + step, centre, centre - step];
 }
 
+/**
+ * Options for a listed part: the listing itself, then lower-mileage units at the same price steps.
+ * Steps shrink to stay inside the model year's mileage band; too little room leaves fewer options.
+ */
+export function listedOptions(part: { year: number; price: number; mileage: number | null }): UnitOption[] {
+  const miles = part.mileage;
+  if (!miles) return [{ tier: 0, label: TIER_LABELS[0], price: part.price, miles: 0 }];
+  const [lo] = mileBand(part.year);
+  const step = Math.min(Math.max(5000, Math.round((miles * 0.18) / 1000) * 1000), Math.floor((miles - lo) / 2000) * 1000);
+  if (step < 3000) return [{ tier: 0, label: TIER_LABELS[0], price: part.price, miles }];
+  return TIER_MARKUPS.map((m, tier) => ({
+    tier,
+    label: TIER_LABELS[tier],
+    price: tier ? listPrice(part.price * m) : part.price,
+    miles: miles - step * tier,
+  }));
+}
+
 export const unitRef = (v: Vehicle) => stockNoFor(`${v.year}|${v.make}|${v.model}|${v.partType}|${v.spec}`);
 
 export async function unitOptions(v: Vehicle): Promise<UnitOption[] | null> {

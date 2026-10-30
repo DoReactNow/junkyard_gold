@@ -24,6 +24,14 @@ export function allSpecModels(make: string) {
   return [...new Set(Object.keys(SPECS).flatMap((y) => specModels(make, Number(y))))];
 }
 
+/** Model years that list this exact spec for the same make, model and part. */
+export function yearsWithSpec(make: string, model: string, partType: string, spec: string) {
+  return Object.keys(SPECS)
+    .filter((y) => specsFor(Number(y), make, model, partType).includes(spec))
+    .map(Number)
+    .sort((a, b) => a - b);
+}
+
 /** Specs for a vehicle. An exact model wins; otherwise close names ("Silverado" ↔ "Silverado 1500") are combined. */
 export function specsFor(year: number, make: string, model: string, partType: string): string[] {
   const slot = partType === "Engine" ? "e" : partType === "Transmission" ? "t" : null;

@@ -38,7 +38,7 @@ export function PartCard({ part }: { part: Part }) {
         {part.spec && <p className="mt-1 line-clamp-2 text-[13.5px] leading-snug text-steel">{part.spec}</p>}
         <div className="mt-auto flex items-end justify-between gap-3 pt-5">
           <div>
-            <div className="font-serif text-[30px] leading-none">{money(part.price)}</div>
+            <div className="font-display text-[26px] font-bold leading-none tabular-nums tracking-tight">{money(part.price)}</div>
             <div className="mt-1.5 text-[12.5px] text-steel">
               {part.mileage ? `${part.mileage.toLocaleString()} mi · ` : ""}
               {warrantyAdj(part.warranty)} warranty
