@@ -1,6 +1,7 @@
 // RingCentral REST API: JWT sign-in, sending SMS, and the webhook subscription for incoming texts.
 // Docs: developers.ringcentral.com/guide/authentication/jwt-flow, /messaging/sms/sending-sms,
 //       /notifications/webhooks/creating-webhooks, /notifications/event-filters/instant-message
+import { createHash } from "crypto";
 import { siteUrl } from "./business";
 
 const server = () => (process.env.RINGCENTRAL_SERVER || "https://platform.ringcentral.com").replace(/\/$/, "");
@@ -64,6 +65,12 @@ export async function rcInboundSince(since: Date) {
   return list.records;
 }
 
+/** RingCentral rejects some token values, so it gets a short hex form of the secret, whatever its format. */
+export function webhookToken() {
+  const secret = process.env.RINGCENTRAL_WEBHOOK_TOKEN;
+  return secret ? createHash("sha256").update(secret).digest("hex").slice(0, 32) : undefined;
+}
+
 export const webhookUrl = () => `${siteUrl()}/api/sms/inbound`;
 const EVENT_FILTER = "/restapi/v1.0/account/~/extension/~/message-store/instant?type=SMS";
 const WEEK = 7 * 24 * 3600;
@@ -89,7 +96,7 @@ export async function ensureInboundSubscription(): Promise<string> {
     method: "POST",
     body: {
       eventFilters: [EVENT_FILTER],
-      deliveryMode: { transportType: "WebHook", address: webhookUrl(), verificationToken: process.env.RINGCENTRAL_WEBHOOK_TOKEN || undefined },
+      deliveryMode: { transportType: "WebHook", address: webhookUrl(), verificationToken: webhookToken() },
       expiresIn: WEEK,
     },
   });

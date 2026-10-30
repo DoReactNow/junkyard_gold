@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { timingSafeEqual } from "crypto";
 import { afterInbound, recordInbound } from "@/lib/inbound";
-import { rcMessageText } from "@/lib/ringcentral";
+import { rcMessageText, webhookToken } from "@/lib/ringcentral";
 import { normalizePhone } from "@/lib/phone";
 
 type Notification = {
@@ -10,7 +10,7 @@ type Notification = {
 };
 
 function tokenOk(got: string | null) {
-  const want = process.env.RINGCENTRAL_WEBHOOK_TOKEN;
+  const want = webhookToken();
   if (!want) return true;
   if (!got) return false;
   const a = Buffer.from(got);
