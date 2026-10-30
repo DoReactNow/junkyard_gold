@@ -1,6 +1,6 @@
 import { BUSINESS } from "./business";
 
-const OWN_NUMBERS = [BUSINESS.phoneE164.slice(2)];
+const OWN_NUMBERS = [BUSINESS.phoneE164.slice(2), BUSINESS.smsE164.slice(2)];
 
 /** Valid US/CA mobile-style number -> E.164 ("+1XXXXXXXXXX"), otherwise null. */
 export function normalizePhone(input: string | null | undefined): string | null {

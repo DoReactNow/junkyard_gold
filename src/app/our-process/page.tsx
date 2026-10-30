@@ -45,7 +45,7 @@ export default function Page() {
           <Stage src="/img/parts-cut/any-zf-transmission-2.webp" gold className="aspect-[4/3] rounded-[28px] shadow-lift" imgClassName="p-10" />
           <div className="rounded-[24px] bg-ink p-7 text-white">
             <div className="font-serif text-[2rem] leading-none">Start with your VIN</div>
-            <p className="mt-2 text-sm text-white/60">Text it to {BUSINESS.phoneDisplay}. {BUSINESS.hours}.</p>
+            <p className="mt-2 text-sm text-white/60">Text it to {BUSINESS.smsDisplay}. {BUSINESS.hours}.</p>
             <div className="mt-5 flex flex-wrap gap-3">
               <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold"><ChatIcon /> Text your VIN</a>
               <Link href="/warranty" className="btn-outline-light">Read the warranty</Link>

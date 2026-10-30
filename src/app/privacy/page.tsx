@@ -26,7 +26,7 @@ export default function Page() {
       <h2>Your choices</h2>
       <p>Reply STOP to any text to opt out. To see, correct or delete your information, contact {BUSINESS.email}.</p>
       <h2>Contact</h2>
-      <p>{BUSINESS.name}, {ADDRESS_LINE} · {BUSINESS.phoneDisplay} · {BUSINESS.email}</p>
+      <p>{BUSINESS.name}, {ADDRESS_LINE} · Call {BUSINESS.phoneDisplay} · Text {BUSINESS.smsDisplay} · {BUSINESS.email}</p>
     </PolicyPage>
   );
 }

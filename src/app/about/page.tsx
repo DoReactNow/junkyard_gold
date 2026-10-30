@@ -45,7 +45,7 @@ export default function Page() {
           </p>
           <h2>Talk to a real person</h2>
           <p>
-            Call or text {BUSINESS.phoneDisplay}, {BUSINESS.hours}. You&apos;ll reach a parts specialist, not a ticket queue. Our
+            Call {BUSINESS.phoneDisplay} or text {BUSINESS.smsDisplay}, {BUSINESS.hours}. You&apos;ll reach a parts specialist, not a ticket queue. Our
             office is at {ADDRESS_LINE}. We ship every order; we don&apos;t offer pickup.
           </p>
         </Reveal>

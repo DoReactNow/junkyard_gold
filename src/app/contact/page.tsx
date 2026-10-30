@@ -7,7 +7,7 @@ export const metadata = { title: "Contact" };
 
 export default function Page() {
   const items = [
-    { i: <ChatIcon className="size-5" />, t: "Text us (fastest)", v: BUSINESS.phoneDisplay, href: SMS_HREF },
+    { i: <ChatIcon className="size-5" />, t: "Text us (fastest)", v: BUSINESS.smsDisplay, href: SMS_HREF },
     { i: <PhoneIcon className="size-5" />, t: "Call", v: BUSINESS.phoneDisplay, href: TEL_HREF },
     { i: <MailIcon className="size-5" />, t: "Email", v: BUSINESS.email, href: `mailto:${BUSINESS.email}` },
     { i: <PinIcon className="size-5" />, t: "Office · we ship every order, no pickups", v: ADDRESS_LINE, href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS_LINE)}` },

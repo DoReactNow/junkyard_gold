@@ -125,7 +125,7 @@ export const GUIDES: Guide[] = [
         <h2>The easy way</h2>
         <p>
           Enter your VIN in the search on our home page. We decode it with the federal NHTSA database and show the parts that match
-          your engine. Or text your VIN to {BUSINESS.phoneDisplay} and a specialist will confirm the exact match for you.
+          your engine. Or text your VIN to {BUSINESS.smsDisplay} and a specialist will confirm the exact match for you.
         </p>
       </>
     ),

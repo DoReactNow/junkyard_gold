@@ -20,7 +20,7 @@ export default function Page() {
         <li><b>Changed your mind:</b> contact us within 14 days of delivery. The part must be uninstalled and in the condition we sent it. Return shipping is paid by the customer.</li>
         <li>Talk to us before sending anything back so we can give you a return number and arrange the return freight.</li>
       </ul>
-      <p>Every order is different, so if you have a special situation, just ask. Call or text {BUSINESS.phoneDisplay}.</p>
+      <p>Every order is different, so if you have a special situation, just ask. Call {BUSINESS.phoneDisplay} or text {BUSINESS.smsDisplay}.</p>
     </PolicyPage>
   );
 }

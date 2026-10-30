@@ -18,7 +18,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <a href={smsWithBody(sp.slug ? `Hi, I'd like to buy ${sp.slug}. My VIN is: ` : "Hi, I need a part. My VIN is: ")} className="btn-gold">
-            Text {BUSINESS.phoneDisplay}
+            Text {BUSINESS.smsDisplay}
           </a>
           <a href={TEL_HREF} className="btn-dark">Call us</a>
           <Link href="/parts" className="btn-ghost">Browse parts</Link>

@@ -27,7 +27,7 @@ export default function Page() {
         <li>Replace the oil, filter and coolant (engines) or fluid and filter (transmissions) on installation and keep the receipts.</li>
         <li>Check and replace the radiator, thermostat, water pump and torque converter where needed.</li>
       </ul>
-      <p>Questions? Call or text {BUSINESS.phoneDisplay} or email {BUSINESS.email}.</p>
+      <p>Questions? Call {BUSINESS.phoneDisplay}, text {BUSINESS.smsDisplay} or email {BUSINESS.email}.</p>
     </PolicyPage>
   );
 }

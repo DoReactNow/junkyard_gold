@@ -107,7 +107,7 @@ export function Footer() {
             Have your VIN handy? <em className="text-gold-grad">Let&apos;s find your part.</em>
           </h2>
           <div className="flex flex-wrap gap-3">
-            <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-[54px] !px-7"><ChatIcon /> Text {BUSINESS.phoneDisplay}</a>
+            <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-[54px] !px-7"><ChatIcon /> Text {BUSINESS.smsDisplay}</a>
             <a href={TEL_HREF} className="btn-outline-light !h-[54px] !px-7"><PhoneIcon /> Call us</a>
           </div>
         </div>
@@ -151,7 +151,7 @@ export function Footer() {
             <h3 className="text-[12px] font-semibold uppercase tracking-[0.16em] text-gold-2">Contact</h3>
             <ul className="mt-4 space-y-3 text-[14px] text-white/70">
               <li><a href={TEL_HREF} className="flex items-center gap-2.5 hover:text-white"><PhoneIcon className="size-4 text-gold-2" /> Call {BUSINESS.phoneDisplay}</a></li>
-              <li><a href={SMS_HREF} className="flex items-center gap-2.5 hover:text-white"><ChatIcon className="size-4 text-gold-2" /> Text {BUSINESS.phoneDisplay}</a></li>
+              <li><a href={SMS_HREF} className="flex items-center gap-2.5 hover:text-white"><ChatIcon className="size-4 text-gold-2" /> Text {BUSINESS.smsDisplay}</a></li>
               <li><a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2.5 hover:text-white"><MailIcon className="size-4 text-gold-2" /> {BUSINESS.email}</a></li>
               <li className="flex items-start gap-2.5"><PinIcon className="mt-0.5 size-4 shrink-0 text-gold-2" /> {ADDRESS_LINE}</li>
               <li className="pl-6.5 text-white/45">{BUSINESS.hours}</li>

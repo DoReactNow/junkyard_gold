@@ -181,7 +181,7 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
             <div className="font-display text-xl font-bold">Not finding it?</div>
             <p className="mt-1 text-sm text-white/65">We check our partner network for anything not listed here.</p>
             <a href={smsWithBody(`Hi, I need a used ${what}. My VIN is: `)} className="btn-gold mt-4 w-full text-sm">
-              <ChatIcon /> Text {BUSINESS.phoneDisplay}
+              <ChatIcon /> Text {BUSINESS.smsDisplay}
             </a>
           </div>
         </aside>

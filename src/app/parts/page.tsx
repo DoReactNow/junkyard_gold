@@ -115,7 +115,7 @@ export default async function PartsPage({ searchParams }: { searchParams: SP }) 
                       </div>
                     )}
                     <div className="mt-7 flex flex-wrap gap-3">
-                      <a href={smsWithBody(smsText)} className="btn-gold !h-[52px] !px-6"><ChatIcon /> Text {BUSINESS.phoneDisplay}</a>
+                      <a href={smsWithBody(smsText)} className="btn-gold !h-[52px] !px-6"><ChatIcon /> Text {BUSINESS.smsDisplay}</a>
                       <a href={TEL_HREF} className="btn-outline-light !h-[52px] !px-6"><PhoneIcon /> Call for a quote</a>
                     </div>
                   </div>

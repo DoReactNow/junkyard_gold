@@ -9,7 +9,7 @@ export default function Page() {
       <h2>SMS program</h2>
       <p>
         <b>{BUSINESS.name} Parts Quotes.</b> When you submit a request on our website and check the consent box, or text
-        us first, you agree to receive text messages from {BUSINESS.name} at {BUSINESS.phoneDisplay} about your parts
+        us first, you agree to receive text messages from {BUSINESS.name} at {BUSINESS.smsDisplay} about your parts
         request: quotes, photos, up to three follow-up reminders, order updates and warranty support. Automatic texts are only sent between 10 AM and 8 PM Eastern.
       </p>
       <ul>

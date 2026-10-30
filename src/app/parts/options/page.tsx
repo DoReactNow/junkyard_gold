@@ -107,7 +107,7 @@ export default async function OptionsPage({ searchParams }: { searchParams: SP }
                 <h2 className="font-serif mt-2 text-[2.2rem] leading-none">We&apos;ll text you three options</h2>
                 <p className="mt-3 text-[15px] leading-relaxed text-steel">This one needs a specialist&apos;s price. Send your VIN and we&apos;ll reply with mileage and price options from our {BUSINESS.networkSize} network.</p>
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <a href={smsWithBody(sms)} className="btn-gold"><ChatIcon /> Text {BUSINESS.phoneDisplay}</a>
+                  <a href={smsWithBody(sms)} className="btn-gold"><ChatIcon /> Text {BUSINESS.smsDisplay}</a>
                   <a href={TEL_HREF} className="btn-ghost"><PhoneIcon /> Call for a quote</a>
                 </div>
                 <div className="mt-7 border-t border-line pt-6">

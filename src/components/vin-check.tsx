@@ -99,7 +99,7 @@ export function VinCheck({ partType, productSlug }: { partType?: string; product
                           <b className="whitespace-nowrap">${e.low.toLocaleString()}–${e.high.toLocaleString()}</b>
                         </li>
                       ))}
-                      <li className="pt-1 text-xs text-steel">Estimate from similar parts we&apos;ve sold. Text or call {BUSINESS.phoneDisplay} for your exact quote.</li>
+                      <li className="pt-1 text-xs text-steel">Estimate from similar parts we&apos;ve sold. Text {BUSINESS.smsDisplay} or call {BUSINESS.phoneDisplay} for your exact quote.</li>
                     </ul>
                   )}
                 </div>

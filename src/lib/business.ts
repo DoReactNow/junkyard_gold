@@ -1,8 +1,12 @@
 export const BUSINESS = {
   name: "Junkyard Gold",
   domain: "junkyardgold.com",
+  // calls
   phoneDisplay: "904-481-5300",
   phoneE164: "+19044815300",
+  // texts (the RingCentral number; also RINGCENTRAL_FROM_NUMBER in deploy.yml)
+  smsDisplay: "847-929-8737",
+  smsE164: "+18479298737",
   email: "support@junkyardgold.com",
   street: "2727 75th St W",
   city: "Bradenton",
@@ -20,7 +24,7 @@ export const BUSINESS = {
 
 export const ADDRESS_LINE = `${BUSINESS.street}, ${BUSINESS.city}, ${BUSINESS.state} ${BUSINESS.zip}`;
 
-export const SMS_HREF = `sms:${BUSINESS.phoneE164}`;
+export const SMS_HREF = `sms:${BUSINESS.smsE164}`;
 export const TEL_HREF = `tel:${BUSINESS.phoneE164}`;
 
 export function smsWithBody(body: string) {

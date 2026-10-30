@@ -1,6 +1,6 @@
 # Junkyard Gold — junkyardgold.com
 
-Website and staff text inbox for Junkyard Gold (2727 75th St W, Bradenton, FL 34209 · 904-481-5300 · support@junkyardgold.com).
+Website and staff text inbox for Junkyard Gold (2727 75th St W, Bradenton, FL 34209 · call 904-481-5300 · text 847-929-8737 · support@junkyardgold.com).
 
 ## How it works
 
@@ -13,7 +13,7 @@ Customer ─► website: Year/Make/Model finder, VIN check, "Text me my options"
                                         ─► AI (Claude) drafts a reply with 2–3 matching units + links
                                         ─► email alert to support@junkyardgold.com (Zoho) / optional staff text
 
-Customer texts 904-481-5300 directly ─► RingCentral ─► same inbox, same AI draft
+Customer texts 847-929-8737 directly ─► RingCentral ─► same inbox, same AI draft
 
 Staff open /admin ─► review/edit the draft ─► Send (goes out as a real SMS)
                   ─► "+ Pay link" inserts a Stripe checkout link for that unit
