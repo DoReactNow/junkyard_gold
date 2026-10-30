@@ -1,4 +1,4 @@
-import { BUSINESS, isOpenNow } from "./business";
+import { BUSINESS, isTextingNow } from "./business";
 import { db } from "./db";
 import { cancelQueued, queueText, sendIfDue } from "./sms";
 import { nextTextWindow } from "./schedule";
@@ -29,9 +29,9 @@ export async function startLeadTexts(opts: { conversationId: string; name: strin
     at: now,
     body:
       `Hi ${first}, this is ${BUSINESS.name} in Bradenton, FL. We got your request${opts.vehicle ? ` for your ${opts.vehicle}` : ""}. ` +
-      (isOpenNow(sendAt)
+      (isTextingNow(sendAt)
         ? "A parts specialist is checking stock now and will text you options shortly."
-        : `We're open ${BUSINESS.hours} and a parts specialist will text you options as soon as we're back.`) +
+        : `We answer texts ${BUSINESS.textHours} and a parts specialist will text you options as soon as we're back at 10 AM ET.`) +
       " Reply STOP to opt out.",
   });
 

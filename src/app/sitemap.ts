@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
   const parts = await db.part.findMany({ where: { status: "available" }, select: { slug: true, updatedAt: true } });
-  const pages = ["", "/parts?type=Other", "/about", "/our-process", "/guides", ...GUIDES.map((g) => `/guides/${g.slug}`), "/warranty", "/shipping-returns", "/contact", "/privacy", "/terms"];
+  const pages = ["", "/parts?type=Other", "/about", "/our-process", "/guides", ...GUIDES.map((g) => `/guides/${g.slug}`), "/warranty", "/shipping-returns", "/faq", "/repair-shops", "/contact", "/privacy", "/terms"];
   const catalog = await allCatalogPaths();
   return [
     ...pages.map((p) => ({ url: `${base}${p}` })),

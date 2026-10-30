@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { PageShell } from "@/components/site-chrome";
-import { BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
+import { BUSINESS, TEL_HREF, parseDelivery, smsWithBody } from "@/lib/business";
 
 export const metadata = { title: "Checkout" };
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ slug?: string; reason?: string }> }) {
+export default async function Page({ searchParams }: { searchParams: Promise<{ slug?: string; reason?: string; delivery?: string }> }) {
   const sp = await searchParams;
   const sold = sp.reason === "sold";
   return (
@@ -17,7 +17,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
             : "Online checkout isn't switched on yet. Text or call us and we'll send you a secure payment link right away."}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <a href={smsWithBody(sp.slug ? `Hi, I'd like to buy ${sp.slug}. My VIN is: ` : "Hi, I need a part. My VIN is: ")} className="btn-gold">
+          <a href={smsWithBody(sp.slug ? `Hi, I'd like to buy ${sp.slug}, ${parseDelivery(sp.delivery) === "home" ? "home delivery to ZIP:" : "free delivery to my repair shop."} My VIN is: ` : "Hi, I need a part. My VIN is: ")} className="btn-gold">
             Text {BUSINESS.smsDisplay}
           </a>
           <a href={TEL_HREF} className="btn-dark">Call us</a>

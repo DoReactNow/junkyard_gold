@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const phone = normalizePhone(s.customer_details?.phone);
     const amount = ((s.amount_total || 0) / 100).toFixed(2);
     const ship = s.collected_information?.shipping_details?.address;
-    const note = `PAID $${amount} – ${part?.title || s.metadata?.item || "part"} (${part?.stockNo || s.metadata?.stockNo || partId}). Ship to: ${
+    const note = `PAID $${amount} – ${part?.title || s.metadata?.item || "part"} (${part?.stockNo || s.metadata?.stockNo || partId}). ${s.metadata?.delivery || "Delivery"}. Ship to: ${
       ship ? [ship.line1, ship.city, ship.state, ship.postal_code].filter(Boolean).join(", ") : "n/a"
     }`;
     if (phone) {

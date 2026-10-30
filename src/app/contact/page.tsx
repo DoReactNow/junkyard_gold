@@ -15,7 +15,7 @@ export default function Page() {
   return (
     <PageShell>
       <PageHero crumbs={[{ name: "Home", href: "/" }, { name: "Contact", href: "/contact" }]} eyebrow="Contact" title={<>Talk to a <span className="text-gold-grad">parts specialist</span></>}>
-        Text is fastest. Send your VIN and we&apos;ll reply with matching parts, prices and photos. {BUSINESS.hours}.
+        Text is fastest. Send your VIN and we&apos;ll reply with matching parts, prices and photos. {BUSINESS.contactHours}.
       </PageHero>
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:px-6 lg:grid-cols-[1fr_1.1fr]">
         <div className="grid gap-3 self-start">

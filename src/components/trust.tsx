@@ -8,7 +8,7 @@ import { Reveal } from "./reveal";
 export function OpenStatus({ className = "" }: { className?: string }) {
   const now = new Date();
   const open = isOpenNow(now);
-  let label = "Open now · until 6 PM ET";
+  let label = "Phones open until 6 PM ET · Texts 7 days";
   if (!open) {
     // step forward to the next opening hour
     let t = new Date(Math.ceil(now.getTime() / 3_600_000) * 3_600_000);
@@ -16,7 +16,7 @@ export function OpenStatus({ className = "" }: { className?: string }) {
     const fmt = (d: Date) => d.toLocaleDateString("en-US", { timeZone: "America/New_York" });
     const tomorrow = new Date(now.getTime() + 86_400_000);
     const day = fmt(t) === fmt(now) ? "today" : fmt(t) === fmt(tomorrow) ? "tomorrow" : t.toLocaleDateString("en-US", { timeZone: "America/New_York", weekday: "long" });
-    label = `Closed · opens ${day} at 10 AM ET`;
+    label = `Phones open ${day} at 10 AM ET · Texts 7 days`;
   }
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
@@ -68,8 +68,8 @@ export function SoldShowcase({ summary }: { summary: SalesSummary }) {
               <dd className="font-serif mt-1 text-[2.6rem] leading-none">{BUSINESS.founded}</dd>
             </div>
             <div className="border-l border-gold/40 pl-5">
-              <dt className="text-[12px] uppercase tracking-[0.14em] text-white/45">Delivered to</dt>
-              <dd className="font-serif mt-1 text-[2.6rem] leading-none">50 states</dd>
+              <dt className="text-[12px] uppercase tracking-[0.14em] text-white/45">We deliver to</dt>
+              <dd className="font-serif mt-1 text-[2.6rem] leading-none">48 states</dd>
             </div>
           </dl>
         </Reveal>
@@ -154,8 +154,8 @@ const ROWS: [string, string, string, string][] = [
   ["Matched to your VIN", "Yes, every order", "Up to you", "Yes"],
   ["Photos of the actual unit", "Yes, before you pay", "Rarely", "Not applicable"],
   ["Warranty", `${BUSINESS.warrantyAdj}, in writing`, "Often sold as-is", "Yes"],
-  ["Delivered to your door or shop", "Yes, all 50 states", "Usually pickup only", "Through your shop"],
-  ["A specialist who answers", `Call or text, ${BUSINESS.hours.replace(" ET", "")}`, "Counter service", "Parts counter"],
+  ["Delivered", `Free to shops, in ${BUSINESS.deliveryDays}, lower 48 states`, "Usually pickup only", "Through your shop"],
+  ["A specialist who answers", BUSINESS.contactHours, "Counter service", "Parts counter"],
 ];
 
 export function Comparison() {

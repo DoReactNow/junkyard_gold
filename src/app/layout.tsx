@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   openGraph: { images: ["/brand/og.png"], siteName: "Junkyard Gold" },
   description:
-    "Tested used engines, transmissions and major parts from Junkyard Gold in Bradenton, Florida. Text your VIN for options in minutes. 3-month warranty, nationwide shipping.",
+    "Quality used engines, transmissions and major parts from Junkyard Gold in Bradenton, Florida. Text your VIN for options in minutes. 3-month warranty, free delivery to repair shops.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

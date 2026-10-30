@@ -70,7 +70,7 @@ export function VinCheck({ partType, productSlug }: { partType?: string; product
               {others.length > 0 && (
                 <div className="mt-4">
                   <div className="text-xs font-semibold uppercase text-steel">
-                    {productSlug ? "Other units that match your VIN" : "In stock for your vehicle"}
+                    {productSlug ? "Other units that match your VIN" : "Listed for your vehicle"}
                   </div>
                   <ul className="mt-2 divide-y divide-line">
                     {others.map((m) => (

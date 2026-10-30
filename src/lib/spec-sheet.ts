@@ -27,17 +27,17 @@ export function specFacts(spec: string, partType: string): [string, string][] {
   return facts.filter((f): f is [string, string] => Boolean(f[1]));
 }
 
-function addBusinessDays(from: Date, days: number) {
-  const d = new Date(from);
-  while (days > 0) {
-    d.setDate(d.getDate() + 1);
-    if (d.getDay() !== 0 && d.getDay() !== 6) days--;
-  }
+/** Days from now, moved to Monday if it lands on a weekend (freight doesn't deliver then). */
+function deliveryDay(from: Date, days: number) {
+  let d = new Date(from.getTime() + days * 86_400_000);
+  const weekday = () => d.toLocaleDateString("en-US", { weekday: "short", timeZone: "America/New_York" });
+  while (weekday() === "Sat" || weekday() === "Sun") d = new Date(d.getTime() + 86_400_000);
   return d;
 }
 
-/** From the shipping policy: ships in 1–3 business days, arrives 3–7 business days after that. */
+/** From the shipping policy: delivered in 5–7 days. */
 export function deliveryWindow(now = new Date()) {
   const fmt = (d: Date) => d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "America/New_York" });
-  return `${fmt(addBusinessDays(now, 4))} – ${fmt(addBusinessDays(now, 10))}`;
+  const [a, b] = [fmt(deliveryDay(now, 5)), fmt(deliveryDay(now, 7))];
+  return a === b ? a : `${a} – ${b}`;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
+import { BUSINESS, TEL_HREF, smsWithBody, type Delivery } from "@/lib/business";
 import type { UnitOption } from "@/lib/unit-options";
 import { CheckIcon, ChatIcon, PhoneIcon, ShieldIcon, TruckIcon } from "./icons";
 
@@ -25,12 +25,13 @@ export function UnitPicker({
   delivery: string;
 }) {
   const [tier, setTier] = useState(options[0].tier);
+  const [dest, setDest] = useState<Delivery>("shop");
   const [stuck, setStuck] = useState(false);
   const buy = useRef<HTMLFormElement>(null);
   const formId = useId();
   const unit = options.find((o) => o.tier === tier) ?? options[0];
   const miles = unit.miles ? `${unit.miles.toLocaleString()} miles` : "Mileage on request";
-  const sms = `Hi, I'm interested in the ${name}${spec ? `, ${spec}` : ""}, ${miles} at ${usd(unit.price)} (ref ${unitRef}). My VIN is: `;
+  const sms = `Hi, I'm interested in the ${name}${spec ? `, ${spec}` : ""}, ${miles} at ${usd(unit.price)} (ref ${unitRef}), ${dest === "home" ? "home delivery to ZIP:" : "delivery to my repair shop."} My VIN is: `;
 
   useEffect(() => {
     const el = buy.current;
@@ -78,19 +79,35 @@ export function UnitPicker({
         })}
       </div>
 
+      <fieldset className="mt-5">
+        <legend className="text-[13px] font-bold uppercase tracking-[0.14em]">Deliver to</legend>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          {([
+            ["shop", "Repair shop", "Free", "Delivered free to your shop's address"],
+            ["home", "Home", BUSINESS.homeDeliveryFee, "Based on the part price. We text you the exact cost before it ships"],
+          ] as const).map(([value, title, cost, text]) => (
+            <label key={value} className={`cursor-pointer rounded-xl border p-3.5 transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gold ${dest === value ? "border-gold bg-gold-light/15 shadow-[0_0_0_1px_var(--color-gold)]" : "border-line bg-white hover:border-ink/30"}`}>
+              <input type="radio" name="deliver-to" value={value} checked={dest === value} onChange={() => setDest(value)} className="sr-only" />
+              <span className="flex items-baseline justify-between gap-3 text-[14px] font-semibold">{title}<span className={value === "shop" ? "text-ok" : "text-steel"}>{cost}</span></span>
+              <span className="mt-0.5 block text-[13px] text-steel">{text}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
       <dl className="mt-5 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">
         <div className="flex gap-3 bg-white p-3.5">
           <TruckIcon className="size-5 shrink-0 text-gold-dark" />
           <div>
             <dt className="text-[13.5px] font-semibold">Estimated delivery: {delivery}</dt>
-            <dd className="mt-0.5 text-[13px] text-steel">Freight is quoted to your ZIP before it ships</dd>
+            <dd className="mt-0.5 text-[13px] text-steel">Usually {BUSINESS.deliveryDays} from your order</dd>
           </div>
         </div>
         <div className="flex gap-3 bg-white p-3.5">
           <ShieldIcon className="size-5 shrink-0 text-gold-dark" />
           <div>
             <dt className="text-[13.5px] font-semibold">{BUSINESS.warrantyAdj} warranty included</dt>
-            <dd className="mt-0.5 text-[13px] text-steel">Replacement or refund on a defective part</dd>
+            <dd className="mt-0.5 text-[13px] text-steel">{BUSINESS.replacementDays}-day pickup and replacement at our cost</dd>
           </div>
         </div>
       </dl>
@@ -98,6 +115,7 @@ export function UnitPicker({
       <form ref={buy} id={formId} action="/api/checkout" method="post" className="mt-5">
         {Object.entries(checkout).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
         <input type="hidden" name="tier" value={unit.tier} />
+        <input type="hidden" name="delivery" value={dest} />
         <button className="btn-gold !h-[60px] w-full justify-between !px-6 text-[17px]">
           <span>Buy this unit</span>
           <span className={`${num} text-[1.4rem]`}>{usd(unit.price)} →</span>

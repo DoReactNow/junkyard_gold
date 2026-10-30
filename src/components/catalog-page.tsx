@@ -7,6 +7,7 @@ import { money, partUrl } from "@/lib/inventory";
 import { PageHero, PageShell } from "./site-chrome";
 import { PartCard } from "./part-card";
 import { VinCheck } from "./vin-check";
+import { AssuranceStrip } from "./assurance";
 import { ChatIcon } from "./icons";
 
 type Params = { make?: string; model?: string; year?: string };
@@ -39,7 +40,7 @@ export async function catalogMetadata(kind: Kind, p: Params): Promise<Metadata> 
   const from = facet ? ` from ${money(facet.from)}` : "";
   return {
     title: `${title} for Sale${from}`,
-    description: `${vehicle ? `${vehicle} used ${k.singular}s` : `Used ${k.singular}s`}${from}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and real photos before you buy. Shipped nationwide from ${BUSINESS.name}, Bradenton FL.`,
+    description: `${vehicle ? `${vehicle} used ${k.singular}s` : `Used ${k.singular}s`}${from}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and real photos before you buy. Shipped to the lower 48 states from ${BUSINESS.name}, Bradenton FL.`,
     alternates: { canonical: catalogPath(kind, r.make?.name, r.model?.name, r.year) },
   };
 }
@@ -97,9 +98,11 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
     },
     {
       q: `How much is a used ${what}?`,
-      a: `Our used ${what}s start at ${money(from)}. Each listing shows the price, mileage and the ${BUSINESS.warrantyAdj} warranty. Shipping is quoted to your ZIP code.`,
+      a: `Our used ${what}s start at ${money(from)}. Each listing shows the price, mileage and the ${BUSINESS.warrantyAdj} warranty. Delivery to a repair shop is free; home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price.`,
     },
     { q: "Can I see the actual part?", a: "Yes. Text us and we'll send photos of the exact unit before you pay." },
+    { q: "How long does delivery take?", a: `Usually ${BUSINESS.deliveryDays} from your order, by freight, to the lower 48 states.` },
+    { q: "What if there's a problem with it?", a: `Tell us within ${BUSINESS.replacementDays} days of delivery. We pick up the part and send a replacement at our cost, or refund you if we don't have one.` },
   ];
   const jsonLd = [
     {
@@ -127,16 +130,18 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
           <span><b className="text-white">{total.toLocaleString()}</b> listed online · more via our {BUSINESS.networkSize} network</span>
           <span>From <b className="text-gold-light">{money(from)}</b></span>
           <span>{BUSINESS.warrantyAdj} warranty</span>
-          <span>Ships to all 50 states</span>
+          <span>Free delivery to shops</span>
         </div>
       </PageHero>
+
+      <AssuranceStrip />
 
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-[1fr_340px]">
         <div className="min-w-0">
           <p className="max-w-3xl text-[16.5px] leading-relaxed text-ink/75">
             {vehicle
               ? `Looking for a used ${what}? Every ${k.singular} below is matched to your VIN before it ships, comes with a ${BUSINESS.warrantyAdj} warranty, and we'll text you photos of the exact unit before you pay. Prices start at ${money(from)}.`
-              : `Tested used ${k.singular}s for cars, trucks and SUVs, shipped by freight to your door or repair shop. Pick your make below, or check your VIN to see what fits. Every ${k.singular} carries a ${BUSINESS.warrantyAdj} warranty.`}
+              : `Quality used ${k.singular}s for cars, trucks and SUVs, delivered free to repair shops or to your home for ${BUSINESS.homeDeliveryFee}. Pick your make below, or check your VIN to see what fits. Every ${k.singular} carries a ${BUSINESS.warrantyAdj} warranty.`}
           </p>
 
           {facets && (

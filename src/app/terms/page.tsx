@@ -20,11 +20,11 @@ export default function Page() {
         <li>Consent to receive texts is not a condition of purchase.</li>
       </ul>
       <h2>Quotes and prices</h2>
-      <p>Prices and availability can change until an order is paid. Used parts are sold as described in the listing and under our warranty; we may cancel and refund an order if a part turns out to be unavailable or not as described.</p>
+      <p>Prices and availability can change until an order is paid. Used parts are sold as described in the listing and under our warranty; we may cancel and refund an order before it ships if a part turns out to be unavailable or not as described.</p>
       <h2>Fitment</h2>
       <p>We check every order against the VIN you provide. You are responsible for giving us the correct VIN and for having the part installed by a qualified mechanic.</p>
       <h2>Warranty and returns</h2>
-      <p>See our <a href="/warranty" className="underline">warranty</a> and <a href="/shipping-returns" className="underline">shipping &amp; returns</a> pages.</p>
+      <p>All sales are final unless something goes wrong with the part. See our <a href="/warranty" className="underline">warranty</a> and <a href="/shipping-returns" className="underline">shipping &amp; returns</a> pages.</p>
       <h2>Limitation of liability</h2>
       <p>To the extent allowed by law, our liability for any part is limited to its purchase price. We are not responsible for labor, towing, rental or other indirect costs.</p>
       <p>These terms are governed by the laws of the State of Florida.</p>

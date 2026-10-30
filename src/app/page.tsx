@@ -11,6 +11,8 @@ import { PartCard } from "@/components/part-card";
 import { Stage } from "@/components/stage";
 import { Reveal } from "@/components/reveal";
 import { Comparison, GuaranteeSeal, SoldShowcase } from "@/components/trust";
+import { AssuranceStrip, BuyOnline, DeliveryChoices } from "@/components/assurance";
+import { GUIDES } from "@/lib/guides";
 import { salesSummary } from "@/lib/site-data";
 import { CameraIcon, ChatIcon, PhoneIcon, ReturnIcon, SearchIcon, ShieldIcon, TruckIcon } from "@/components/icons";
 
@@ -20,24 +22,24 @@ const STEPS = [
   { t: "Send your VIN", d: "Text it or enter it above. Your VIN tells us exactly which engine and transmission your vehicle left the factory with." },
   { t: "Get matched options", d: "A parts specialist texts you the units that fit, with price, mileage and warranty for each, usually within minutes." },
   { t: "See the actual part", d: "Ask for photos of the exact unit before you pay. You know precisely what's on the truck." },
-  { t: "Delivered to you", d: "Strapped to a pallet and shipped by freight to your door or repair shop, anywhere in the US." },
+  { t: "Delivered to you", d: `Strapped to a pallet and shipped by freight, usually in ${BUSINESS.deliveryDays}. Free to your repair shop, or to your home for ${BUSINESS.homeDeliveryFee}.` },
 ];
 
 const PROMISES = [
   { i: <SearchIcon className="size-5" />, t: "VIN-matched", d: "Engine code, drivetrain and options checked against your VIN before anything ships." },
   { i: <CameraIcon className="size-5" />, t: "Photos before you pay", d: "Real photos of the exact unit, sent to your phone on request." },
-  { i: <ShieldIcon className="size-5" />, t: `${BUSINESS.warrantyAdj} warranty`, d: "Every used part is covered against defects, with clear terms in writing." },
-  { i: <TruckIcon className="size-5" />, t: "Freight to your door", d: "Palletized, strapped and wrapped. Homes and shops in all 50 states." },
-  { i: <ChatIcon className="size-5" />, t: "A real specialist", d: `Talk or text with a person, ${BUSINESS.hours}. No ticket queues.` },
-  { i: <ReturnIcon className="size-5" />, t: "We make it right", d: "Wrong or defective under warranty? Exchange or refund, return freight included." },
+  { i: <ShieldIcon className="size-5" />, t: `${BUSINESS.warrantyAdj} warranty`, d: "Every used part is covered against defects, in writing." },
+  { i: <TruckIcon className="size-5" />, t: "Free delivery to shops", d: `Palletized, strapped and wrapped, usually delivered in ${BUSINESS.deliveryDays}. Home delivery is ${BUSINESS.homeDeliveryFee}.` },
+  { i: <ChatIcon className="size-5" />, t: "A real specialist", d: `${BUSINESS.contactHours}. No ticket queues.` },
+  { i: <ReturnIcon className="size-5" />, t: `${BUSINESS.replacementDays}-day replacement`, d: "A problem with the part? We pick it up and send a replacement at our cost." },
 ];
 
 const FAQ = [
   { q: "Do I need my VIN?", a: "It's the fastest way to get the right part. If you don't have it, text us the year, make, model and engine size and we'll work from that." },
   { q: "What warranty do I get?", a: `Every used part comes with a ${BUSINESS.warrantyAdj} warranty against defects. See the warranty page for the details.` },
-  { q: "How does shipping work?", a: "Engines and transmissions ship on a pallet by freight carrier to homes and repair shops. We confirm the shipping cost to your ZIP with your quote, before you pay." },
+  { q: "How does shipping work?", a: `Engines and transmissions ship on a pallet by freight carrier, usually in ${BUSINESS.deliveryDays}. Delivery to a repair shop is free. Home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price. We deliver to the lower 48 states.` },
   { q: "Can I see photos first?", a: "Yes. Ask for photos of the exact unit by text and we'll send them before you buy." },
-  { q: "What if it doesn't fit?", a: "We match every order to your VIN before it ships. If we send the wrong part, we'll make it right with an exchange or refund." },
+  { q: "What if there's a problem?", a: `We match every order to your VIN before it ships. If there's a problem within ${BUSINESS.replacementDays} days, we pick up the part and send a replacement at our cost, or refund you if we don't have one.` },
 ];
 
 export default async function Home() {
@@ -122,7 +124,7 @@ export default async function Home() {
                   <span className="size-2 rounded-full bg-ok shadow-[0_0_0_4px_rgb(31_122_74/0.25)]" />
                   <span>
                     <span className="block text-[13px] font-semibold">{hero.year} {hero.make} {hero.model} engine</span>
-                    <span className="block text-[12px] text-white/55">{money(hero.price)} · {hero.mileage?.toLocaleString()} mi · ready to ship</span>
+                    <span className="block text-[12px] text-white/55">{money(hero.price)} · {hero.mileage?.toLocaleString()} mi</span>
                   </span>
                 </Link>
               )}
@@ -141,8 +143,8 @@ export default async function Home() {
           {[
             [BUSINESS.soldSince, `parts sold since ${BUSINESS.founded}`],
             ["All makes", "cars, SUVs to heavy-duty trucks"],
-            ["3 mo.", "warranty on every part"],
-            ["50", "states we ship to"],
+            [`${BUSINESS.replacementDays} days`, "pickup and replacement at our cost"],
+            ["Free", "delivery to repair shops"],
           ].map(([n, t]) => (
             <div key={t} className="px-2 py-8 md:px-8">
               <div className="font-serif text-[2.7rem] leading-none">{n}</div>
@@ -151,6 +153,8 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <AssuranceStrip />
 
       {/* ───────── CATEGORIES ───────── */}
       <section className="mx-auto max-w-7xl px-4 pt-24 md:px-6">
@@ -212,8 +216,8 @@ export default async function Home() {
       <section className="mx-auto max-w-7xl px-4 pb-24 md:px-6">
         <Reveal className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="eyebrow">In stock now</div>
-            <h2 className="font-serif mt-3 text-[2.6rem] leading-none sm:text-[3.2rem]">This week&apos;s picks</h2>
+            <div className="eyebrow">From our listings</div>
+            <h2 className="font-serif mt-3 text-[2.6rem] leading-none sm:text-[3.2rem]">Popular vehicles</h2>
           </div>
           <div className="flex gap-2">
             <Link href="/used-engines" className="btn-ghost !h-11 text-sm">All engines</Link>
@@ -230,6 +234,8 @@ export default async function Home() {
       </section>
 
       {sales && <SoldShowcase summary={sales} />}
+
+      <BuyOnline />
 
       {/* ───────── PROMISE ───────── */}
       <section className="bg-white">
@@ -287,6 +293,16 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-20 md:px-6">
+          <Reveal className="max-w-2xl">
+            <div className="eyebrow">Delivery</div>
+            <h2 className="font-serif mt-3 text-[2.8rem] leading-[1.02] sm:text-[3.4rem]">Know where it&apos;s going and what it costs.</h2>
+          </Reveal>
+          <div className="mt-10"><DeliveryChoices /></div>
+        </div>
+      </section>
+
       <Comparison />
 
       {/* ───────── GUARANTEE ───────── */}
@@ -304,7 +320,7 @@ export default async function Home() {
               {[
                 ["Matched to your VIN", "We confirm engine code, drivetrain and options against your VIN before anything ships."],
                 [`${BUSINESS.warrantyAdj} warranty`, "Covered against defects from the day it arrives. The terms are written down, not promised over the phone."],
-                ["Return freight on us", "If we send the wrong part or it's defective under warranty, we exchange or refund it and cover the freight."],
+                [`${BUSINESS.replacementDays}-day replacement`, "If there's a problem with the part, we pick it up and send a replacement at our cost."],
               ].map(([t, d], i) => (
                 <div key={t} className="border-t border-gold/40 pt-5">
                   <div className="font-serif text-[1.9rem] leading-none text-gold-dark">0{i + 1}</div>
@@ -317,6 +333,54 @@ export default async function Home() {
               Read the full warranty →
             </Link>
           </Reveal>
+        </div>
+      </section>
+
+      {/* ───────── SHOP BY MAKE ───────── */}
+      <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
+        <Reveal className="max-w-2xl">
+          <div className="eyebrow">Shop by make</div>
+          <h2 className="font-serif mt-3 text-[2.8rem] leading-[1.02] sm:text-[3.4rem]">Go straight to your vehicle.</h2>
+        </Reveal>
+        <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {engineMakes.slice(0, 16).map((m) => {
+            const t = transMakes.find((x) => x.slug === m.slug);
+            return (
+              <li key={m.slug} className="card p-5">
+                <h3 className="text-[17px] font-semibold">{m.name}</h3>
+                <Link href={catalogPath("used-engines", m.name)} className="mt-3 flex justify-between gap-3 text-[14px] text-steel hover:text-ink">
+                  Engines <span>from <b className="font-semibold text-ink">{money(m.from)}</b></span>
+                </Link>
+                {t && (
+                  <Link href={catalogPath("used-transmissions", m.name)} className="mt-1.5 flex justify-between gap-3 text-[14px] text-steel hover:text-ink">
+                    Transmissions <span>from <b className="font-semibold text-ink">{money(t.from)}</b></span>
+                  </Link>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* ───────── GUIDES ───────── */}
+      <section className="border-y border-line bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-20 md:px-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div className="eyebrow">Before you buy</div>
+              <h2 className="font-serif mt-3 text-[2.8rem] leading-[1.02] sm:text-[3.4rem]">Know what you&apos;re buying.</h2>
+            </div>
+            <Link href="/guides" className="btn-ghost !h-11 text-sm">All guides</Link>
+          </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {GUIDES.slice(0, 3).map((g) => (
+              <Link key={g.slug} href={`/guides/${g.slug}`} className="card flex flex-col p-6 transition hover:-translate-y-0.5 hover:border-gold/60">
+                <span className="eyebrow">{g.eyebrow} · {g.minutes} min read</span>
+                <span className="mt-3 text-[18px] font-semibold leading-snug">{g.title}</span>
+                <span className="mt-2 text-[14.5px] leading-relaxed text-steel">{g.description}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -349,12 +413,13 @@ export default async function Home() {
                   </details>
                 ))}
               </div>
+              <Link href="/faq" className="mt-5 inline-flex font-semibold underline decoration-gold underline-offset-4 hover:text-gold-dark">See all questions →</Link>
               <div className="mt-8 flex items-center gap-4 rounded-2xl bg-ink p-5 text-white">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/brand/jg-mark-sm.png" alt="" className="h-9 w-auto" />
                 <div className="mr-auto">
                   <div className="font-semibold">Talk to a parts specialist</div>
-                  <div className="text-sm text-white/55">{BUSINESS.hours}</div>
+                  <div className="text-sm text-white/55">{BUSINESS.contactHours}</div>
                 </div>
                 <a href={TEL_HREF} className="btn-gold !h-11 text-sm"><PhoneIcon /> Call</a>
               </div>

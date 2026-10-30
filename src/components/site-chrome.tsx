@@ -34,7 +34,8 @@ const NAV = [
   { href: "/used-transmissions", label: "Transmissions" },
   { href: "/parts?type=Other", label: "Other parts" },
   { href: "/our-process", label: "How it works" },
-  { href: "/about", label: "About" },
+  { href: "/repair-shops", label: "For shops" },
+  { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -43,14 +44,14 @@ export function Header() {
     <header className="sticky top-0 z-40">
       <div className="hidden bg-ink-2 text-[12.5px] text-white/60 md:block">
         <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-6">
-          <span className="flex items-center gap-5">
-            <span className="flex items-center gap-1.5"><ShieldIcon className="size-3.5 text-gold-2" /> {BUSINESS.warrantyAdj} warranty on every part</span>
-            <span className="flex items-center gap-1.5"><TruckIcon className="size-3.5 text-gold-2" /> Ships to all 50 states</span>
-            <span className="hidden items-center gap-1.5 lg:flex">{BUSINESS.networkSize} engines &amp; transmissions · every make</span>
+          <span className="flex items-center gap-5 whitespace-nowrap">
+            <span className="flex items-center gap-1.5"><ShieldIcon className="size-3.5 text-gold-2" /> {BUSINESS.replacementDays}-day replacement at our cost</span>
+            <span className="hidden items-center gap-1.5 lg:flex"><TruckIcon className="size-3.5 text-gold-2" /> Free delivery to repair shops</span>
+            <span className="hidden items-center gap-1.5 2xl:flex">{BUSINESS.networkSize} engines &amp; transmissions · every make</span>
           </span>
-          <span className="flex items-center gap-5">
+          <span className="flex items-center gap-5 whitespace-nowrap">
             <OpenStatus />
-            <a href={`mailto:${BUSINESS.email}`} className="hover:text-white">{BUSINESS.email}</a>
+            <a href={`mailto:${BUSINESS.email}`} className="hidden hover:text-white xl:inline">{BUSINESS.email}</a>
           </span>
         </div>
       </div>
@@ -117,8 +118,8 @@ export function Footer() {
           <div>
             <Logo light />
             <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-white/60">
-              Quality used engines, transmissions and major parts, matched to your VIN and shipped nationwide from
-              Bradenton, Florida. Every part carries a {BUSINESS.warrantyAdj} warranty.
+              Quality used engines, transmissions and major parts, matched to your VIN and shipped across the lower 48 states from
+              Bradenton, Florida. Every part carries a {BUSINESS.warrantyAdj} warranty and {BUSINESS.replacementDays}-day pickup and replacement at our cost.
             </p>
           </div>
           <div>
@@ -134,6 +135,7 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5">
               <li><Link href="/about" className={col}>About us</Link></li>
               <li><Link href="/our-process" className={col}>How it works</Link></li>
+              <li><Link href="/repair-shops" className={col}>For repair shops</Link></li>
               <li><Link href="/guides" className={col}>Guides</Link></li>
             </ul>
           </div>
@@ -142,6 +144,7 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5">
               <li><Link href="/warranty" className={col}>Warranty</Link></li>
               <li><Link href="/shipping-returns" className={col}>Shipping &amp; returns</Link></li>
+              <li><Link href="/faq" className={col}>FAQ</Link></li>
               <li><Link href="/contact" className={col}>Contact</Link></li>
               <li><Link href="/terms" className={col}>Terms &amp; SMS policy</Link></li>
               <li><Link href="/privacy" className={col}>Privacy</Link></li>
@@ -154,7 +157,7 @@ export function Footer() {
               <li><a href={SMS_HREF} className="flex items-center gap-2.5 hover:text-white"><ChatIcon className="size-4 text-gold-2" /> Text {BUSINESS.smsDisplay}</a></li>
               <li><a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2.5 hover:text-white"><MailIcon className="size-4 text-gold-2" /> {BUSINESS.email}</a></li>
               <li className="flex items-start gap-2.5"><PinIcon className="mt-0.5 size-4 shrink-0 text-gold-2" /> {ADDRESS_LINE}</li>
-              <li className="pl-6.5 text-white/45">{BUSINESS.hours}</li>
+              <li className="pl-6.5 text-white/45">Calls {BUSINESS.hours}<br />Texts {BUSINESS.textHours}</li>
             </ul>
           </div>
         </div>

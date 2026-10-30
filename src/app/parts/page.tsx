@@ -7,6 +7,7 @@ import { makeWhere, modelMatches } from "@/lib/vehicles";
 import { QuoteForm } from "@/components/quote-form";
 import { ChatIcon, PhoneIcon } from "@/components/icons";
 import { estimatePrice } from "@/lib/estimate";
+import { AssuranceStrip } from "@/components/assurance";
 import { PageHero, PageShell } from "@/components/site-chrome";
 import { PartCard } from "@/components/part-card";
 import { PartFinder } from "@/components/part-finder";
@@ -72,6 +73,8 @@ export default async function PartsPage({ searchParams }: { searchParams: SP }) 
           <>Available through our supplier network of {BUSINESS.networkSize} engines and transmissions · {BUSINESS.warrantyAdj} warranty</>
         )}
       </PageHero>
+
+      <AssuranceStrip />
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-[320px_1fr]">
         <aside className="space-y-5 lg:sticky lg:top-32 lg:self-start">

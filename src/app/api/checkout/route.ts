@@ -1,29 +1,28 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { siteUrl } from "@/lib/business";
-import { BUSINESS } from "@/lib/business";
+import { BUSINESS, parseDelivery, siteUrl, type Delivery } from "@/lib/business";
 import { createCheckout, paymentsLive, startCheckout } from "@/lib/payments";
 import { specsFor } from "@/lib/specs";
 import { listedOptions, unitOptions, unitRef } from "@/lib/unit-options";
 
-async function go(slug: string | null) {
+async function go(slug: string | null, delivery: Delivery = "shop") {
   const part = slug ? await db.part.findUnique({ where: { slug } }) : null;
   if (!part || part.status !== "available") {
     return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?reason=sold`, 303);
   }
   if (!paymentsLive()) {
-    return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?slug=${encodeURIComponent(part.slug)}`, 303);
+    return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?slug=${encodeURIComponent(part.slug)}&delivery=${delivery}`, 303);
   }
   try {
-    return NextResponse.redirect(await createCheckout(part), 303);
+    return NextResponse.redirect(await createCheckout(part, delivery), 303);
   } catch (err) {
     console.error("Stripe checkout failed", err);
-    return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?slug=${encodeURIComponent(part.slug)}`, 303);
+    return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?slug=${encodeURIComponent(part.slug)}&delivery=${delivery}`, 303);
   }
 }
 
 /** A unit we source to order. The price is worked out here, never taken from the browser. */
-async function goUnit(form: FormData) {
+async function goUnit(form: FormData, delivery: Delivery) {
   const field = (k: string) => String(form.get(k) || "");
   const v = { year: parseInt(field("year"), 10), make: field("make"), model: field("model"), partType: field("partType"), spec: field("spec") };
   const unit = v.year && specsFor(v.year, v.make, v.model, v.partType).includes(v.spec) ? (await unitOptions(v))?.[parseInt(field("tier"), 10)] : null;
@@ -33,7 +32,7 @@ async function goUnit(form: FormData) {
   const title = `${v.year} ${v.make} ${v.model} Used ${v.partType}`;
   const line = `${v.spec} · ${unit.miles.toLocaleString()} miles`;
   const q = new URLSearchParams({ year: String(v.year), make: v.make, model: v.model, type: v.partType, spec: v.spec });
-  const unavailable = () => NextResponse.redirect(`${siteUrl()}/checkout/unavailable?${new URLSearchParams({ slug: `${title}, ${line} at $${unit.price.toLocaleString("en-US")} (ref ${ref})` })}`, 303);
+  const unavailable = () => NextResponse.redirect(`${siteUrl()}/checkout/unavailable?${new URLSearchParams({ slug: `${title}, ${line} at $${unit.price.toLocaleString("en-US")} (ref ${ref})`, delivery })}`, 303);
   if (!paymentsLive()) return unavailable();
   try {
     const url = await startCheckout({
@@ -42,6 +41,7 @@ async function goUnit(form: FormData) {
       description: `${line} · ${BUSINESS.warrantyAdj} warranty · Ref ${ref}`,
       metadata: { item: `${title}, ${line}`, stockNo: ref },
       cancelPath: `/parts/options?${q}`,
+      delivery,
     });
     return NextResponse.redirect(url, 303);
   } catch (err) {
@@ -51,14 +51,14 @@ async function goUnit(form: FormData) {
 }
 
 /** A lower-mileage option offered on a listed part's page. The listing itself stays available. */
-async function goListedTier(slug: string, tier: number) {
+async function goListedTier(slug: string, tier: number, delivery: Delivery) {
   const part = await db.part.findUnique({ where: { slug } });
   const unit = part?.status === "available" ? listedOptions(part).find((o) => o.tier === tier) : null;
   if (!part || !unit) return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?reason=sold`, 303);
 
   const line = `${unit.miles.toLocaleString()} miles`;
   const ref = `${part.stockNo || part.slug}-${tier}`;
-  const unavailable = () => NextResponse.redirect(`${siteUrl()}/checkout/unavailable?${new URLSearchParams({ slug: `${part.title}, ${line} at $${unit.price.toLocaleString("en-US")} (ref ${ref})` })}`, 303);
+  const unavailable = () => NextResponse.redirect(`${siteUrl()}/checkout/unavailable?${new URLSearchParams({ slug: `${part.title}, ${line} at $${unit.price.toLocaleString("en-US")} (ref ${ref})`, delivery })}`, 303);
   if (!paymentsLive()) return unavailable();
   try {
     const url = await startCheckout({
@@ -67,6 +67,7 @@ async function goListedTier(slug: string, tier: number) {
       description: `${line} · ${BUSINESS.warrantyAdj} warranty · Ref ${ref}`,
       metadata: { item: `${part.title}, ${line}`, stockNo: ref },
       cancelPath: `/parts/${part.slug}`,
+      delivery,
     });
     return NextResponse.redirect(url, 303);
   } catch (err) {
@@ -80,9 +81,10 @@ export async function POST(req: Request) {
   const form = await req.formData();
   const slug = String(form.get("slug") || "");
   const tier = parseInt(String(form.get("tier") || "0"), 10);
-  if (slug && tier > 0) return goListedTier(slug, tier);
-  if (!slug && form.has("tier")) return goUnit(form);
-  return go(String(form.get("slug") || ""));
+  const delivery = parseDelivery(form.get("delivery"));
+  if (slug && tier > 0) return goListedTier(slug, tier, delivery);
+  if (!slug && form.has("tier")) return goUnit(form, delivery);
+  return go(slug, delivery);
 }
 
 // From a pay link texted by staff

@@ -15,8 +15,8 @@ const STEPS = [
   { t: "We match it to the right unit", d: "A parts specialist checks the VIN against our listings and our supplier network, and finds the units that fit." },
   { t: "You get options by text", d: "Price, mileage and warranty for each matching unit, side by side, so you can choose with the facts in front of you." },
   { t: "You see the actual part", d: "Ask for photos of the exact unit before you pay. If it isn't what you expected, you don't buy it." },
-  { t: "We crate and ship it", d: "The part is strapped to a pallet and wrapped, then shipped by freight carrier to your home or repair shop. You get tracking by text." },
-  { t: "You're covered after delivery", d: `A ${BUSINESS.warrantyAdj} warranty against defects, in writing. If we sent the wrong part or it's defective, we exchange or refund it.` },
+  { t: "We crate and ship it", d: `The part is strapped to a pallet and wrapped, then shipped by freight carrier: free to your repair shop, or to your home for ${BUSINESS.homeDeliveryFee}. It usually arrives in ${BUSINESS.deliveryDays}, with tracking by text.` },
+  { t: "You're covered after delivery", d: `A ${BUSINESS.warrantyAdj} warranty against defects, in writing. If there's a problem within ${BUSINESS.replacementDays} days, we pick up the part and send a replacement at our cost, or refund you if we don't have one.` },
 ];
 
 export default function Page() {
@@ -45,7 +45,7 @@ export default function Page() {
           <Stage src="/img/parts-cut/any-zf-transmission-2.webp" gold className="aspect-[4/3] rounded-[28px] shadow-lift" imgClassName="p-10" />
           <div className="rounded-[24px] bg-ink p-7 text-white">
             <div className="font-serif text-[2rem] leading-none">Start with your VIN</div>
-            <p className="mt-2 text-sm text-white/60">Text it to {BUSINESS.smsDisplay}. {BUSINESS.hours}.</p>
+            <p className="mt-2 text-sm text-white/60">Text it to {BUSINESS.smsDisplay}. {BUSINESS.contactHours}.</p>
             <div className="mt-5 flex flex-wrap gap-3">
               <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold"><ChatIcon /> Text your VIN</a>
               <Link href="/warranty" className="btn-outline-light">Read the warranty</Link>

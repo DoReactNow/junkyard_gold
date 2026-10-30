@@ -32,19 +32,19 @@ export type ProductViewProps = {
 const INCLUDED: [string, string][] = [
   ["Matched to your VIN", "A specialist checks your VIN before anything ships"],
   ["Photos before you pay", "Text us and we'll send real photos of your unit"],
-  [`${BUSINESS.warrantyAdj} warranty`, "Replacement or refund on a defective part"],
-  ["Return freight covered", "If it's the wrong part or defective"],
-  ["14-day returns", "Uninstalled parts in the condition we sent them"],
-  ["Shipped nationwide", "By freight to your home or shop, in all 50 states"],
+  [`${BUSINESS.warrantyAdj} warranty`, "Against internal defects, in writing"],
+  [`${BUSINESS.replacementDays}-day replacement`, "A problem with the part? We pick it up and send a replacement at our cost, or refund you if we don't have one"],
+  ["Free delivery to shops", `Home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price`],
+  [`Delivered in ${BUSINESS.deliveryDays}`, "By freight, to the lower 48 states"],
 ];
 
 const STEPS: [string, string][] = [
-  ["You order", "Pick your unit and send us your VIN."],
-  ["VIN check", "A specialist matches your VIN to the part and confirms the freight cost."],
+  ["You order", "Pick your unit, choose shop or home delivery and send us your VIN."],
+  ["VIN check", "A specialist matches your VIN to the part. For home delivery, we also text you the cost to your ZIP."],
   ["Photos", "Ask for real photos of your unit by text at any point before you pay."],
-  ["Packed", "Your part is prepared and strapped to a pallet, usually within 1–3 business days."],
-  ["On its way", "A freight carrier takes it to your home or shop. Tracking comes by text."],
-  ["Delivered", "Usually 3–7 business days after it ships. Check it over before you sign."],
+  ["Packed", "Your part is prepared and strapped to a pallet."],
+  ["On its way", "A freight carrier takes it to your shop or home. Tracking comes by text."],
+  ["Delivered", `Usually ${BUSINESS.deliveryDays} from your order. Check it over before you sign.`],
 ];
 
 function faqs(word: string): { q: string; a: string; href: string; link: string }[] {
@@ -53,10 +53,10 @@ function faqs(word: string): { q: string; a: string; href: string; link: string 
     { q: "Can I see photos before I buy?", a: "Yes. Text us and we'll send real photos of your unit before you pay. The photos on this page are examples unless they're labeled otherwise.", href: "/our-process", link: "Our process" },
     { q: "What does the warranty cover?", a: `For ${BUSINESS.warranty} from the day you receive it, we cover internal mechanical defects that keep the part from working as designed. Labor, towing, fluids and bolt-on accessories aren't covered.`, href: "/warranty", link: "Full warranty" },
     { q: "How do I keep the warranty valid?", a: "Have a qualified mechanic install the part, replace the fluids and filters at installation and keep the receipts. Don't take the part apart without our written approval.", href: "/warranty", link: "Warranty requirements" },
-    { q: "How much is freight, and how long does it take?", a: "We confirm the cost to your ZIP before the part ships. Most orders ship within 1–3 business days and arrive 3–7 business days later. We ship every order and don't offer pickup.", href: "/shipping-returns", link: "Shipping details" },
+    { q: "How much is delivery, and how long does it take?", a: `Delivery to a repair shop address is free. Home delivery is ${BUSINESS.homeDeliveryFee}, based on the part price, and we text you the exact cost before it ships. We don't deliver to Alaska or Hawaii. Delivery usually takes ${BUSINESS.deliveryDays}. We ship every order and don't offer pickup.`, href: "/shipping-returns", link: "Shipping details" },
     { q: "What should I do on delivery day?", a: "Inspect the shipment when it arrives and note any visible damage on the delivery receipt before you sign.", href: "/shipping-returns", link: "Shipping details" },
-    { q: "What if it's wrong or defective?", a: "If it doesn't match your VIN, or it's defective under our warranty, we'll exchange it or refund you, including return freight.", href: "/shipping-returns", link: "Return policy" },
-    { q: "What if I change my mind?", a: "Contact us within 14 days of delivery. The part must be uninstalled and in the condition we sent it, and return shipping is paid by the customer.", href: "/shipping-returns", link: "Return policy" },
+    { q: "What if there's a problem with it?", a: `Tell us within ${BUSINESS.replacementDays} days of delivery. We pick up the part and send you a replacement at our cost. If we don't have a replacement, we refund you.`, href: "/shipping-returns", link: "Return policy" },
+    { q: "What if I change my mind?", a: "All sales are final unless something goes wrong with the part. We don't offer change-of-mind returns, so check the fit and ask for photos before you pay.", href: "/shipping-returns", link: "Return policy" },
     { q: `What comes with the ${word}?`, a: "What's attached can vary by donor vehicle, so text us your unit's reference and we'll confirm it before you pay.", href: "/contact", link: "Contact us" },
   ];
 }
@@ -226,6 +226,7 @@ export function ProductView(p: ProductViewProps) {
                 ...(p.sameYears && p.sameYears.length > 1 ? ([["Same spec listed for", p.sameYears.join(", ")]] as [string, string][]) : []),
                 ["Condition", p.condition || "Used OEM"],
                 ["Warranty", `${BUSINESS.warrantyAdj}, parts`],
+                ["Replacement", `${BUSINESS.replacementDays} days, at our cost`],
                 ["Reference", p.unitRef],
               ]}
             />
@@ -233,8 +234,9 @@ export function ProductView(p: ProductViewProps) {
               title="Shipping"
               rows={[
                 ["Method", "Freight, on a pallet"],
-                ["Delivers to", "Home or shop, all 50 states"],
-                ["Freight cost", "Quoted to your ZIP before it ships"],
+                ["Delivers to", BUSINESS.coverage],
+                ["Repair shop delivery", "Free"],
+                ["Home delivery", `${BUSINESS.homeDeliveryFee}, based on part price`],
                 ["Estimated delivery", delivery],
                 ["Tracking", "By text"],
               ]}
@@ -277,7 +279,7 @@ export function ProductView(p: ProductViewProps) {
           <div>
             <div className="eyebrow">Straight answers</div>
             <h2 className="font-serif mt-2 text-[2.4rem] leading-[1.03] sm:text-[3.2rem]">What buyers ask first</h2>
-            <p className="mt-4 text-[15px] leading-relaxed text-steel">Each answer comes from our published policies. Need something else? A specialist answers {BUSINESS.hours}.</p>
+            <p className="mt-4 text-[15px] leading-relaxed text-steel">Each answer comes from our published policies. Need something else? {BUSINESS.contactHours}.</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a href={smsWithBody(sms)} className="btn-dark"><ChatIcon /> Text {BUSINESS.smsDisplay}</a>
               <a href={TEL_HREF} className="btn-ghost"><PhoneIcon /> Call {BUSINESS.phoneDisplay}</a>

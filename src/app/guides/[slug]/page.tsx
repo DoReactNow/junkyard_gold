@@ -36,7 +36,7 @@ export default async function Page({ params }: P) {
         <aside className="space-y-5 lg:sticky lg:top-32 lg:self-start">
           <div className="rounded-[22px] bg-ink p-6 text-white">
             <div className="font-serif text-[1.7rem] leading-none">Need the right part?</div>
-            <p className="mt-2 text-sm leading-relaxed text-white/60">Text your VIN and a specialist will match it for you. {BUSINESS.hours}.</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/60">Text your VIN and a specialist will match it for you. {BUSINESS.contactHours}.</p>
             <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold mt-5 w-full text-sm"><ChatIcon /> Text your VIN</a>
             <a href={TEL_HREF} className="btn-outline-light mt-2 w-full text-sm"><PhoneIcon /> {BUSINESS.phoneDisplay}</a>
           </div>

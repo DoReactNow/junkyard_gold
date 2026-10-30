@@ -7,14 +7,14 @@ import { ChatIcon, PhoneIcon } from "@/components/icons";
 
 export const metadata = {
   title: "About us",
-  description: `${BUSINESS.name} supplies quality used engines and transmissions from Bradenton, Florida to all 50 states.`,
+  description: `${BUSINESS.name} supplies quality used engines and transmissions from Bradenton, Florida to the lower 48 states.`,
 };
 
 export default function Page() {
   const facts = [
     [String(BUSINESS.founded), "founded in Bradenton, Florida"],
     [BUSINESS.soldSince, `parts sold since ${BUSINESS.founded}`],
-    ["50", "states we deliver to"],
+    ["48", "states we deliver to"],
     [BUSINESS.warrantyAdj, "warranty on every used part"],
   ];
   return (
@@ -24,7 +24,7 @@ export default function Page() {
         eyebrow="About Junkyard Gold"
         title={<>Used parts, sold <span className="text-gold-grad">the right way.</span></>}
       >
-        Since {BUSINESS.founded}, a used engine and transmission supplier in Bradenton, Florida, shipping to drivers and repair shops across the country.
+        Since {BUSINESS.founded}, a used engine and transmission supplier in Bradenton, Florida, shipping to drivers and repair shops across the lower 48 states.
       </PageHero>
       <section className="mx-auto grid max-w-7xl gap-16 px-4 py-20 md:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <Reveal className="prose-jg max-w-2xl">
@@ -35,8 +35,8 @@ export default function Page() {
           </p>
           <p>
             Every order starts with your VIN, so the part matches the engine code and drivetrain your vehicle left the factory
-            with. You can see photos of the actual unit before you pay. It ships crated on a pallet to your driveway or your shop,
-            and it&apos;s covered by a {BUSINESS.warrantyAdj} warranty that&apos;s written down.
+            with. You can see photos of the actual unit before you pay. It ships on a pallet, free to your repair shop or to your home for {BUSINESS.homeDeliveryFee},
+            and it&apos;s covered by a {BUSINESS.warrantyAdj} warranty that&apos;s written down. If there&apos;s a problem within {BUSINESS.replacementDays} days, we pick it up and send a replacement at our cost, or refund you if we don&apos;t have one.
           </p>
           <h2>A network behind every quote</h2>
           <p>
@@ -45,7 +45,7 @@ export default function Page() {
           </p>
           <h2>Talk to a real person</h2>
           <p>
-            Call {BUSINESS.phoneDisplay} or text {BUSINESS.smsDisplay}, {BUSINESS.hours}. You&apos;ll reach a parts specialist, not a ticket queue. Our
+            Call {BUSINESS.phoneDisplay} Mon–Fri 10 AM – 6 PM ET, or text {BUSINESS.smsDisplay} {BUSINESS.textHours}. You&apos;ll reach a parts specialist, not a ticket queue. Our
             office is at {ADDRESS_LINE}. We ship every order; we don&apos;t offer pickup.
           </p>
         </Reveal>
