@@ -3,6 +3,7 @@
 // Models come from the free NHTSA vPIC database (cached for a month) merged with our own listings.
 import { db } from "./db";
 import { normMake } from "./inventory";
+import { specModels } from "./specs";
 import { titleMake } from "./vin";
 
 /** [make, first year, last year] for the US market. EV-only brands are left out (no engines). */
@@ -72,7 +73,8 @@ export async function modelsForYear(make: string, year: number, partWhere: objec
     }),
   ]);
   const byKey = new Map<string, FinderModel>();
-  for (const m of official) if (!byKey.has(key(m))) byKey.set(key(m), { name: m, inStock: false });
+  // spec-list names first, so picking a model finds its specs
+  for (const m of [...specModels(make, year), ...official]) if (!byKey.has(key(m))) byKey.set(key(m), { name: m, inStock: false });
   for (const { model } of ours) {
     const k = key(normMake(make) === "ram" ? model.replace(/^ram\s*/i, "") : model);
     // merge "F150" into "F-150", "Silverado 1500" into "Silverado", etc.

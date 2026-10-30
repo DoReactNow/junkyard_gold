@@ -13,7 +13,20 @@ export function payLink(part: Pick<Part, "slug">) {
   return `${siteUrl()}/api/checkout?slug=${encodeURIComponent(part.slug)}`;
 }
 
-export async function createCheckout(part: Part) {
+type CheckoutItem = { title: string; price: number; description: string; metadata: Record<string, string>; cancelPath: string };
+
+export const createCheckout = (part: Part) =>
+  startCheckout({
+    title: part.title,
+    price: part.price,
+    description: [part.mileage ? `${part.mileage.toLocaleString()} miles` : "", `${warrantyAdj(part.warranty)} warranty`, part.stockNo ? `Stock ${part.stockNo}` : ""]
+      .filter(Boolean)
+      .join(" · "),
+    metadata: { partId: part.id, stockNo: part.stockNo || "" },
+    cancelPath: partUrl(part),
+  });
+
+export async function startCheckout(item: CheckoutItem) {
   const session = await getStripe().checkout.sessions.create({
     mode: "payment",
     line_items: [
@@ -21,13 +34,8 @@ export async function createCheckout(part: Part) {
         quantity: 1,
         price_data: {
           currency: "usd",
-          unit_amount: part.price * 100,
-          product_data: {
-            name: part.title,
-            description: [part.mileage ? `${part.mileage.toLocaleString()} miles` : "", `${warrantyAdj(part.warranty)} warranty`, part.stockNo ? `Stock ${part.stockNo}` : ""]
-              .filter(Boolean)
-              .join(" · "),
-          },
+          unit_amount: item.price * 100,
+          product_data: { name: item.title, description: item.description },
         },
       },
     ],
@@ -36,9 +44,9 @@ export async function createCheckout(part: Part) {
     custom_text: {
       submit: { message: "We confirm fitment with your VIN and text you the freight cost before the part ships." },
     },
-    metadata: { partId: part.id, stockNo: part.stockNo || "" },
+    metadata: item.metadata,
     success_url: `${siteUrl()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl()}${partUrl(part)}`,
+    cancel_url: `${siteUrl()}${item.cancelPath}`,
   });
   return session.url!;
 }

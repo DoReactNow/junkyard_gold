@@ -150,9 +150,12 @@ function unitHash(key: string) {
  * Owner's rule: 2015–2025 → 10k–80k, 2000–2014 → 70k–110k, older → 80k–130k (never above 130k).
  * Newer vehicles sit toward the low end of their band; a stable per-listing offset spreads them out.
  */
+export function mileBand(year: number) {
+  return year >= 2015 ? [10_000, 80_000, 2026, 11] : year >= 2000 ? [70_000, 110_000, 2014, 14] : [80_000, 130_000, 1999, 30];
+}
+
 export function milesFor(year: number, key: string) {
-  const [lo, hi, newest, span] =
-    year >= 2015 ? [10_000, 80_000, 2026, 11] : year >= 2000 ? [70_000, 110_000, 2014, 14] : [80_000, 130_000, 1999, 30];
+  const [lo, hi, newest, span] = mileBand(year);
   const age = Math.min(1, Math.max(0, (newest - year) / span));
   const miles = lo + (hi - lo) * (0.75 * age + 0.25 * unitHash(key));
   return Math.min(MAX_MILES, Math.round(miles / 1000) * 1000);
