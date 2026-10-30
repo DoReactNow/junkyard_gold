@@ -3,7 +3,7 @@
 // Models come from the free NHTSA vPIC database (cached for a month) merged with our own listings.
 import { db } from "./db";
 import { normMake } from "./inventory";
-import { specModels } from "./specs";
+import { allSpecModels, specModels } from "./specs";
 import { titleMake } from "./vin";
 
 /** [make, first year, last year] for the US market. EV-only brands are left out (no engines). */
@@ -35,7 +35,15 @@ export function makesForYear(year: number) {
 }
 
 const VPIC_TYPES = ["passenger car", "truck", "multipurpose passenger vehicle (mpv)"];
-const key = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+const key = (s: string) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]/g, "");
+// NHTSA and the spec list spell some names in capitals or with odd casing
+const tidy = (s: string) =>
+  s
+    .replace(/\b[A-Z][A-Z]{3,}\b/g, (w) => w[0] + w.slice(1).toLowerCase())
+    .replace(/\b(Fwd|Rwd|Awd|Lhs|Tc|Pt)\b/g, (w) => w.toUpperCase())
+    .replace(/\bLebaron\b/, "LeBaron")
+    .replace(/ And /g, " and ");
+const keepModel = (m: string) => /^[A-Za-z0-9]/.test(m) && !/chassis|military|incomplete|motorhome|recreational|reman|\bsedan$|maybach|^ford /i.test(m);
 
 async function vpicModels(make: string, year: number): Promise<string[]> {
   const lists = await Promise.all(
@@ -54,18 +62,41 @@ async function vpicModels(make: string, year: number): Promise<string[]> {
     }),
   );
   // drop kit-car / chassis oddities like "'34" or "Bus Chassis"
-  return lists.flat().filter((m) => /^[A-Za-z0-9]/.test(m) && !/chassis|military|incomplete|motorhome/i.test(m));
+  return lists.flat().filter(keepModel);
 }
 
-export type FinderModel = { name: string; inStock: boolean };
+/** Every model NHTSA has for a make, in any model year (same vehicle types, so no trailers). */
+async function vpicAllModels(make: string): Promise<string[]> {
+  const lists = await Promise.all(
+    VPIC_TYPES.map(async (t) => {
+      try {
+        const res = await fetch(
+          `https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/${encodeURIComponent(make)}/vehicletype/${encodeURIComponent(t)}?format=json`,
+          { next: { revalidate: 60 * 60 * 24 * 30 }, signal: AbortSignal.timeout(8000) },
+        );
+        if (!res.ok) return [];
+        const json = (await res.json()) as { Results?: { Model_Name: string }[] };
+        return (json.Results ?? []).map((r) => r.Model_Name.trim());
+      } catch {
+        return [];
+      }
+    }),
+  );
+  return lists.flat().filter(keepModel);
+}
+
+export type FinderModel = { name: string; inStock: boolean; group?: string };
 
 /**
  * Models for a make and year: NHTSA's list plus anything we have listed (our naming wins where
- * they're the same model, e.g. "F150" vs "F-150", so the search finds our listings).
+ * they're the same model, e.g. "F150" vs "F-150", so the search finds our listings). Models from
+ * the make's other years follow in their own group, so no customer is left without their model
+ * when a year's records are thin.
  */
 export async function modelsForYear(make: string, year: number, partWhere: object): Promise<FinderModel[]> {
-  const [official, ours] = await Promise.all([
+  const [official, everyYear, ours] = await Promise.all([
     vpicModels(make, year),
+    vpicAllModels(make),
     db.part.findMany({
       where: { status: "available", year, ...makeWhere(make), ...partWhere },
       distinct: ["model"],
@@ -74,7 +105,7 @@ export async function modelsForYear(make: string, year: number, partWhere: objec
   ]);
   const byKey = new Map<string, FinderModel>();
   // spec-list names first, so picking a model finds its specs
-  for (const m of [...specModels(make, year), ...official]) if (!byKey.has(key(m))) byKey.set(key(m), { name: m, inStock: false });
+  for (const m of [...official, ...specModels(make, year)]) if (!byKey.has(key(m))) byKey.set(key(m), { name: tidy(m), inStock: false });
   for (const { model } of ours) {
     const k = key(normMake(make) === "ram" ? model.replace(/^ram\s*/i, "") : model);
     // merge "F150" into "F-150", "Silverado 1500" into "Silverado", etc.
@@ -82,7 +113,12 @@ export async function modelsForYear(make: string, year: number, partWhere: objec
     if (near) byKey.set(near, { name: byKey.get(near)!.name, inStock: true });
     else byKey.set(k, { name: model, inStock: true });
   }
-  return [...byKey.values()].sort((a, b) => a.name.localeCompare(b.name, "en", { numeric: true }));
+  const byName = (a: FinderModel, b: FinderModel) => a.name.localeCompare(b.name, "en", { numeric: true });
+  const others = new Map<string, FinderModel>();
+  for (const m of [...everyYear, ...allSpecModels(make)]) {
+    if (!byKey.has(key(m)) && !others.has(key(m))) others.set(key(m), { name: tidy(m), inStock: false, group: `Other ${make} models` });
+  }
+  return [...[...byKey.values()].sort(byName), ...[...others.values()].sort(byName)];
 }
 
 /** Listing filter for a make the customer picked. Ram trucks are listed under Dodge in older sheets. */

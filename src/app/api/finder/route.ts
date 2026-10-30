@@ -3,7 +3,7 @@ import { typeWhere, normMake } from "@/lib/inventory";
 import { specsFor } from "@/lib/specs";
 import { finderYears, makesForYear, modelsForYear, stockedMakes } from "@/lib/vehicles";
 
-export type FinderOption = { name: string; inStock: boolean };
+export type FinderOption = { name: string; inStock: boolean; group?: string };
 
 /** Year → Make → Model → Spec options: every US-market vehicle, flagged where we have listings. */
 export async function GET(req: Request) {

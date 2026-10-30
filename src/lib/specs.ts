@@ -5,7 +5,7 @@ import data from "@/data/specs.json";
 type Entry = { e?: string[]; t?: string[] };
 const SPECS = data as Record<string, Record<string, Record<string, Entry>>>;
 
-const key = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+const key = (s: string) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]/g, "");
 
 function modelsOf(make: string, year: number) {
   const makes = SPECS[String(year)];
@@ -17,6 +17,11 @@ function modelsOf(make: string, year: number) {
 /** Model names we have specs for, so the finder offers them under the same spelling. */
 export function specModels(make: string, year: number) {
   return Object.keys(modelsOf(make, year));
+}
+
+/** Every model we have specs for under a make, in any year. */
+export function allSpecModels(make: string) {
+  return [...new Set(Object.keys(SPECS).flatMap((y) => specModels(make, Number(y))))];
 }
 
 /** Specs for a vehicle. An exact model wins; otherwise close names ("Silverado" ↔ "Silverado 1500") are combined. */
