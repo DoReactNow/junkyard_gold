@@ -15,23 +15,38 @@ export const catalogPath = (kind: Kind, make?: string, model?: string, year?: nu
 export type Facet = { name: string; slug: string; count: number; from: number };
 
 const avail = (kind: Kind) => ({ status: "available", partType: KINDS[kind].partType });
+const ci = (value: string) => ({ equals: value, mode: "insensitive" as const });
+
+/** Groups rows by URL slug, so names that differ only in capitalization share one page. */
+function mergeBySlug(rows: { name: string; count: number; from: number }[]): Facet[] {
+  const bySlug = new Map<string, Facet & { best: number }>();
+  for (const r of rows) {
+    const slug = slugify(r.name);
+    const f = bySlug.get(slug);
+    if (!f) bySlug.set(slug, { name: r.name, slug, count: r.count, from: r.from, best: r.count });
+    else {
+      if (r.count > f.best) { f.name = r.name; f.best = r.count; }
+      f.count += r.count;
+      f.from = Math.min(f.from, r.from);
+    }
+  }
+  return [...bySlug.values()].map(({ name, slug, count, from }) => ({ name, slug, count, from }));
+}
 
 export async function makesFor(kind: Kind): Promise<Facet[]> {
   const rows = await db.part.groupBy({ by: ["make"], where: avail(kind), _count: true, _min: { price: true } });
-  return rows
-    .map((r) => ({ name: r.make, slug: slugify(r.make), count: r._count, from: r._min.price ?? 0 }))
+  return mergeBySlug(rows.map((r) => ({ name: r.make, count: r._count, from: r._min.price ?? 0 })))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 }
 
 export async function modelsFor(kind: Kind, make: string): Promise<Facet[]> {
-  const rows = await db.part.groupBy({ by: ["model"], where: { ...avail(kind), make }, _count: true, _min: { price: true } });
-  return rows
-    .map((r) => ({ name: r.model, slug: slugify(r.model), count: r._count, from: r._min.price ?? 0 }))
+  const rows = await db.part.groupBy({ by: ["model"], where: { ...avail(kind), make: ci(make) }, _count: true, _min: { price: true } });
+  return mergeBySlug(rows.map((r) => ({ name: r.model, count: r._count, from: r._min.price ?? 0 })))
     .sort((a, b) => a.name.localeCompare(b.name, "en", { numeric: true }));
 }
 
 export async function yearsFor(kind: Kind, make: string, model: string): Promise<Facet[]> {
-  const rows = await db.part.groupBy({ by: ["year"], where: { ...avail(kind), make, model }, _count: true, _min: { price: true } });
+  const rows = await db.part.groupBy({ by: ["year"], where: { ...avail(kind), make: ci(make), model: ci(model) }, _count: true, _min: { price: true } });
   return rows
     .map((r) => ({ name: String(r.year), slug: String(r.year), count: r._count, from: r._min.price ?? 0 }))
     .sort((a, b) => Number(b.name) - Number(a.name));
@@ -47,7 +62,7 @@ export async function resolveModel(kind: Kind, make: string, slug: string) {
 
 export function listingsFor(kind: Kind, f: { make?: string; model?: string; year?: number }, take = 24) {
   return db.part.findMany({
-    where: { ...avail(kind), ...(f.make ? { make: f.make } : {}), ...(f.model ? { model: f.model } : {}), ...(f.year ? { year: f.year } : {}) },
+    where: { ...avail(kind), ...(f.make ? { make: ci(f.make) } : {}), ...(f.model ? { model: ci(f.model) } : {}), ...(f.year ? { year: f.year } : {}) },
     orderBy: [{ year: "desc" }, { price: "asc" }],
     take,
   });

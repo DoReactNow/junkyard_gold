@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { money } from "@/lib/inventory";
+import { money, warrantyAdj } from "@/lib/inventory";
 import { catalogPath } from "@/lib/catalog";
 import { BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
 import { PageShell } from "@/components/site-chrome";
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!part) return {};
   return {
     title: part.title,
-    description: `${part.title}${part.mileage ? `, ${part.mileage.toLocaleString()} miles` : ""}. ${money(part.price)} with a ${part.warranty} warranty from ${BUSINESS.name} in Bradenton, FL.`,
+    description: `${part.title}${part.mileage ? `, ${part.mileage.toLocaleString()} miles` : ""}. ${money(part.price)} with a ${warrantyAdj(part.warranty)} warranty from ${BUSINESS.name} in Bradenton, FL.`,
   };
 }
 
@@ -55,112 +55,138 @@ export default async function PartPage({ params }: { params: Params }) {
   return (
     <PageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="mx-auto max-w-6xl px-4 pt-6 text-sm text-steel">
-        <Link href="/" className="hover:text-ink">Home</Link> /{" "}
-        {kind ? (
-          <>
-            <Link href={catalogPath(kind)} className="hover:text-ink">{part.partType}s</Link> /{" "}
-            <Link href={catalogPath(kind, part.make)} className="hover:text-ink">{part.make}</Link> /{" "}
-            <Link href={catalogPath(kind, part.make, part.model)} className="hover:text-ink">{part.model}</Link> /{" "}
-            <Link href={catalogPath(kind, part.make, part.model, part.year)} className="hover:text-ink">{part.year}</Link>
-          </>
-        ) : (
-          <>
-            <Link href="/parts?type=Other" className="hover:text-ink">Other parts</Link> /{" "}
-            <Link href={`/parts?year=${part.year}&make=${encodeURIComponent(part.make)}&model=${encodeURIComponent(part.model)}`} className="hover:text-ink">
-              {part.year} {part.make} {part.model}
-            </Link>
-          </>
-        )}
+      <div className="border-b border-line bg-white">
+        <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-1.5 px-4 py-3.5 text-[13px] text-steel md:px-6" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-ink">Home</Link>
+          {(kind
+            ? [
+                { name: `${part.partType}s`, href: catalogPath(kind) },
+                { name: part.make, href: catalogPath(kind, part.make) },
+                { name: part.model, href: catalogPath(kind, part.make, part.model) },
+                { name: String(part.year), href: catalogPath(kind, part.make, part.model, part.year) },
+              ]
+            : [
+                { name: "Other parts", href: "/parts?type=Other" },
+                { name: `${part.year} ${part.make} ${part.model}`, href: `/parts?year=${part.year}&make=${encodeURIComponent(part.make)}&model=${encodeURIComponent(part.model)}` },
+              ]
+          ).map((c) => (
+            <span key={c.href} className="flex items-center gap-1.5">
+              <span className="text-line">/</span>
+              <Link href={c.href} className="hover:text-ink">{c.name}</Link>
+            </span>
+          ))}
+        </nav>
       </div>
 
-      <section className="mx-auto grid max-w-6xl gap-8 px-4 py-6 lg:grid-cols-2">
-        <div>
-          <div className={`relative overflow-hidden rounded-xl border border-line ${images.kind === "illustration" ? "bg-ink" : "bg-white"}`}>
+      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-10 md:px-6 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+        <div className="lg:sticky lg:top-32 lg:self-start">
+          <div className={`relative overflow-hidden rounded-3xl border border-line shadow-card ${images.kind === "illustration" ? "bg-ink" : "bg-white"}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={images.files[0]} alt={images.kind === "own" ? part.title : `Example ${part.partType.toLowerCase()} photo`} className="aspect-[4/3] w-full object-contain" />
+            <img src={images.files[0]} alt={images.kind === "own" ? part.title : `Example ${part.partType.toLowerCase()} photo`} className="aspect-[4/3] w-full object-contain p-6" />
             {images.kind !== "own" && (
-              <span className="absolute left-3 top-3 rounded bg-ink/85 px-2 py-1 text-xs font-semibold text-white">
+              <span className="absolute left-4 top-4 rounded-full bg-ink/90 px-3 py-1.5 text-[12px] font-semibold text-gold-light">
                 {images.kind === "example" ? "Example photo" : "Illustration"}
               </span>
             )}
           </div>
           {images.files.length > 1 && (
-            <div className="mt-2 grid grid-cols-4 gap-2">
+            <div className="mt-3 grid grid-cols-4 gap-3">
               {images.files.slice(1, 5).map((f) => (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img key={f} src={f} alt="" loading="lazy" className="aspect-square w-full rounded-md border border-line bg-white object-contain" />
+                <img key={f} src={f} alt="" loading="lazy" className="aspect-square w-full rounded-xl border border-line bg-white object-contain p-1.5" />
               ))}
             </div>
           )}
-          <a href={smsWithBody(smsBody)} className="mt-3 flex items-center gap-3 rounded-lg border border-line bg-white p-4 hover:border-gold">
-            <CameraIcon className="size-6 text-gold-dark" />
-            <span className="text-sm">
-              <b>Want to see this exact unit?</b> Text us and we&apos;ll send real photos before you buy.
+          <a href={smsWithBody(smsBody)} className="mt-4 flex items-center gap-4 rounded-2xl bg-ink p-5 text-white transition hover:bg-ink-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/10 text-gold-2"><CameraIcon /></span>
+            <span className="text-[14.5px] text-white/75">
+              <b className="block text-white">See this exact unit before you buy</b>
+              Text us and we&apos;ll send real photos of it.
             </span>
+            <span className="ml-auto text-gold-2" aria-hidden>→</span>
           </a>
         </div>
 
-        <div>
-          <span className="text-xs font-semibold uppercase tracking-wide text-gold-dark">
-            Used {part.partType} · Stock {part.stockNo || "—"}
-          </span>
-          <h1 className="mt-1 font-display text-4xl font-bold uppercase leading-tight">{name}</h1>
-          {part.spec && <p className="mt-1 text-lg text-steel">{part.spec}</p>}
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-ink px-3 py-1 text-[12px] font-semibold text-gold-light">Used {part.partType.toLowerCase()}</span>
+            <span className="rounded-full border border-line bg-white px-3 py-1 text-[12px] font-medium text-steel">Stock {part.stockNo || "—"}</span>
+            {sold ? (
+              <span className="rounded-full bg-bad px-3 py-1 text-[12px] font-bold text-white">Sold</span>
+            ) : (
+              <span className="flex items-center gap-1.5 rounded-full bg-ok/10 px-3 py-1 text-[12px] font-semibold text-ok">
+                <span className="size-1.5 rounded-full bg-ok" /> Available
+              </span>
+            )}
+          </div>
+          <h1 className="mt-4 font-display text-[2.2rem] font-bold leading-[1.08] sm:text-[2.6rem]">{name}</h1>
+          {part.spec && <p className="mt-2 text-[17px] text-steel">{part.spec}</p>}
 
-          <div className="mt-5 flex items-end gap-4">
-            <div className="font-display text-5xl font-bold">{money(part.price)}</div>
-            {sold && <span className="mb-2 rounded bg-bad px-2 py-1 text-xs font-bold uppercase text-white">Sold</span>}
+          <div className="card mt-7 p-6 sm:p-7">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <div className="font-display text-5xl font-bold leading-none">{money(part.price)}</div>
+                <div className="mt-2 text-[14px] text-steel">Includes a {warrantyAdj(part.warranty)} warranty · freight quoted to your ZIP</div>
+              </div>
+            </div>
+            <dl className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-4">
+              {[
+                ["Mileage", part.mileage ? `${part.mileage.toLocaleString()} mi` : "Ask us"],
+                ["Warranty", part.warranty],
+                ["Condition", part.condition],
+                ["Ships to", "All 50 states"],
+              ].map(([k, v]) => (
+                <div key={k} className="bg-white px-4 py-3">
+                  <dt className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-steel">{k}</dt>
+                  <dd className="mt-0.5 font-semibold">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            {!sold && (
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <form action="/api/checkout" method="post">
+                  <input type="hidden" name="slug" value={part.slug} />
+                  <button className="btn-gold !h-14 w-full text-base">Buy now · {money(part.price)}</button>
+                </form>
+                <a href={smsWithBody(smsBody)} className="btn-dark !h-14 w-full text-base">
+                  <ChatIcon /> Text about this part
+                </a>
+              </div>
+            )}
+            <a href={TEL_HREF} className="mt-4 flex items-center justify-center gap-2 text-sm font-semibold text-ink/80 hover:text-gold-dark">
+              <PhoneIcon /> Prefer to talk? Call {BUSINESS.phoneDisplay}
+            </a>
           </div>
 
-          <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line text-sm sm:grid-cols-4">
-            {[
-              ["Mileage", part.mileage ? `${part.mileage.toLocaleString()} mi` : "Ask us"],
-              ["Warranty", part.warranty],
-              ["Condition", part.condition],
-              ["Ships to", "All 50 states"],
-            ].map(([k, v]) => (
-              <div key={k} className="bg-white p-3">
-                <dt className="text-xs uppercase text-steel">{k}</dt>
-                <dd className="font-semibold">{v}</dd>
-              </div>
-            ))}
-          </dl>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            <li className="flex gap-3 rounded-xl border border-line bg-white p-4 text-[14px]">
+              <ShieldIcon className="size-5 shrink-0 text-gold-dark" />
+              <span><b className="block">{warrantyAdj(part.warranty)} warranty</b><span className="text-steel">Covered against defects. </span><Link href="/warranty" className="font-medium underline decoration-gold underline-offset-2">Details</Link></span>
+            </li>
+            <li className="flex gap-3 rounded-xl border border-line bg-white p-4 text-[14px]">
+              <TruckIcon className="size-5 shrink-0 text-gold-dark" />
+              <span><b className="block">Freight to your door</b><span className="text-steel">Home or shop, all 50 states. </span><Link href="/shipping-returns" className="font-medium underline decoration-gold underline-offset-2">Shipping</Link></span>
+            </li>
+          </ul>
 
-          {!sold && (
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <form action="/api/checkout" method="post">
-                <input type="hidden" name="slug" value={part.slug} />
-                <button className="btn-gold w-full text-base">Buy Now · {money(part.price)}</button>
-              </form>
-              <a href={smsWithBody(smsBody)} className="btn-dark w-full text-base">
-                <ChatIcon /> Text About This Part
-              </a>
-            </div>
-          )}
-          <a href={TEL_HREF} className="mt-3 flex items-center justify-center gap-2 text-sm font-semibold hover:text-gold-dark">
-            <PhoneIcon /> Or call {BUSINESS.phoneDisplay}
-          </a>
-
-          <div className="mt-6 rounded-lg border border-line bg-white p-5">
-            <h2 className="font-display text-xl font-semibold uppercase">Will it fit? Check your VIN</h2>
-            <p className="mb-3 text-sm text-steel">We decode your VIN and compare it with this unit.</p>
+          <div className="card mt-6 p-6">
+            <div className="eyebrow">Will it fit?</div>
+            <h2 className="mt-1 font-display text-xl font-bold">Check your VIN against this unit</h2>
+            <p className="mb-4 mt-1 text-sm text-steel">We decode your VIN and compare it with this {part.partType.toLowerCase()}.</p>
             <VinCheck partType={part.partType} productSlug={part.slug} />
           </div>
-
-          <ul className="mt-6 space-y-3 text-sm">
-            <li className="flex gap-3"><ShieldIcon className="size-5 shrink-0 text-gold-dark" /> {part.warranty} warranty against defects. <Link href="/warranty" className="underline">Details</Link></li>
-            <li className="flex gap-3"><TruckIcon className="size-5 shrink-0 text-gold-dark" /> Freight shipping to your door or shop, quoted to your ZIP. <Link href="/shipping-returns" className="underline">Shipping &amp; returns</Link></li>
-          </ul>
-          {part.description && <p className="mt-6 whitespace-pre-line text-sm leading-relaxed text-ink/80">{part.description}</p>}
+          {part.description && <p className="mt-6 whitespace-pre-line text-[15px] leading-relaxed text-ink/80">{part.description}</p>}
         </div>
       </section>
 
       {siblings.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pb-14">
-          <h2 className="font-display text-2xl font-semibold uppercase">More {part.year} {part.make} {part.model} {part.partType.toLowerCase()}s</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {siblings.map((p) => <PartCard key={p.id} part={p} />)}
+        <section className="border-t border-line bg-sand/50">
+          <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+            <div className="eyebrow">More options</div>
+            <h2 className="mt-2 font-display text-3xl font-bold">More {part.year} {part.make} {part.model} {part.partType.toLowerCase()}s</h2>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {siblings.map((p) => <PartCard key={p.id} part={p} />)}
+            </div>
           </div>
         </section>
       )}

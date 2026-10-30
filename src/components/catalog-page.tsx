@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { BUSINESS, siteUrl, smsWithBody } from "@/lib/business";
 import { KINDS, catalogPath, listingsFor, makesFor, modelsFor, resolveMake, resolveModel, yearsFor, type Facet, type Kind } from "@/lib/catalog";
 import { money, partUrl } from "@/lib/inventory";
-import { PageShell } from "./site-chrome";
+import { PageHero, PageShell } from "./site-chrome";
 import { PartCard } from "./part-card";
 import { VinCheck } from "./vin-check";
 import { ChatIcon } from "./icons";
@@ -48,13 +48,13 @@ function FacetLinks({ title, items, href }: { title: string; items: Facet[]; hre
   if (!items.length) return null;
   return (
     <section className="mt-10">
-      <h2 className="font-display text-2xl font-semibold uppercase">{title}</h2>
+      <h2 className="font-display text-2xl font-semibold">{title}</h2>
       <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {items.map((f) => (
           <li key={f.slug}>
-            <Link href={href(f)} className="block rounded-md border border-line bg-white px-3 py-2.5 text-sm hover:border-gold">
+            <Link href={href(f)} className="block rounded-xl border border-line bg-white px-4 py-3 text-sm shadow-card transition hover:-translate-y-0.5 hover:border-gold/60">
               <span className="block truncate font-semibold">{f.name}</span>
-              <span className="block text-xs text-steel">{f.count} available · from {money(f.from)}</span>
+              <span className="mt-0.5 block text-xs text-steel">{f.count} available · from <span className="font-semibold text-ink">{money(f.from)}</span></span>
             </Link>
           </li>
         ))}
@@ -122,27 +122,18 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
   return (
     <PageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <section className="bg-ink text-white">
-        <div className="mx-auto max-w-6xl px-4 py-10">
-          <nav className="flex flex-wrap gap-1 text-sm text-white/60" aria-label="Breadcrumb">
-            {crumbs.map((c, i) => (
-              <span key={c.href}>
-                {i > 0 && " / "}
-                {i < crumbs.length - 1 ? <Link href={c.href} className="hover:text-gold">{c.name}</Link> : <span className="text-white/85">{c.name}</span>}
-              </span>
-            ))}
-          </nav>
-          <h1 className="mt-2 font-display text-4xl font-bold uppercase sm:text-5xl">{title} for Sale</h1>
-          <p className="mt-2 text-white/75">
-            {total.toLocaleString()} available · from {money(from)} · {BUSINESS.warrantyAdj} warranty · ships to all 50 states
-          </p>
+      <PageHero crumbs={crumbs} eyebrow={`Used ${k.plural.toLowerCase()}`} title={<>{title} <span className="text-gold-grad">for sale</span></>}>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-[15px]">
+          <span><b className="text-white">{total.toLocaleString()}</b> available</span>
+          <span>From <b className="text-gold-light">{money(from)}</b></span>
+          <span>{BUSINESS.warrantyAdj} warranty</span>
+          <span>Ships to all 50 states</span>
         </div>
-        <div className="stripe h-1.5" />
-      </section>
+      </PageHero>
 
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_320px]">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-[1fr_340px]">
         <div className="min-w-0">
-          <p className="max-w-3xl leading-relaxed text-ink/80">
+          <p className="max-w-3xl text-[16.5px] leading-relaxed text-ink/75">
             {vehicle
               ? `Looking for a used ${what}? Every ${k.singular} below is matched to your VIN before it ships, comes with a ${BUSINESS.warrantyAdj} warranty, and we'll text you photos of the exact unit before you pay. Prices start at ${money(from)}.`
               : `Tested used ${k.singular}s for cars, trucks and SUVs, shipped by freight to your door or repair shop. Pick your make below, or check your VIN to see what fits. Every ${k.singular} carries a ${BUSINESS.warrantyAdj} warranty.`}
@@ -158,7 +149,7 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
 
           <section className="mt-10">
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-display text-2xl font-semibold uppercase">{vehicle ? `${vehicle} ${k.plural}` : `Latest ${k.plural}`}</h2>
+              <h2 className="font-display text-2xl font-semibold">{vehicle ? `${vehicle} ${k.plural}` : `Latest ${k.plural}`}</h2>
               {total > listings.length && <Link href={allHref} className="text-sm font-semibold underline">See all {total.toLocaleString()} →</Link>}
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -167,10 +158,10 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
           </section>
 
           <section className="mt-12">
-            <h2 className="font-display text-2xl font-semibold uppercase">Questions</h2>
-            <div className="mt-3 divide-y divide-line rounded-lg border border-line bg-white">
+            <h2 className="font-display text-2xl font-semibold">Questions</h2>
+            <div className="mt-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
               {faq.map((x) => (
-                <div key={x.q} className="p-4">
+                <div key={x.q} className="p-5">
                   <h3 className="font-semibold">{x.q}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-steel">{x.a}</p>
                 </div>
@@ -180,15 +171,16 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
         </div>
 
         <aside className="space-y-5 lg:sticky lg:top-32 lg:self-start">
-          <div className="rounded-lg border border-line bg-white p-4">
-            <h2 className="font-display text-lg uppercase">Check your VIN</h2>
+          <div className="card p-5">
+            <div className="eyebrow">Will it fit?</div>
+            <h2 className="mt-1 font-display text-xl font-bold">Check your VIN</h2>
             <p className="mb-3 text-sm text-steel">See which {k.singular}s fit your vehicle.</p>
             <VinCheck partType={k.partType} />
           </div>
-          <div className="rounded-lg bg-gold p-4">
-            <div className="font-display text-lg font-semibold uppercase">Not finding it?</div>
-            <p className="mt-1 text-sm">We check our partner network for anything not listed here.</p>
-            <a href={smsWithBody(`Hi, I need a used ${what}. My VIN is: `)} className="btn-dark mt-3 w-full !py-2.5 text-sm">
+          <div className="rounded-2xl bg-ink p-5 text-white">
+            <div className="font-display text-xl font-bold">Not finding it?</div>
+            <p className="mt-1 text-sm text-white/65">We check our partner network for anything not listed here.</p>
+            <a href={smsWithBody(`Hi, I need a used ${what}. My VIN is: `)} className="btn-gold mt-4 w-full text-sm">
               <ChatIcon /> Text {BUSINESS.phoneDisplay}
             </a>
           </div>

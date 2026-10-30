@@ -10,7 +10,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
   return (
     <PageShell>
       <section className="mx-auto max-w-xl px-4 py-20 text-center">
-        <h1 className="font-display text-4xl font-bold uppercase">{sold ? "This part just sold" : "Let's finish your order by text"}</h1>
+        <h1 className="font-display text-4xl font-bold">{sold ? "This part just sold" : "Let's finish your order by text"}</h1>
         <p className="mt-4 text-lg text-steel">
           {sold
             ? "Someone beat you to it, but we likely have another one. Text us your VIN and we'll find you the next best unit."

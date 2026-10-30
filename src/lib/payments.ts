@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import type { Part } from "@prisma/client";
 import { siteUrl } from "./business";
-import { partUrl } from "./inventory";
+import { partUrl, warrantyAdj } from "./inventory";
 
 export const paymentsLive = () => Boolean(process.env.STRIPE_SECRET_KEY);
 
@@ -24,7 +24,7 @@ export async function createCheckout(part: Part) {
           unit_amount: part.price * 100,
           product_data: {
             name: part.title,
-            description: [part.mileage ? `${part.mileage.toLocaleString()} miles` : "", `${part.warranty} warranty`, part.stockNo ? `Stock ${part.stockNo}` : ""]
+            description: [part.mileage ? `${part.mileage.toLocaleString()} miles` : "", `${warrantyAdj(part.warranty)} warranty`, part.stockNo ? `Stock ${part.stockNo}` : ""]
               .filter(Boolean)
               .join(" · "),
           },

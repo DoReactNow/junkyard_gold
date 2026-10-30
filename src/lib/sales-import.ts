@@ -211,6 +211,17 @@ export function convertSalesRows(rows: Record<string, string>[]): ConvertResult 
     used++;
   });
 
+  // One spelling per model: "Ranger" and "ranger" become whichever the sheet uses most
+  const spellings = new Map<string, Map<string, number>>();
+  for (const g of groups.values()) {
+    const k = `${g.v.make}|${g.v.model.toLowerCase()}`;
+    const m = spellings.get(k) ?? new Map<string, number>();
+    m.set(g.v.model, (m.get(g.v.model) ?? 0) + g.sales.length + g.vendor.length + 1);
+    spellings.set(k, m);
+  }
+  const canonical = (make: string, model: string) =>
+    [...(spellings.get(`${make}|${model.toLowerCase()}`) ?? new Map([[model, 1]])).entries()].sort((a, b) => b[1] - a[1])[0][0];
+
   const listings: Record<string, string>[] = [];
   let pricedFromVendor = 0;
   let raisedToFloor = 0;
@@ -239,7 +250,7 @@ export function convertSalesRows(rows: Record<string, string>[]): ConvertResult 
       part_type: g.partType,
       year: String(g.v.year),
       make: g.v.make,
-      model: g.v.model,
+      model: canonical(g.v.make, g.v.model),
       spec: g.spec,
       price: String(listPrice(price)),
       mileage: String(milesFor(g.v.year, key)),

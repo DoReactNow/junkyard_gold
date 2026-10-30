@@ -68,7 +68,7 @@ export function QuoteForm({
         <div className="mx-auto grid size-12 place-items-center rounded-full bg-ok text-white">
           <CheckIcon className="size-6" />
         </div>
-        <h3 className="mt-3 font-display text-2xl uppercase">Request received</h3>
+        <h3 className="mt-3 font-display text-2xl">Request received</h3>
         <p className={`mt-2 text-sm ${dark ? "text-white/75" : "text-steel"}`}>
           Check your phone. We just sent you a text, and a parts specialist will reply with options during
           business hours ({BUSINESS.hours}). Questions? Call {BUSINESS.phoneDisplay}.

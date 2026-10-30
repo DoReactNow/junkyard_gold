@@ -1,18 +1,29 @@
 import Link from "next/link";
 import { ADDRESS_LINE, BUSINESS, SMS_HREF, TEL_HREF, smsWithBody } from "@/lib/business";
-import { ChatIcon, MailIcon, PhoneIcon, PinIcon } from "./icons";
+import { ChatIcon, MailIcon, PhoneIcon, PinIcon, ShieldIcon, TruckIcon } from "./icons";
 
-export function Logo({ light = false }: { light?: boolean }) {
+/** JG monogram + wordmark. `light` = on a dark background. */
+export function Logo({ light = false, compact = false }: { light?: boolean; compact?: boolean }) {
   return (
-    <Link href="/" className="flex items-center gap-2.5" aria-label={`${BUSINESS.name} home`}>
-      <svg viewBox="0 0 64 64" className="size-9 shrink-0" aria-hidden>
-        <rect width="64" height="64" rx="12" fill={light ? "#e8a913" : "#121212"} />
-        <path d="M14 44 24 22h16l10 22z" fill={light ? "#121212" : "#e8a913"} />
-        <path d="M24 22l6 22M40 22l-6 22" stroke={light ? "#e8a913" : "#121212"} strokeWidth="3" />
-      </svg>
-      <span className={`whitespace-nowrap font-display text-xl font-bold uppercase leading-none sm:text-2xl ${light ? "text-white" : "text-ink"}`}>
-        Junkyard <span className="text-gold">Gold</span>
-      </span>
+    <Link href="/" className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label={`${BUSINESS.name} home`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/brand/jg-mark-sm.png"
+        alt=""
+        width={64}
+        height={38}
+        className={`h-8 w-auto shrink-0 sm:h-9 ${light ? "" : "drop-shadow-[0_1px_0_rgb(0_0_0/0.25)]"}`}
+      />
+      {!compact && (
+        <span className="leading-none">
+          <span className={`block whitespace-nowrap font-display text-[15px] font-bold tracking-[0.12em] sm:text-[19px] sm:tracking-[0.14em] ${light ? "text-white" : "text-ink"}`}>
+            JUNKYARD <span className="text-gold-grad">GOLD</span>
+          </span>
+          <span className={`mt-1 hidden whitespace-nowrap text-[10px] font-medium tracking-[0.2em] sm:block ${light ? "text-white/55" : "text-steel"}`}>
+            USED ENGINES · TRANSMISSIONS
+          </span>
+        </span>
+      )}
     </Link>
   );
 }
@@ -20,8 +31,8 @@ export function Logo({ light = false }: { light?: boolean }) {
 const NAV = [
   { href: "/used-engines", label: "Engines" },
   { href: "/used-transmissions", label: "Transmissions" },
-  { href: "/parts?type=Other", label: "Other Parts" },
-  { href: "/#how", label: "How It Works" },
+  { href: "/parts?type=Other", label: "Other parts" },
+  { href: "/#how", label: "How it works" },
   { href: "/warranty", label: "Warranty" },
   { href: "/contact", label: "Contact" },
 ];
@@ -29,87 +40,110 @@ const NAV = [
 export function Header() {
   return (
     <header className="sticky top-0 z-40">
-      <div className="bg-ink text-[13px] text-white/80">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2">
-          <span className="hidden items-center gap-1.5 sm:flex">
-            <PinIcon className="size-3.5 text-gold" /> {ADDRESS_LINE}
+      <div className="hidden bg-ink-2 text-[12.5px] text-white/60 md:block">
+        <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-6">
+          <span className="flex items-center gap-5">
+            <span className="flex items-center gap-1.5"><ShieldIcon className="size-3.5 text-gold-2" /> {BUSINESS.warrantyAdj} warranty on every part</span>
+            <span className="flex items-center gap-1.5"><TruckIcon className="size-3.5 text-gold-2" /> Ships to all 50 states</span>
           </span>
-          <span className="flex items-center gap-4">
-            <a href={TEL_HREF} className="flex items-center gap-1.5 hover:text-gold">
-              <PhoneIcon className="size-3.5 text-gold" /> Call {BUSINESS.phoneDisplay}
-            </a>
-            <a href={SMS_HREF} className="flex items-center gap-1.5 hover:text-gold">
-              <ChatIcon className="size-3.5 text-gold" /> Text {BUSINESS.phoneDisplay}
-            </a>
+          <span className="flex items-center gap-5">
+            <span>{BUSINESS.hours}</span>
+            <a href={`mailto:${BUSINESS.email}`} className="hover:text-white">{BUSINESS.email}</a>
           </span>
         </div>
       </div>
-      <div className="border-b border-line bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3">
-          <Logo />
-          <nav className="hidden items-center gap-6 text-[15px] font-medium lg:flex">
+      <div className="border-b border-white/10 bg-ink/95 text-white backdrop-blur supports-[backdrop-filter]:bg-ink/85">
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:h-[72px] md:px-6 lg:gap-8">
+          <Logo light />
+          <nav className="ml-2 hidden items-center gap-6 text-[14.5px] font-medium text-white/75 lg:flex xl:ml-6 xl:gap-7">
             {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="hover:text-gold-dark">
+              <Link key={n.href} href={n.href} className="whitespace-nowrap transition hover:text-white">
                 {n.label}
               </Link>
             ))}
           </nav>
-          <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold shrink-0 whitespace-nowrap !px-3.5 !py-2.5 text-sm">
-            <ChatIcon /> Text<span className="hidden sm:inline"> Your</span> VIN
-          </a>
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+            <a href={TEL_HREF} className="hidden items-center gap-2 whitespace-nowrap text-sm font-semibold text-white/85 hover:text-white 2xl:flex">
+              <PhoneIcon className="size-4 text-gold-2" /> {BUSINESS.phoneDisplay}
+            </a>
+            <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-10 shrink-0 whitespace-nowrap !px-4 text-sm">
+              <ChatIcon /> <span className="hidden sm:inline">Text your VIN</span><span className="sm:hidden">Text us</span>
+            </a>
+            <details className="group relative lg:hidden">
+              <summary className="flex size-10 cursor-pointer list-none items-center justify-center rounded-lg border border-white/15 text-white [&::-webkit-details-marker]:hidden" aria-label="Menu">
+                <svg viewBox="0 0 24 24" className="size-5 group-open:hidden" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+                <svg viewBox="0 0 24 24" className="hidden size-5 group-open:block" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
+              </summary>
+              <div className="absolute right-0 top-12 w-[min(88vw,320px)] overflow-hidden rounded-2xl border border-white/10 bg-ink-2 p-2 shadow-lift">
+                {NAV.map((n) => (
+                  <Link key={n.href} href={n.href} className="block rounded-lg px-4 py-3 text-[15px] font-medium text-white/85 hover:bg-white/5">
+                    {n.label}
+                  </Link>
+                ))}
+                <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/10 p-2 pt-3">
+                  <a href={TEL_HREF} className="btn-outline-light !h-11 text-sm"><PhoneIcon /> Call</a>
+                  <a href={SMS_HREF} className="btn-gold !h-11 text-sm"><ChatIcon /> Text</a>
+                </div>
+              </div>
+            </details>
+          </div>
         </div>
-        <nav className="flex gap-5 overflow-x-auto border-t border-line px-4 py-2 text-sm font-medium lg:hidden">
-          {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="shrink-0 hover:text-gold-dark">
-              {n.label}
-            </Link>
-          ))}
-        </nav>
       </div>
     </header>
   );
 }
 
 export function Footer() {
+  const col = "text-[14px] text-white/60 transition hover:text-white";
   return (
-    <footer className="bg-ink text-white/75">
-      <div className="stripe h-2" />
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-4">
-        <div className="md:col-span-2">
-          <Logo light />
-          <p className="mt-4 max-w-sm text-sm leading-relaxed">
-            Tested used engines, transmissions and major parts from our yard in Bradenton, Florida. Every part
-            comes with a {BUSINESS.warrantyAdj} warranty, and we&apos;ll text you real photos before it ships.
-          </p>
+    <footer className="relative overflow-hidden bg-ink text-white">
+      <div className="hairline-gold" />
+      <div className="mx-auto max-w-7xl px-4 pb-10 pt-16 md:px-6">
+        <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
+          <div>
+            <Logo light />
+            <p className="mt-5 max-w-sm text-[14.5px] leading-relaxed text-white/60">
+              Quality used engines, transmissions and major parts, matched to your VIN and shipped nationwide from
+              Bradenton, Florida. Every part carries a {BUSINESS.warrantyAdj} warranty.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href={smsWithBody("Hi, I need a part. My VIN is: ")} className="btn-gold !h-11 text-sm"><ChatIcon /> Text your VIN</a>
+              <a href={TEL_HREF} className="btn-outline-light !h-11 text-sm"><PhoneIcon /> Call us</a>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.16em] text-gold-2">Shop</h3>
+            <ul className="mt-4 space-y-2.5">
+              <li><Link href="/used-engines" className={col}>Used engines</Link></li>
+              <li><Link href="/used-transmissions" className={col}>Used transmissions</Link></li>
+              <li><Link href="/parts?type=Other" className={col}>Other parts</Link></li>
+              <li><Link href="/#how" className={col}>How it works</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.16em] text-gold-2">Support</h3>
+            <ul className="mt-4 space-y-2.5">
+              <li><Link href="/warranty" className={col}>Warranty</Link></li>
+              <li><Link href="/shipping-returns" className={col}>Shipping &amp; returns</Link></li>
+              <li><Link href="/contact" className={col}>Contact</Link></li>
+              <li><Link href="/terms" className={col}>Terms &amp; SMS policy</Link></li>
+              <li><Link href="/privacy" className={col}>Privacy</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.16em] text-gold-2">Contact</h3>
+            <ul className="mt-4 space-y-3 text-[14px] text-white/70">
+              <li><a href={TEL_HREF} className="flex items-center gap-2.5 hover:text-white"><PhoneIcon className="size-4 text-gold-2" /> Call {BUSINESS.phoneDisplay}</a></li>
+              <li><a href={SMS_HREF} className="flex items-center gap-2.5 hover:text-white"><ChatIcon className="size-4 text-gold-2" /> Text {BUSINESS.phoneDisplay}</a></li>
+              <li><a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2.5 hover:text-white"><MailIcon className="size-4 text-gold-2" /> {BUSINESS.email}</a></li>
+              <li className="flex items-start gap-2.5"><PinIcon className="mt-0.5 size-4 shrink-0 text-gold-2" /> {ADDRESS_LINE}</li>
+              <li className="pl-6.5 text-white/45">{BUSINESS.hours}</li>
+            </ul>
+          </div>
         </div>
-        <div>
-          <h3 className="font-display text-lg uppercase text-white">Shop</h3>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li><Link href="/used-engines" className="hover:text-gold">Used Engines</Link></li>
-            <li><Link href="/used-transmissions" className="hover:text-gold">Used Transmissions</Link></li>
-            <li><Link href="/parts?type=Other" className="hover:text-gold">Other Parts</Link></li>
-            <li><Link href="/warranty" className="hover:text-gold">Warranty</Link></li>
-            <li><Link href="/shipping-returns" className="hover:text-gold">Shipping &amp; Returns</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="font-display text-lg uppercase text-white">Contact</h3>
-          <ul className="mt-3 space-y-2.5 text-sm">
-            <li><a href={TEL_HREF} className="flex items-center gap-2 hover:text-gold"><PhoneIcon className="size-4 text-gold" />Call {BUSINESS.phoneDisplay}</a></li>
-            <li><a href={SMS_HREF} className="flex items-center gap-2 hover:text-gold"><ChatIcon className="size-4 text-gold" />Text {BUSINESS.phoneDisplay}</a></li>
-            <li><a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2 hover:text-gold"><MailIcon className="size-4 text-gold" />{BUSINESS.email}</a></li>
-            <li className="flex items-start gap-2"><PinIcon className="mt-0.5 size-4 shrink-0 text-gold" />{ADDRESS_LINE}</li>
-            <li className="pl-6 text-white/55">{BUSINESS.hours}</li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-white/50">
+        <div className="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6 text-[12.5px] text-white/40">
           <span>© {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.</span>
-          <span className="flex gap-4">
-            <Link href="/privacy" className="hover:text-gold">Privacy</Link>
-            <Link href="/terms" className="hover:text-gold">Terms &amp; SMS Policy</Link>
-          </span>
+          <span>Every part is VIN-matched before it ships.</span>
         </div>
       </div>
     </footer>
@@ -123,5 +157,41 @@ export function PageShell({ children }: { children: React.ReactNode }) {
       <main>{children}</main>
       <Footer />
     </>
+  );
+}
+
+/** Dark page header used on inner pages. */
+export function PageHero({
+  eyebrow,
+  title,
+  children,
+  crumbs,
+}: {
+  eyebrow?: string;
+  title: React.ReactNode;
+  children?: React.ReactNode;
+  crumbs?: { name: string; href: string }[];
+}) {
+  return (
+    <section className="relative overflow-hidden bg-ink text-white">
+      <div className="grain pointer-events-none absolute inset-0" />
+      <div className="pointer-events-none absolute -right-40 -top-40 size-[520px] rounded-full bg-gold/10 blur-3xl" />
+      <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-10 md:px-6 md:pb-14">
+        {crumbs && (
+          <nav className="flex flex-wrap gap-1.5 text-[13px] text-white/50" aria-label="Breadcrumb">
+            {crumbs.map((c, i) => (
+              <span key={c.href} className="flex items-center gap-1.5">
+                {i > 0 && <span className="text-white/25">/</span>}
+                {i < crumbs.length - 1 ? <Link href={c.href} className="hover:text-gold-light">{c.name}</Link> : <span className="text-white/80">{c.name}</span>}
+              </span>
+            ))}
+          </nav>
+        )}
+        {eyebrow && <div className="mt-6 text-[12px] font-semibold uppercase tracking-[0.18em] text-gold-2">{eyebrow}</div>}
+        <h1 className="mt-3 max-w-4xl font-display text-[2.4rem] font-bold leading-[1.05] sm:text-5xl md:text-[3.4rem]">{title}</h1>
+        {children && <div className="mt-4 max-w-3xl text-[16.5px] leading-relaxed text-white/70">{children}</div>}
+      </div>
+      <div className="hairline-gold" />
+    </section>
   );
 }

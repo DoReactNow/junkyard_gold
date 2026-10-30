@@ -1,63 +1,121 @@
 @import "tailwindcss";
 
+/* Junkyard Gold design system: near-black + metallic gold (from the JG monogram), warm neutrals. */
 @theme {
-  --color-ink: #121212;
-  --color-ink-2: #1d1d1d;
-  --color-ink-3: #2a2a2a;
-  --color-gold: #e8a913;
-  --color-gold-2: #ffc94a;
-  --color-gold-dark: #a87506;
+  --color-ink: #0b0b0c;
+  --color-ink-2: #141416;
+  --color-ink-3: #232326;
+  --color-gold: #c9962f;
+  --color-gold-2: #e6bd5c;
+  --color-gold-light: #f5dc93;
+  --color-gold-dark: #8f6a1e;
   --color-paper: #f7f4ee;
-  --color-steel: #6b6f76;
-  --color-line: #e4dfd4;
-  --color-ok: #1f8a4c;
+  --color-sand: #efe9de;
+  --color-steel: #6d6860;
+  --color-line: #e6dfd2;
+  --color-ok: #1f7a4a;
   --color-bad: #b42318;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --shadow-card: 0 1px 2px rgb(11 11 12 / 0.04), 0 8px 24px -12px rgb(11 11 12 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(11 11 12 / 0.05), 0 24px 48px -20px rgb(11 11 12 / 0.28);
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background: var(--color-paper);
   color: var(--color-ink);
+  font-feature-settings: "ss01", "cv11";
+}
+
+::selection {
+  background: var(--color-gold-light);
+  color: var(--color-ink);
 }
 
 .font-display {
-  letter-spacing: 0.01em;
+  letter-spacing: -0.022em;
 }
 
-/* Diagonal hazard stripe used as a section accent */
-.stripe {
-  background-image: repeating-linear-gradient(-45deg, var(--color-gold) 0 14px, var(--color-ink) 14px 28px);
+/* Metallic gold, matched to the logo */
+@utility text-gold-grad {
+  background: linear-gradient(100deg, #f6dd8f 0%, #d9a742 38%, #f7e7b8 55%, #b98a2c 78%, #e8c062 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility bg-gold-grad {
+  background: linear-gradient(120deg, #f3d27a 0%, #d6a23d 45%, #f1dc9e 62%, #c08f2d 100%);
+}
+.hairline-gold {
+  background: linear-gradient(90deg, transparent, #c9962f 20%, #f5dc93 50%, #c9962f 80%, transparent);
+  height: 1px;
+}
+.grain {
+  background-image: radial-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+@utility eyebrow {
+  @apply text-[12px] font-semibold uppercase tracking-[0.16em] text-gold-dark;
 }
 
 @utility field {
-  @apply w-full rounded-md border border-line bg-white px-3 py-2.5 text-[15px] text-ink outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/30 disabled:bg-paper disabled:text-steel;
+  @apply h-12 w-full rounded-lg border border-line bg-white px-3.5 text-[15px] text-ink shadow-[inset_0_1px_1px_rgb(0_0_0/0.03)] outline-none transition placeholder:text-steel/70 focus:border-gold focus:ring-4 focus:ring-gold/15 disabled:bg-sand/60 disabled:text-steel;
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-3 text-[15px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 text-[15px] font-semibold tracking-[-0.01em] transition duration-200 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50;
 }
 @utility btn-gold {
-  @apply btn bg-gold text-ink hover:bg-gold-2;
+  @apply btn bg-gold-grad text-ink shadow-[0_1px_0_rgb(255_255_255/0.4)_inset,0_8px_20px_-10px_rgb(201_150_47/0.9)] hover:brightness-105;
 }
 @utility btn-dark {
-  @apply btn bg-ink text-white hover:bg-ink-3;
+  @apply btn bg-ink text-white shadow-[0_8px_20px_-12px_rgb(0_0_0/0.6)] hover:bg-ink-3;
 }
 @utility btn-ghost {
-  @apply btn border border-line bg-white text-ink hover:border-ink;
+  @apply btn border border-line bg-white text-ink hover:border-ink/40 hover:bg-paper;
+}
+@utility btn-outline-light {
+  @apply btn border border-white/20 text-white hover:border-gold-2 hover:text-gold-light;
 }
 
+@utility card {
+  @apply rounded-2xl border border-line bg-white shadow-card;
+}
+
+.prose-jg {
+  @apply text-[16px] leading-relaxed text-ink/80;
+}
 .prose-jg h2 {
-  @apply mt-8 mb-2 font-display text-2xl uppercase;
+  @apply mt-10 mb-3 font-display text-2xl font-semibold tracking-tight text-ink;
+}
+.prose-jg > :first-child {
+  @apply mt-0;
 }
 .prose-jg p,
 .prose-jg li {
-  @apply mb-3 leading-relaxed text-ink/85;
+  @apply mb-3;
 }
 .prose-jg ul {
-  @apply ml-5 list-disc;
+  @apply ml-5 list-disc marker:text-gold;
+}
+.prose-jg a {
+  @apply font-medium text-ink underline decoration-gold underline-offset-2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

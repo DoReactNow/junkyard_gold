@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { typeWhere } from "@/lib/inventory";
 import { BUSINESS, SMS_HREF, smsWithBody } from "@/lib/business";
 import { estimatePrice } from "@/lib/estimate";
-import { PageShell } from "@/components/site-chrome";
+import { PageHero, PageShell } from "@/components/site-chrome";
 import { PartCard } from "@/components/part-card";
 import { PartFinder } from "@/components/part-finder";
 
@@ -47,29 +47,20 @@ export default async function PartsPage({ searchParams }: { searchParams: SP }) 
 
   return (
     <PageShell>
-      <section className="bg-ink text-white">
-        <div className="mx-auto max-w-6xl px-4 py-10">
-          <nav className="text-sm text-white/60">
-            <Link href="/" className="hover:text-gold">Home</Link> / <span>Parts</span>
-          </nav>
-          <h1 className="mt-2 font-display text-4xl font-bold uppercase sm:text-5xl">{heading}</h1>
-          <p className="mt-2 text-white/70">
-            {total} available · 3-month warranty on every part · real photos by text
-          </p>
-        </div>
-        <div className="stripe h-1.5" />
-      </section>
+      <PageHero crumbs={[{ name: "Home", href: "/" }, { name: "Parts", href: "/parts" }]} eyebrow="Search results" title={heading}>
+        <b className="text-white">{total.toLocaleString()}</b> available · {BUSINESS.warrantyAdj} warranty on every part · real photos by text
+      </PageHero>
 
-      <section className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[300px_1fr]">
+      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-[300px_1fr]">
         <aside className="space-y-5">
-          <div className="rounded-lg border border-line bg-white p-4">
-            <h2 className="mb-3 font-display text-lg uppercase">Change vehicle</h2>
-            <PartFinder />
+          <div className="card p-5">
+            <h2 className="mb-4 font-display text-lg font-bold">Change vehicle</h2>
+            <PartFinder stacked />
           </div>
-          <div className="rounded-lg bg-gold p-4">
-            <div className="font-display text-lg font-semibold uppercase">Not finding it?</div>
-            <p className="mt-1 text-sm">Text us your VIN. We check the whole yard and our partner yards, not just what&apos;s listed here.</p>
-            <a href={smsWithBody(`Hi, I'm looking for a ${heading}. My VIN is: `)} className="btn-dark mt-3 w-full !py-2.5 text-sm">
+          <div className="rounded-2xl bg-ink p-5 text-white">
+            <div className="font-display text-lg font-bold">Not finding it?</div>
+            <p className="mt-1 text-sm text-white/65">Text us your VIN. We check the whole yard and our partner yards, not just what&apos;s listed here.</p>
+            <a href={smsWithBody(`Hi, I'm looking for a ${heading}. My VIN is: `)} className="btn-gold mt-4 w-full text-sm">
               Text Your VIN
             </a>
           </div>
@@ -77,8 +68,8 @@ export default async function PartsPage({ searchParams }: { searchParams: SP }) 
 
         <div>
           {parts.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
-              <h2 className="font-display text-2xl uppercase">Nothing listed for that yet</h2>
+            <div className="card p-12 text-center">
+              <h2 className="font-display text-2xl">Nothing listed for that yet</h2>
               <p className="mt-2 text-steel">Stock changes daily and not everything is online.</p>
               {estimate && (
                 <p className="mx-auto mt-4 max-w-md rounded-md bg-paper p-3 text-sm">

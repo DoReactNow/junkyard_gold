@@ -123,3 +123,8 @@ export function partLine(p: Part) {
     .join(" · ");
   return `${bits} — ${money(p.price)}`;
 }
+
+/** "3 months" → "3-month" (for "a 3-month warranty") */
+export function warrantyAdj(w: string) {
+  return w.replace(/(\d+)\s*months?/i, "$1-month").replace(/(\d+)\s*years?/i, "$1-year");
+}
