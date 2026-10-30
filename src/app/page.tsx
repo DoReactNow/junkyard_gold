@@ -83,7 +83,7 @@ export default async function Home() {
           <div className="grid items-center gap-6 pb-10 pt-14 lg:grid-cols-[1fr_1.05fr] lg:pb-14 lg:pt-20">
             <div className="relative z-10 min-w-0">
               <div className="flex items-center gap-3 text-[12px] font-medium uppercase tracking-[0.22em] text-gold-2">
-                <span className="h-px w-8 bg-gold-2" /> Bradenton, Florida · Nationwide
+                <span className="h-px w-8 bg-gold-2" /> Est. {BUSINESS.founded} · Bradenton, Florida
               </div>
               <h1 className="font-serif mt-6 text-[3.4rem] leading-[0.98] sm:text-[4.6rem] lg:text-[5.6rem]">
                 Used engines,

@@ -21,7 +21,7 @@ export function Logo({ light = false, compact = false }: { light?: boolean; comp
             JUNKYARD <span className="text-gold-grad">GOLD</span>
           </span>
           <span className={`mt-1 hidden whitespace-nowrap text-[10px] font-medium tracking-[0.2em] sm:block ${light ? "text-white/55" : "text-steel"}`}>
-            USED ENGINES · TRANSMISSIONS
+            EST. {BUSINESS.founded} · BRADENTON, FL
           </span>
         </span>
       )}
@@ -159,8 +159,8 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6 text-[12.5px] text-white/40">
-          <span>© {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.</span>
-          <span>Every part is VIN-matched before it ships.</span>
+          <span>© {BUSINESS.founded}–{new Date().getFullYear()} {BUSINESS.name}. All rights reserved.</span>
+          <span>Serving drivers and repair shops since {BUSINESS.founded}.</span>
         </div>
       </div>
     </footer>

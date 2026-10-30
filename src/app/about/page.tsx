@@ -15,10 +15,10 @@ export const metadata = {
 export default async function Page() {
   const sales = await salesSummary();
   const facts = [
+    [String(BUSINESS.founded), "founded in Bradenton, Florida"],
     [BUSINESS.networkSize, "engines & transmissions in our supplier network"],
     ...(sales ? [[roundedPlus(sales.totalSold), "parts sold and shipped this year"]] : []),
     ["50", "states we deliver to"],
-    [BUSINESS.warrantyAdj, "warranty on every used part"],
   ];
   return (
     <PageShell>
@@ -27,14 +27,14 @@ export default async function Page() {
         eyebrow="About Junkyard Gold"
         title={<>Used parts, sold <span className="text-gold-grad">the right way.</span></>}
       >
-        A used engine and transmission supplier in Bradenton, Florida, shipping to drivers and repair shops across the country.
+        Since {BUSINESS.founded}, a used engine and transmission supplier in Bradenton, Florida, shipping to drivers and repair shops across the country.
       </PageHero>
       <section className="mx-auto grid max-w-7xl gap-16 px-4 py-20 md:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <Reveal className="prose-jg max-w-2xl">
           <h2>Why we do it this way</h2>
           <p>
             Replacing an engine or a transmission is one of the biggest repair bills a driver faces, and buying used often feels
-            like a gamble: unclear fitment, no photos, a warranty nobody honors. We built {BUSINESS.name} to take the gamble out.
+            like a gamble: unclear fitment, no photos, a warranty nobody honors. We started {BUSINESS.name} in {BUSINESS.founded} to take the gamble out.
           </p>
           <p>
             Every order starts with your VIN, so the part matches the engine code and drivetrain your vehicle left the factory

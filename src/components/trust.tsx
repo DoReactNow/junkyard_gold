@@ -129,7 +129,7 @@ export function SoldShowcase({ summary }: { summary: SalesSummary }) {
 
 /** Circular warranty seal with the JG monogram. */
 export function GuaranteeSeal({ className = "" }: { className?: string }) {
-  const text = `${BUSINESS.warrantyAdj} warranty  ·  VIN matched  ·  Photos first  ·  `.toUpperCase();
+  const text = `Est. ${BUSINESS.founded}  ·  ${BUSINESS.warrantyAdj} warranty  ·  VIN matched  ·  Photos first  ·  `.toUpperCase();
   return (
     <div className={`relative aspect-square ${className}`}>
       <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full" aria-hidden>
