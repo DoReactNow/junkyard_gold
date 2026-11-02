@@ -40,7 +40,7 @@ export async function catalogMetadata(kind: Kind, p: Params): Promise<Metadata> 
   const from = facet ? ` from ${money(facet.from)}` : "";
   return {
     title: `${title} for Sale${from}`,
-    description: `${vehicle ? `${vehicle} used ${k.singular}s` : `Used ${k.singular}s`}${from}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and real photos before you buy. Shipped nationwide from ${BUSINESS.name}, Bradenton FL.`,
+    description: `${vehicle ? `${vehicle} used ${k.singular}s` : `Used ${k.singular}s`}${from}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and photos before you buy. Shipped nationwide by ${BUSINESS.name}.`,
     alternates: { canonical: catalogPath(kind, r.make?.name, r.model?.name, r.year) },
   };
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Inter_Tight, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { BUSINESS } from "@/lib/business";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const serif = Instrument_Serif({ variable: "--font-serif", subsets: ["latin"], weight: "400", style: ["normal", "italic"] });
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     template: `%s | ${BUSINESS.name}`,
   },
   openGraph: { images: ["/brand/og.png"], siteName: "Junkyard Gold" },
+  alternates: { canonical: "./" },
   description:
     "Quality used engines, transmissions and major parts from Junkyard Gold in Bradenton, Florida. Text your VIN for options in minutes. 3-month warranty, free delivery to repair shops.",
 };
@@ -21,7 +23,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${interTight.variable} ${serif.variable} font-sans antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${interTight.variable} ${serif.variable} font-sans antialiased`}>
+        <SmoothScroll />
+        {children}
+      </body>
     </html>
   );
 }

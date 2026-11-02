@@ -1,7 +1,7 @@
 import { PolicyPage } from "@/components/policy-page";
 import { ADDRESS_LINE, BUSINESS } from "@/lib/business";
 
-export const metadata = { title: "Privacy Policy" };
+export const metadata = { title: "Privacy Policy", description: "How Junkyard Gold collects, uses and protects the details you share when you text, call or order." };
 
 export default function Page() {
   return (

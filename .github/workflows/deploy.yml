@@ -153,6 +153,19 @@ jobs:
             cd /opt/junkyard_gold
             mkdir -p backups
 
+            # 0. Server health before deploying. Counts and statuses only: this repo's Actions logs are public.
+            (
+              set +e
+              echo "== uptime / memory / disk"; uptime; free -m; df -h / | tail -1
+              echo "== containers"; docker ps -a --format '{{.Names}}  {{.Status}}'
+              for c in junkyard_gold_app $(docker ps -q --filter "label=com.docker.compose.service=db") $(docker ps -q --filter "name=traefik"); do
+                docker inspect -f '{{.Name}} started={{.State.StartedAt}} restarts={{.RestartCount}} oomkilled={{.State.OOMKilled}} exit={{.State.ExitCode}}' "$c"
+              done
+              echo "== kernel OOM kills in log: $( (dmesg 2>/dev/null || journalctl -k --no-pager 2>/dev/null) | grep -ci 'out of memory')"
+              echo "== app error lines, last 7 days: $(docker logs --since 168h junkyard_gold_app 2>&1 | grep -ciE 'error|unhandled|fatal')"
+              echo "== last boot: $(who -b 2>/dev/null)"
+            ) || true
+
             # 1. Back up the database before anything changes (keeps the last 14)
             DB_CONTAINER=$(docker ps --filter "label=com.docker.compose.project=junkyard_gold" --filter "label=com.docker.compose.service=db" -q | head -n1)
             if [ -n "$DB_CONTAINER" ]; then

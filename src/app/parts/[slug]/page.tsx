@@ -17,9 +17,15 @@ type Params = Promise<{ slug: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const part = await db.part.findUnique({ where: { slug: (await params).slug } });
   if (!part) return {};
+  // Full spec titles run past 100 characters; search results show about 60.
+  const miles = part.mileage ? `, ${Math.round(part.mileage / 1000)}K Miles` : "";
+  const name = `${part.year} ${part.make} ${part.model} Used ${part.partType}`;
+  const tail = ` ${money(part.price)} with a ${warrantyAdj(part.warranty)} warranty from ${BUSINESS.name}.`;
+  const spec = part.title.length + tail.length <= 158 ? part.title : `${part.title.slice(0, 154 - tail.length).replace(/\s+\S*$/, "")}…`;
   return {
-    title: part.title,
-    description: `${part.title}${part.mileage ? `, ${part.mileage.toLocaleString()} miles` : ""}. ${money(part.price)} with a ${warrantyAdj(part.warranty)} warranty from ${BUSINESS.name} in Bradenton, FL.`,
+    title: `${name}${miles}`,
+    description: `${spec}.${tail}`,
+    alternates: { canonical: `/parts/${part.slug}` },
   };
 }
 

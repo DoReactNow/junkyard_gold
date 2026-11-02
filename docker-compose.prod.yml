@@ -26,6 +26,12 @@ services:
       db:
         condition: service_healthy
     env_file: .env
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
     environment:
       # v2 keeps its tables in the "app" schema; v1's old tables stay untouched in "public"
       DATABASE_URL: postgresql://junkyard:${DB_PASSWORD}@db:5432/junkyard?schema=app

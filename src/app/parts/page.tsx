@@ -23,7 +23,10 @@ export async function generateMetadata({ searchParams }: { searchParams: SP }): 
   const sp = await searchParams;
   const what = LABEL[sp.type || ""] || "Used Parts";
   const veh = [sp.year, sp.make, sp.model].filter(Boolean).join(" ");
-  return { title: veh ? `${veh} ${what}` : what };
+  return {
+    title: veh ? `${veh} ${what}` : what,
+    description: `${veh ? `${veh} ${what.toLowerCase()}` : what}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and free delivery to repair shops. Shipped nationwide by ${BUSINESS.name}.`,
+  };
 }
 
 export default async function PartsPage({ searchParams }: { searchParams: SP }) {

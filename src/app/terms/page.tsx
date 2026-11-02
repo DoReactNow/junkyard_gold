@@ -1,7 +1,7 @@
 import { PolicyPage } from "@/components/policy-page";
 import { BUSINESS } from "@/lib/business";
 
-export const metadata = { title: "Terms & SMS Policy" };
+export const metadata = { title: "Terms & SMS Policy", description: "Terms of sale and text messaging policy for Junkyard Gold: warranty, delivery, final sales and how to opt out of texts." };
 
 export default function Page() {
   return (

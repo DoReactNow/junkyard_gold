@@ -9,6 +9,18 @@ export type PickerOption = { value: string; label: string; group?: string };
 const SEARCH_FROM = 9; // shorter lists don't need a search box
 
 /** Branded dropdown with type-to-search. Its list renders on <body> so no panel can clip it. */
+/** Lowercase letters and digits only, so "f150" finds "F-150". */
+const squash = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** Index in the filtered list to highlight: an exact match, then one that starts with the query, else the first. */
+function bestMatch(options: { label: string }[], query: string) {
+  const q = squash(query);
+  const hits = q ? options.filter((o) => squash(o.label).includes(q)) : options;
+  const exact = hits.findIndex((o) => squash(o.label) === q);
+  if (exact >= 0) return exact;
+  return Math.max(0, hits.findIndex((o) => squash(o.label).startsWith(q)));
+}
+
 export function Picker({
   label,
   placeholder,
@@ -39,8 +51,8 @@ export function Picker({
   const searchable = options.length >= SEARCH_FROM;
 
   const shown = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return q ? options.filter((o) => o.label.toLowerCase().includes(q)) : options;
+    const q = squash(query);
+    return q ? options.filter((o) => squash(o.label).includes(q)) : options;
   }, [options, query]);
 
   const place = useCallback(() => {
@@ -81,8 +93,8 @@ export function Picker({
   useLayoutEffect(() => {
     if (!open) return;
     place();
-    // don't pop the keyboard up over the list on a phone
-    if (searchable && window.matchMedia("(pointer: fine)").matches) search.current?.focus({ preventScroll: true });
+    // don't pop the keyboard up over the list on a phone; short lists take arrow keys and Enter on the trigger
+    if (window.matchMedia("(pointer: fine)").matches) (searchable ? search.current : trigger.current)?.focus({ preventScroll: true });
     window.addEventListener("resize", place);
     window.addEventListener("scroll", place, true);
     return () => {
@@ -169,7 +181,7 @@ export function Picker({
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value);
-                    setActive(0);
+                    setActive(bestMatch(options, e.target.value));
                   }}
                   placeholder={`Search ${label.toLowerCase()}`}
                   aria-label={`Search ${label.toLowerCase()}`}
@@ -177,7 +189,7 @@ export function Picker({
                 />
               </div>
             )}
-            <ul id={listId} role="listbox" aria-label={label} className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1.5">
+            <ul id={listId} role="listbox" aria-label={label} data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1.5">
               {shown.map((o, i) => (
                 <li key={o.value} role="presentation">
                   {o.group && o.group !== shown[i - 1]?.group && (

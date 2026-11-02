@@ -3,7 +3,10 @@ import { QuoteForm } from "@/components/quote-form";
 import { ADDRESS_LINE, BUSINESS, SMS_HREF, TEL_HREF } from "@/lib/business";
 import { ChatIcon, MailIcon, PhoneIcon, PinIcon } from "@/components/icons";
 
-export const metadata = { title: "Contact" };
+export const metadata = {
+  title: "Contact",
+  description: `Text ${BUSINESS.smsDisplay} or call ${BUSINESS.phoneDisplay} for a used engine or transmission. ${BUSINESS.contactHours}.`,
+};
 
 export default function Page() {
   const items = [

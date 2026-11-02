@@ -38,7 +38,7 @@ export function VinCheck({ partType, productSlug }: { partType?: string; product
           value={vin}
           onChange={(e) => setVin(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 17))}
           className="field font-mono uppercase placeholder:font-sans placeholder:normal-case"
-          placeholder="Enter your 17-digit VIN"
+          placeholder="17-digit VIN"
           aria-label="VIN"
         />
         <button className="btn-gold shrink-0" disabled={vin.length !== 17 || busy}>
