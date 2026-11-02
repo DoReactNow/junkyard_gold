@@ -157,8 +157,8 @@ jobs:
             (
               set +e
               echo "== uptime / memory / disk"; uptime; free -m; df -h / | tail -1
-              echo "== containers"; docker ps -a --format '{{.Names}}  {{.Status}}'
-              for c in junkyard_gold_app $(docker ps -q --filter "label=com.docker.compose.service=db") $(docker ps -q --filter "name=traefik"); do
+              echo "== containers"; docker ps -a --filter "label=com.docker.compose.project=junkyard_gold" --format '{{.Names}}  {{.Status}}'
+              for c in $(docker ps -aq --filter "label=com.docker.compose.project=junkyard_gold"); do
                 docker inspect -f '{{.Name}} started={{.State.StartedAt}} restarts={{.RestartCount}} oomkilled={{.State.OOMKilled}} exit={{.State.ExitCode}}' "$c"
               done
               echo "== kernel OOM kills in log: $( (dmesg 2>/dev/null || journalctl -k --no-pager 2>/dev/null) | grep -ci 'out of memory')"
