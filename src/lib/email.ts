@@ -69,18 +69,19 @@ export interface CheckoutOrderPayload {
   message?: string;
 }
 
-/** Get list of all order recipients, guaranteeing both Adam and Junkyard Gold support */
+/** Get list of all order recipients (defaults strictly to Adam) */
 export function getCheckoutRecipients(): string[] {
-  const base = ["adam@tagoreautoparts.com", "support@junkyardgold.com"];
-  if (process.env.NOTIFY_TO) {
-    const list = process.env.NOTIFY_TO.split(",")
+  if (process.env.CHECKOUT_NOTIFY_TO) {
+    return process.env.CHECKOUT_NOTIFY_TO.split(",")
       .map((s) => s.trim())
       .filter(Boolean);
-    for (const email of list) {
-      if (!base.includes(email)) base.push(email);
-    }
   }
-  return base;
+  if (process.env.NOTIFY_TO) {
+    return process.env.NOTIFY_TO.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return ["adam@tagoreautoparts.com"];
 }
 
 /** Sends full order & payment notification to multi-recipients */
