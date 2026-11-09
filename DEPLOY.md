@@ -42,13 +42,13 @@ the switch takes a few seconds. v1's files are **moved**, never deleted, into `/
 | `RINGCENTRAL_CLIENT_SECRET` | for texting | |
 | `RINGCENTRAL_JWT` | for texting | JWT credential of the user that owns 847-874-5972 |
 | `RINGCENTRAL_WEBHOOK_TOKEN` | for texting | `openssl rand -hex 24` |
-| `SMTP_PASS` | for email alerts | Zoho app password for support@junkyardgold.com |
+| `SMTP_PASS` | for email alerts | Google app password for junkyardgoldinc@gmail.com |
 | `STRIPE_SECRET_KEY` | for online payments | |
 | `STRIPE_WEBHOOK_SECRET` | for online payments | |
 | `STAFF_ALERT_PHONE` | optional | staff cell for a text on every new lead, e.g. `+19045550100` |
 
 Anything optional left empty runs in demo mode (texts show as "simulated" in the inbox, template drafts,
-"Buy Now" asks the customer to text/call). Fixed settings (domain, Traefik names, texting number, Zoho host)
+"Buy Now" asks the customer to text/call). Fixed settings (domain, Traefik names, texting number, Gmail host)
 are written by the workflow itself.
 
 Use secrets made of letters, numbers, `-` and `_` (what `openssl rand -hex` gives you). Avoid `$`,

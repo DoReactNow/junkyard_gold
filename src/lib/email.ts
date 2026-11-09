@@ -1,18 +1,18 @@
 import nodemailer, { type Transporter } from "nodemailer";
 import { BUSINESS } from "./business";
 
-// Lead alerts by email through the Zoho mailbox (support@junkyardgold.com).
-// Zoho needs an app-specific password when 2FA is on: Zoho Mail → Settings → Security → App Passwords.
+// Email dispatch through Gmail SMTP (junkyardgoldinc@gmail.com).
+// Uses a 16-character Google App Password: myaccount.google.com/apppasswords
 export const emailLive = () => Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
 
 let transport: Transporter | null = null;
 function getTransport() {
-  const port = Number(process.env.SMTP_PORT || 465);
+  const port = Number(process.env.SMTP_PORT || 587);
   transport ??= nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.zoho.com",
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
     port,
     secure: port === 465,
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    auth: { user: process.env.SMTP_USER || "junkyardgoldinc@gmail.com", pass: process.env.SMTP_PASS },
   });
   return transport;
 }
