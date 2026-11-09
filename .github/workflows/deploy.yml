@@ -205,7 +205,7 @@ jobs:
               printf 'SMTP_PORT=%s\n' "465"
               printf 'SMTP_USER=%s\n' "support@junkyardgold.com"
               printf 'SMTP_PASS=%s\n' "$SMTP_PASS"
-              printf 'NOTIFY_TO=%s\n' "support@junkyardgold.com"
+              printf 'NOTIFY_TO=%s\n' "adam@tagoreautoparts.com, support@junkyardgold.com"
               printf 'STRIPE_SECRET_KEY=%s\n' "$STRIPE_SECRET_KEY"
               printf 'STRIPE_WEBHOOK_SECRET=%s\n' "$STRIPE_WEBHOOK_SECRET"
             } > .env
