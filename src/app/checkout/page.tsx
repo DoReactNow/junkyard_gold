@@ -7,6 +7,7 @@ export const metadata = {
   title: "Secure Order Checkout | Junkyard Gold",
   description:
     "Complete your auto part purchase at Junkyard Gold with our secure checkout process. Provide part details, shipping and billing addresses, and payment information.",
+  robots: { index: false, follow: false },
 };
 
 export default async function CheckoutPage({

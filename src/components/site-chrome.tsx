@@ -128,7 +128,6 @@ export function Footer() {
               <li><Link href="/used-engines" className={col}>Used engines</Link></li>
               <li><Link href="/used-transmissions" className={col}>Used transmissions</Link></li>
               <li><Link href="/parts?type=Other" className={col}>Other parts</Link></li>
-              <li><Link href="/checkout" className={col}>Pay now / Checkout</Link></li>
             </ul>
           </div>
           <div>

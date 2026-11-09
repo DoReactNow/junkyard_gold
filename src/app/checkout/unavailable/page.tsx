@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/site-chrome";
 import { BUSINESS, TEL_HREF, parseDelivery, smsWithBody } from "@/lib/business";
 
-export const metadata = { title: "Checkout" };
+export const metadata = { title: "Checkout", robots: { index: false, follow: false } };
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ slug?: string; reason?: string; delivery?: string }> }) {
   const sp = await searchParams;

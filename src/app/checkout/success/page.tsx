@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/site-chrome";
 import { BUSINESS } from "@/lib/business";
 
-export const metadata = { title: "Order received" };
+export const metadata = { title: "Order received", robots: { index: false, follow: false } };
 
 export default function Page() {
   return (
