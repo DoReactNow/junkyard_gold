@@ -1,30 +1,8 @@
-import { BUSINESS, isOpenNow } from "@/lib/business";
+import { BUSINESS } from "@/lib/business";
 import { money } from "@/lib/inventory";
 import { cutout, pickPhotos } from "@/lib/photos";
 import type { SalesSummary } from "@/lib/sales-import";
 import { Reveal } from "./reveal";
-
-/** "Open now · until 6 PM ET" / "Closed · opens Mon 10 AM ET", from the real business hours. */
-export function OpenStatus({ className = "" }: { className?: string }) {
-  const now = new Date();
-  const open = isOpenNow(now);
-  let label = "Phones open until 6 PM ET · Texts 7 days";
-  if (!open) {
-    // step forward to the next opening hour
-    let t = new Date(Math.ceil(now.getTime() / 3_600_000) * 3_600_000);
-    for (let i = 0; i < 24 * 8 && !isOpenNow(t); i++) t = new Date(t.getTime() + 3_600_000);
-    const fmt = (d: Date) => d.toLocaleDateString("en-US", { timeZone: "America/New_York" });
-    const tomorrow = new Date(now.getTime() + 86_400_000);
-    const day = fmt(t) === fmt(now) ? "today" : fmt(t) === fmt(tomorrow) ? "tomorrow" : t.toLocaleDateString("en-US", { timeZone: "America/New_York", weekday: "long" });
-    label = `Phones open ${day} at 10 AM ET · Texts 7 days`;
-  }
-  return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      <span className={`size-2 rounded-full ${open ? "bg-[#3ecf7a] shadow-[0_0_0_3px_rgb(62_207_122/0.25)]" : "bg-white/35"}`} />
-      {label}
-    </span>
-  );
-}
 
 function soldPhoto(s: SalesSummary["sold"][number]) {
   const m = pickPhotos({ make: s.make, model: s.model, partType: s.partType, spec: s.spec });

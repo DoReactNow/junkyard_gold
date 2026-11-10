@@ -14,7 +14,7 @@ const WHY = [
   { i: <CameraIcon className="size-5" />, t: "Photos for your customer", d: "Ask for real photos of the unit before you commit, and pass them along." },
   { i: <ShieldIcon className="size-5" />, t: `${BUSINESS.warrantyAdj} warranty`, d: "Written terms you can hand to your customer." },
   { i: <ReturnIcon className="size-5" />, t: `${BUSINESS.replacementDays}-day replacement`, d: "If there's a problem with the part, we pick it up and send a replacement at our cost, or refund you if we don't have one." },
-  { i: <ChatIcon className="size-5" />, t: `Texts ${BUSINESS.textHours}`, d: `Text ${BUSINESS.smsDisplay} any day, or call Mon–Fri 10 AM – 6 PM ET.` },
+  { i: <ChatIcon className="size-5" />, t: `Texts ${BUSINESS.textHours}`, d: `Text ${BUSINESS.smsDisplay} any day, or call Mon–Fri 10 AM – 7 PM ET.` },
 ];
 
 export default function Page() {

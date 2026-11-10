@@ -14,9 +14,9 @@ export const BUSINESS = {
   zip: "34209",
   warranty: "3 months",
   warrantyAdj: "3-month",
-  hours: "Mon–Fri 10:00 AM – 6:00 PM ET", // calls
+  hours: "Mon–Fri 10:00 AM – 7:00 PM ET", // calls
   textHours: "7 days a week",
-  contactHours: "Calls Mon–Fri 10 AM – 6 PM ET · Texts 7 days a week",
+  contactHours: "Calls Mon–Fri 10 AM – 7 PM ET · Texts 7 days a week",
   deliveryDays: "5–7 days",
   replacementDays: 90,
   coverage: "All 50 states",
@@ -44,16 +44,20 @@ export type Delivery = "shop" | "home";
 export const parseDelivery = (v: unknown): Delivery => (v === "home" ? "home" : "shop");
 export const deliveryLine = (d: Delivery) => (d === "home" ? "Home delivery (quoted by text before it ships)" : "Free delivery to repair shop");
 
-/** True during phone hours: Mon–Fri, 10:00–18:00 Florida (Eastern) time. */
+/** Staff hours in Florida (Eastern) time, 24-hour clock: 10 AM to 7 PM. */
+export const OPEN_HOUR = 10;
+export const CLOSE_HOUR = 19;
+
+/** True during phone hours: Mon–Fri, 10:00–19:00 Florida (Eastern) time. */
 export function isOpenNow(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "numeric", hourCycle: "h23" }).formatToParts(now);
   const day = parts.find((p) => p.type === "weekday")?.value;
   const hour = Number(parts.find((p) => p.type === "hour")?.value);
-  return day !== "Sat" && day !== "Sun" && hour >= 10 && hour < 18;
+  return day !== "Sat" && day !== "Sun" && hour >= OPEN_HOUR && hour < CLOSE_HOUR;
 }
 
-/** True when staff answer texts: every day, 10:00–18:00 Florida (Eastern) time. */
+/** True when staff answer texts: every day, 10:00–19:00 Florida (Eastern) time. */
 export function isTextingNow(now = new Date()) {
   const hour = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hourCycle: "h23" }).format(now));
-  return hour >= 10 && hour < 18;
+  return hour >= OPEN_HOUR && hour < CLOSE_HOUR;
 }

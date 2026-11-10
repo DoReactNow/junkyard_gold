@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ADDRESS_LINE, BUSINESS, SMS_HREF, TEL_HREF, smsWithBody } from "@/lib/business";
 import { ChatIcon, MailIcon, PhoneIcon, PinIcon, ShieldIcon, TruckIcon } from "./icons";
-import { OpenStatus } from "./trust";
+import { OpenStatus } from "./open-status";
 
 /** JG monogram + wordmark. `light` = on a dark background. */
 export function Logo({ light = false, compact = false }: { light?: boolean; compact?: boolean }) {

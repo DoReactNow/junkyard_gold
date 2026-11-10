@@ -45,7 +45,7 @@ export default function Page() {
           </p>
           <h2>Talk to a real person</h2>
           <p>
-            Call {BUSINESS.phoneDisplay} Mon–Fri 10 AM – 6 PM ET, or text {BUSINESS.smsDisplay} {BUSINESS.textHours}. You&apos;ll reach a parts specialist, not a ticket queue. Our
+            Call {BUSINESS.phoneDisplay} Mon–Fri 10 AM – 7 PM ET, or text {BUSINESS.smsDisplay} {BUSINESS.textHours}. You&apos;ll reach a parts specialist, not a ticket queue. Our
             office is at {ADDRESS_LINE}. We ship every order; we don&apos;t offer pickup.
           </p>
         </Reveal>
