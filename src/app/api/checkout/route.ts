@@ -5,30 +5,14 @@ import { createCheckout, paymentsLive, startCheckout } from "@/lib/payments";
 import { specsFor } from "@/lib/specs";
 import { listedOptions, unitOptions, unitRef } from "@/lib/unit-options";
 
-// TEMPORARY (owner's internal test, 2026-11-11): while Stripe is off, "Buy this unit" opens the
-// /checkout order form pre-filled with the unit instead of /checkout/unavailable. To undo, delete
-// orderForm() and the three `if (!paymentsLive()) return orderForm(...)` lines below.
-type OrderUnit = { year: number; make: string; model: string; partType: string; spec: string; price: number; miles?: number | null };
-const orderForm = (u: OrderUnit) =>
-  NextResponse.redirect(
-    `${siteUrl()}/checkout?${new URLSearchParams({
-      year: String(u.year),
-      make: u.make,
-      model: u.model,
-      type: u.partType,
-      spec: u.spec,
-      price: u.price.toLocaleString("en-US"),
-      ...(u.miles ? { miles: u.miles.toLocaleString("en-US") } : {}),
-    })}`,
-    303,
-  );
-
 async function go(slug: string | null, delivery: Delivery = "shop") {
   const part = slug ? await db.part.findUnique({ where: { slug } }) : null;
   if (!part || part.status !== "available") {
     return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?reason=sold`, 303);
   }
-  if (!paymentsLive()) return orderForm({ ...part, miles: part.mileage });
+  if (!paymentsLive()) {
+    return NextResponse.redirect(`${siteUrl()}/checkout/unavailable?slug=${encodeURIComponent(part.slug)}&delivery=${delivery}`, 303);
+  }
   try {
     return NextResponse.redirect(await createCheckout(part, delivery), 303);
   } catch (err) {
@@ -49,7 +33,7 @@ async function goUnit(form: FormData, delivery: Delivery) {
   const line = `${v.spec} · ${unit.miles.toLocaleString()} miles`;
   const q = new URLSearchParams({ year: String(v.year), make: v.make, model: v.model, type: v.partType, spec: v.spec });
   const unavailable = () => NextResponse.redirect(`${siteUrl()}/checkout/unavailable?${new URLSearchParams({ slug: `${title}, ${line} at $${unit.price.toLocaleString("en-US")} (ref ${ref})`, delivery })}`, 303);
-  if (!paymentsLive()) return orderForm({ ...v, price: unit.price, miles: unit.miles });
+  if (!paymentsLive()) return unavailable();
   try {
     const url = await startCheckout({
       title,
@@ -75,7 +59,7 @@ async function goListedTier(slug: string, tier: number, delivery: Delivery) {
   const line = `${unit.miles.toLocaleString()} miles`;
   const ref = `${part.stockNo || part.slug}-${tier}`;
   const unavailable = () => NextResponse.redirect(`${siteUrl()}/checkout/unavailable?${new URLSearchParams({ slug: `${part.title}, ${line} at $${unit.price.toLocaleString("en-US")} (ref ${ref})`, delivery })}`, 303);
-  if (!paymentsLive()) return orderForm({ ...part, price: unit.price, miles: unit.miles });
+  if (!paymentsLive()) return unavailable();
   try {
     const url = await startCheckout({
       title: part.title,
