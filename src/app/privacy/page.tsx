@@ -11,7 +11,7 @@ export default function Page() {
       <ul>
         <li>Information you give us: your name, mobile number, email, VIN or vehicle details, ZIP code and messages.</li>
         <li>Order information: shipping address and order details. Card payments are processed by Stripe; we never see or store your full card number.</li>
-        <li>Basic technical data such as pages visited and ad-click identifiers, used to understand how people find us.</li>
+        <li>Basic technical data such as pages visited and ad-click identifiers, collected with Google Tag Manager and Google Analytics cookies, used to understand how people find us.</li>
       </ul>
       <h2>How we use it</h2>
       <p>To find and quote the part you asked for, text or call you about your request, process and ship orders, provide warranty support, and improve our website.</p>
