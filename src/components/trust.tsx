@@ -122,7 +122,7 @@ export function GuaranteeSeal({ className = "" }: { className?: string }) {
         </text>
       </svg>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/brand/jg-mark-sm.png" alt="" className="absolute left-1/2 top-1/2 w-[44%] -translate-x-1/2 -translate-y-1/2" />
+      <img src="/brand/jg-mark-sm.webp" alt="" className="absolute left-1/2 top-1/2 w-[44%] -translate-x-1/2 -translate-y-1/2" />
     </div>
   );
 }
@@ -152,7 +152,7 @@ export function Comparison() {
                 <th className="w-[28%] bg-ink p-5 text-white">
                   <span className="flex items-center gap-2.5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/brand/jg-mark-sm.png" alt="" className="h-6 w-auto" />
+                    <img src="/brand/jg-mark-sm.webp" alt="" className="h-6 w-auto" />
                     <span className="font-semibold">Junkyard Gold</span>
                   </span>
                 </th>

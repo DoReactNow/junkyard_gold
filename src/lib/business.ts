@@ -21,7 +21,9 @@ export const BUSINESS = {
   replacementDays: 90,
   coverage: "All 50 states",
   freeDeliveryArea: "lower 48 states", // Alaska and Hawaii shop delivery is quoted
-  // Engines & transmissions available through our vendor network (what we can source, not what is listed online)
+  // Engines & transmissions available through our vendor network (what we can source, not what is listed online).
+  // Always word it as a network ("from a network of 100K+"), never as our own stock, so it can't be read as
+  // the same claim as soldSince.
   networkSize: "100K+",
   founded: 2022,
   // Parts sold since founding (owner figure)
@@ -42,6 +44,12 @@ export function smsWithBody(body: string) {
 // isn't set, and once shipped "Sitemap: http://localhost:3000/sitemap.xml" to search engines.
 const DEFAULT_SITE_URL = process.env.NODE_ENV === "production" ? "https://junkyardgold.com" : "http://localhost:3000";
 export const siteUrl = () => (process.env.SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, "");
+
+/**
+ * Google review link from the Business Profile ("Ask for reviews" → share link). Review requests stay
+ * off until it's set (REVIEW_URL on the server, from the GitHub repository variable of the same name).
+ */
+export const reviewUrl = () => process.env.REVIEW_URL?.trim() || null;
 
 export type Delivery = "shop" | "home";
 export const parseDelivery = (v: unknown): Delivery => (v === "home" ? "home" : "shop");

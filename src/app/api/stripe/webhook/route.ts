@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { queueReviewRequest } from "@/lib/followups";
 import type Stripe from "stripe";
 import { db } from "@/lib/db";
 import { getStripe } from "@/lib/payments";
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
       });
       await db.message.create({ data: { conversationId: convo.id, direction: "note", author: "system", body: note, status: "received" } });
       await db.lead.updateMany({ where: { conversationId: convo.id, status: { in: ["new", "quoted"] } }, data: { status: "won" } });
+      await queueReviewRequest(convo.id).catch((e) => console.error("review request failed", e));
     }
     await alertStaff(`💰 ${note}`);
   }

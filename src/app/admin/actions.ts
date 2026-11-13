@@ -10,7 +10,7 @@ import { importParts } from "@/lib/import-parts";
 import { convertSalesRows, isSalesSheet, readTable } from "@/lib/sales-import";
 import { normalizePhone } from "@/lib/phone";
 import { recordInbound } from "@/lib/inbound";
-import { stopFollowups } from "@/lib/followups";
+import { cancelReviewRequest, queueReviewRequest, stopFollowups } from "@/lib/followups";
 
 export async function login(_: unknown, form: FormData) {
   if (!checkPassword(String(form.get("password") || ""))) return { error: "Wrong password" };
@@ -51,6 +51,8 @@ export async function setLeadStatus(conversationId: string, status: string) {
   await requireAdmin();
   await db.lead.updateMany({ where: { conversationId }, data: { status } });
   if (status === "won" || status === "lost") await stopFollowups(conversationId, `lead marked ${status}`);
+  if (status === "won") await queueReviewRequest(conversationId);
+  else await cancelReviewRequest(conversationId, `lead marked ${status}`);
   revalidatePath("/admin");
 }
 

@@ -143,11 +143,13 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           STAFF_ALERT_PHONE: ${{ secrets.STAFF_ALERT_PHONE }}
+          # Google review link for post-sale review texts (repository variable; empty = off)
+          REVIEW_URL: ${{ vars.REVIEW_URL }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: IMAGE_TAG,GHCR_USER,GHCR_TOKEN,DB_PASSWORD,ADMIN_PASSWORD,SESSION_SECRET,ANTHROPIC_API_KEY,RINGCENTRAL_CLIENT_ID,RINGCENTRAL_CLIENT_SECRET,RINGCENTRAL_JWT,RINGCENTRAL_WEBHOOK_TOKEN,SMTP_PASS,STRIPE_SECRET_KEY,STRIPE_WEBHOOK_SECRET,STAFF_ALERT_PHONE
+          envs: IMAGE_TAG,GHCR_USER,GHCR_TOKEN,DB_PASSWORD,ADMIN_PASSWORD,SESSION_SECRET,ANTHROPIC_API_KEY,RINGCENTRAL_CLIENT_ID,RINGCENTRAL_CLIENT_SECRET,RINGCENTRAL_JWT,RINGCENTRAL_WEBHOOK_TOKEN,SMTP_PASS,STRIPE_SECRET_KEY,STRIPE_WEBHOOK_SECRET,STAFF_ALERT_PHONE,REVIEW_URL
           script: |
             set -e
             cd /opt/junkyard_gold
@@ -201,6 +203,7 @@ jobs:
               printf 'RINGCENTRAL_FROM_NUMBER=%s\n' "+18478745972"
               printf 'RINGCENTRAL_WEBHOOK_TOKEN=%s\n' "$RINGCENTRAL_WEBHOOK_TOKEN"
               printf 'STAFF_ALERT_PHONE=%s\n' "$STAFF_ALERT_PHONE"
+              printf 'REVIEW_URL=%s\n' "$REVIEW_URL"
               printf 'SMTP_HOST=%s\n' "smtp.gmail.com"
               printf 'SMTP_PORT=%s\n' "587"
               printf 'SMTP_USER=%s\n' "junkyardgoldinc@gmail.com"

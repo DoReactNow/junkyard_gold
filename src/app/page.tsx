@@ -93,7 +93,7 @@ export default async function Home() {
                 <em className="text-gold-grad">done right.</em>
               </h1>
               <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-white/65">
-                {BUSINESS.networkSize} quality used engines and transmissions for every make, matched to your VIN, backed by a{" "}
+                Quality used engines and transmissions for every make, sourced from a network of {BUSINESS.networkSize}, matched to your VIN, backed by a{" "}
                 {BUSINESS.warrantyAdj} warranty, with photos of the exact unit before you pay.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
@@ -416,7 +416,7 @@ export default async function Home() {
               <Link href="/faq" className="mt-5 inline-flex font-semibold underline decoration-gold underline-offset-4 hover:text-gold-dark">See all questions →</Link>
               <div className="mt-8 flex items-center gap-4 rounded-2xl bg-ink p-5 text-white">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/brand/jg-mark-sm.png" alt="" className="h-9 w-auto" />
+                <img src="/brand/jg-mark-sm.webp" alt="" className="h-9 w-auto" />
                 <div className="mr-auto">
                   <div className="font-semibold">Talk to a parts specialist</div>
                   <div className="text-sm text-white/55">{BUSINESS.contactHours}</div>

@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(self)" },
         ],
       },
+      // Photos and brand files aren't content-hashed, so a week (not a year) lets a replaced file show up.
+      ...["/img/:path*", "/brand/:path*"].map((source) => ({
+        source,
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
+      })),
     ];
   },
   // v1 addresses → v2 pages, so old links and bookmarks keep working

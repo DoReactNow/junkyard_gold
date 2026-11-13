@@ -9,6 +9,7 @@ import { PageHero, PageShell } from "./site-chrome";
 import { PartCard } from "./part-card";
 import { VinCheck } from "./vin-check";
 import { AssuranceStrip } from "./assurance";
+import { CodeLinks } from "./code-page";
 import { ChatIcon } from "./icons";
 
 type Params = { make?: string; model?: string; year?: string };
@@ -216,6 +217,8 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
               {listings.map((p) => <PartCard key={p.id} part={p} />)}
             </div>
           </section>
+
+          {!r.make && <CodeLinks kind={kind} />}
 
           {r.model && <FitmentFacts kind={kind} make={r.make!.name} model={r.model.name} year={r.year} years={years} />}
 

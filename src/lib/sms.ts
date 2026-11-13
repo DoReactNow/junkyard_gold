@@ -47,10 +47,18 @@ export async function queueText(opts: { conversationId: string; body: string; ki
   });
 }
 
-/** Cancels queued automatic texts (follow-ups) for a conversation. */
-export async function cancelQueued(conversationId: string, reason: string) {
+/**
+ * Cancels queued automatic texts for a conversation. `kinds` limits it to those kinds; `keep` skips
+ * kinds (a customer reply ends the sales follow-ups but not the post-delivery review request).
+ * STOP is enforced separately: nothing is ever sent to an opted-out conversation.
+ */
+export async function cancelQueued(conversationId: string, reason: string, opts: { kinds?: string[]; keep?: string[] } = {}) {
   await db.message.updateMany({
-    where: { conversationId, status: "queued" },
+    where: {
+      conversationId,
+      status: "queued",
+      ...(opts.kinds ? { kind: { in: opts.kinds } } : opts.keep ? { kind: { notIn: opts.keep } } : {}),
+    },
     data: { status: "cancelled", error: reason },
   });
 }

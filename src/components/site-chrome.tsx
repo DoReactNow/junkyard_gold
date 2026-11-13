@@ -9,7 +9,7 @@ export function Logo({ light = false, compact = false }: { light?: boolean; comp
     <Link href="/" className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label={`${BUSINESS.name} home`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/brand/jg-mark-sm.png"
+        src="/brand/jg-mark-sm.webp"
         alt=""
         width={64}
         height={38}
@@ -47,7 +47,7 @@ export function Header() {
           <span className="flex items-center gap-5 whitespace-nowrap">
             <span className="flex items-center gap-1.5"><ShieldIcon className="size-3.5 text-gold-2" /> {BUSINESS.replacementDays}-day replacement at our cost</span>
             <span className="hidden items-center gap-1.5 lg:flex"><TruckIcon className="size-3.5 text-gold-2" /> Free delivery to repair shops</span>
-            <span className="hidden items-center gap-1.5 2xl:flex">{BUSINESS.networkSize} engines &amp; transmissions · every make</span>
+            <span className="hidden items-center gap-1.5 2xl:flex">{BUSINESS.networkSize} engines &amp; transmissions in our network</span>
           </span>
           <span className="flex items-center gap-5 whitespace-nowrap">
             <OpenStatus />
