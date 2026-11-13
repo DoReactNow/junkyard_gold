@@ -28,6 +28,9 @@ export function normalizeModel(make: string, model: string) {
   const fixed = FIXES[`${make}|${s}`.toLowerCase()];
   if (fixed) return fixed;
   s = fixCase(s);
+  // "Suburban-1500", "Escalade-ESV", "Montero-Sport" → spaces. Short prefixes keep their hyphen
+  // ("F-150", "CX-5", "E-Pace"); the URL slug is the same either way.
+  s = s.replace(/([A-Za-z]{3,})-(?=[A-Za-z0-9])/g, "$1 ");
   // "Truck F150", "Van Express 1500", "Truck Silverado 1500": a body-style word in front of a named model.
   // Kept when the rest is only a number ("Van 3500"), or when it is the whole name (Nissan "Truck").
   s = s.replace(/^(Truck|Van)\s+(?=[A-Za-z])/i, "");
