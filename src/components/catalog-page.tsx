@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { BUSINESS, siteUrl, smsWithBody } from "@/lib/business";
 import { KINDS, catalogPath, isIndexable, listingsFor, makesFor, modelsFor, resolveMake, resolveModel, yearsFor, type Facet, type Kind } from "@/lib/catalog";
 import { money, partUrl } from "@/lib/inventory";
+import { specsFor } from "@/lib/specs";
 import { PageHero, PageShell } from "./site-chrome";
 import { PartCard } from "./part-card";
 import { VinCheck } from "./vin-check";
@@ -20,7 +21,9 @@ async function resolve(kind: Kind, p: Params) {
   if (p.model && !model) notFound();
   const year = p.year ? Number(p.year) : undefined;
   if (p.year && (!/^(19|20)\d{2}$/.test(p.year) || !model)) notFound();
-  if (year && model && !(await yearsFor(kind, make!.name, model.name)).some((y) => y.name === p.year)) notFound();
+  // An old spelling of the model ("f-150", "truck-f150") → the one page for it
+  if (model && p.model !== model.slug) permanentRedirect(catalogPath(kind, make!.name, model.name, year));
+  if (year && model && !(await yearsFor(kind, make!.name, model.names)).some((y) => y.name === p.year)) notFound();
   return { make, model, year };
 }
 
@@ -35,7 +38,7 @@ export async function catalogMetadata(kind: Kind, p: Params): Promise<Metadata> 
   const k = KINDS[kind];
   const { vehicle, title } = heading(kind, r);
   const facet = r.year
-    ? (await yearsFor(kind, r.make!.name, r.model!.name)).find((y) => y.name === String(r.year))
+    ? (await yearsFor(kind, r.make!.name, r.model!.names)).find((y) => y.name === String(r.year))
     : (r.model ?? r.make);
   const from = facet ? ` from ${money(facet.from)}` : "";
   const level = r.year ? "year" : r.model ? "model" : r.make ? "make" : "hub";
@@ -67,21 +70,70 @@ function FacetLinks({ title, items, href }: { title: string; items: Facet[]; hre
   );
 }
 
+/**
+ * Factory engine or transmission options for the vehicle on this page (from src/data/specs.json):
+ * real fitment facts that differ from page to page, instead of shared boilerplate.
+ */
+function FitmentFacts({ kind, make, model, year, years }: { kind: Kind; make: string; model: string; year?: number; years: Facet[] }) {
+  const k = KINDS[kind];
+  const rows = (year ? [year] : years.map((y) => Number(y.name)))
+    .map((y) => ({ year: y, specs: specsFor(y, make, model, k.partType) }))
+    .filter((r) => r.specs.length);
+  if (!rows.length) return null;
+  const vehicle = year ? `${year} ${make} ${model}` : `${make} ${model}`;
+  const engine = k.partType === "Engine";
+  return (
+    <section className="mt-12">
+      <h2 className="font-serif text-[2rem] leading-none">{year ? `${vehicle} ${k.singular} options` : `${vehicle} ${k.singular} options by year`}</h2>
+      <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-ink/75">
+        {engine ? (
+          <>
+            {year ? `The ${vehicle} was built with ${rows[0].specs.length === 1 ? "one engine" : `${rows[0].specs.length} engines`}. ` : ""}
+            The 8th character of your VIN usually tells us which one your vehicle left the factory with.{" "}
+            <Link href="/guides/find-your-engine-code-from-your-vin" className="font-semibold underline">How to find your engine code</Link>.
+          </>
+        ) : (
+          <>The right transmission depends on the engine and drivetrain (4x2 or 4x4). Send us your VIN and we match the exact one before it ships.</>
+        )}
+      </p>
+      {year ? (
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+          {rows[0].specs.map((sp) => (
+            <li key={sp} className="rounded-xl border border-line bg-white px-4 py-3 text-sm">{sp}</li>
+          ))}
+        </ul>
+      ) : (
+        <dl className="mt-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white text-sm">
+          {rows.slice(0, 30).map((r) => (
+            <div key={r.year} className="grid gap-1 px-4 py-3 sm:grid-cols-[64px_1fr]">
+              <dt className="font-semibold">{r.year}</dt>
+              <dd className="text-steel">
+                {r.specs.slice(0, 6).join(" · ")}
+                {r.specs.length > 6 ? ` · +${r.specs.length - 6} more` : ""}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </section>
+  );
+}
+
 export async function CatalogPage({ kind, params }: { kind: Kind; params: Params }) {
   const r = await resolve(kind, params);
   const k = KINDS[kind];
   const { vehicle, title } = heading(kind, r);
-  const f = { make: r.make?.name, model: r.model?.name, year: r.year };
+  const f = { make: r.make?.name, model: r.model?.name, models: r.model?.names, year: r.year };
 
   const [listings, makes, models, years] = await Promise.all([
     listingsFor(kind, f),
     r.make ? Promise.resolve([]) : makesFor(kind),
     r.make && !r.model ? modelsFor(kind, r.make.name) : Promise.resolve([]),
-    r.model && !r.year ? yearsFor(kind, r.make!.name, r.model.name) : Promise.resolve([]),
+    r.model && !r.year ? yearsFor(kind, r.make!.name, r.model.names) : Promise.resolve([]),
   ]);
   const facets = r.year ? null : r.model ? years : r.make ? models : makes;
   const total = r.year
-    ? (await yearsFor(kind, r.make!.name, r.model!.name)).find((y) => y.name === String(r.year))!.count
+    ? (await yearsFor(kind, r.make!.name, r.model!.names)).find((y) => y.name === String(r.year))!.count
     : (facets ?? []).reduce((n, x) => n + x.count, 0);
   const from = Math.min(...listings.map((p) => p.price), ...(facets ?? []).map((x) => x.from));
   const allHref = `/parts?${new URLSearchParams({ type: k.partType, ...(f.year ? { year: String(f.year) } : {}), ...(f.make ? { make: f.make } : {}), ...(f.model ? { model: f.model } : {}) })}`;
@@ -164,6 +216,8 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
               {listings.map((p) => <PartCard key={p.id} part={p} />)}
             </div>
           </section>
+
+          {r.model && <FitmentFacts kind={kind} make={r.make!.name} model={r.model.name} year={r.year} years={years} />}
 
           <section className="mt-12">
             <h2 className="font-serif text-[2rem] leading-none">Questions</h2>

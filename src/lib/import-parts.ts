@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { slugify } from "./inventory";
+import { normalizeModel } from "./models";
 import { stripVins, titleMake } from "./vin";
 
 /** Minimal RFC-4180 CSV parser (quoted fields, commas and newlines inside quotes). */
@@ -64,7 +65,7 @@ export async function importParts(rows: Record<string, string>[]): Promise<Impor
     const partType = PART_TYPES[rawType.toLowerCase()] || (rawType ? rawType.replace(/\b\w/g, (c) => c.toUpperCase()) : "");
     const year = parseInt(pick(row, "year"), 10);
     const make = titleMake(pick(row, "make"));
-    const model = pick(row, "model");
+    const model = normalizeModel(make, pick(row, "model"));
     const price = Math.round(parseFloat(pick(row, "price", "sale_price", "sold_price").replace(/[$,]/g, "")));
     if (!partType || !year || !make || !model) { result.skipped.push({ line, reason: "needs part_type, year, make and model" }); continue; }
     if (!price || price < 1) { result.skipped.push({ line, reason: "missing price" }); continue; }

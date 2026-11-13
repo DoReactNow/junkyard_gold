@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BUSINESS, TEL_HREF, smsWithBody } from "@/lib/business";
 import { catalogPath } from "@/lib/catalog";
+import { normalizeModel } from "@/lib/models";
 import { deliveryWindow, specFacts, vinMark } from "@/lib/spec-sheet";
 import type { UnitOption } from "@/lib/unit-options";
 import { ProductGallery } from "./product-gallery";
@@ -107,7 +108,7 @@ export function ProductView(p: ProductViewProps) {
     ? [
         { name: `${p.partType}s`, href: catalogPath(kind) },
         { name: p.make, href: catalogPath(kind, p.make) },
-        { name: p.model, href: catalogPath(kind, p.make, p.model) },
+        { name: normalizeModel(p.make, p.model), href: catalogPath(kind, p.make, p.model) },
       ]
     : [{ name: "Parts", href: "/parts" }];
 
