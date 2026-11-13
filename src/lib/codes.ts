@@ -4,6 +4,7 @@
 import data from "@/data/specs.json";
 import { db } from "./db";
 import { KINDS, type Kind } from "./catalog";
+import { modelSlug, normalizeModel } from "./models";
 
 /** Fewer listed units than this: no page (404), so every code page has real inventory on it. */
 export const MIN_CODE_LISTINGS = 3;
@@ -20,18 +21,19 @@ export function codeOf(kind: Kind, spec: string) {
 
 export const codePath = (kind: Kind, code: string) => `/${kind}/code/${code.toLowerCase()}`;
 
-export type CodeFacet = { code: string; count: number; from: number; to: number; size: string | null };
+export type CodeFacet = { code: string; count: number; from: number; to: number; size: string | null; updated: Date };
 
 const SIZE = /\b(\d\.\d)L\b/i;
 
 /** Every code with at least MIN_CODE_LISTINGS listed units, most units first. */
 export async function codesFor(kind: Kind): Promise<CodeFacet[]> {
-  const rows = await db.part.findMany({ where: { status: "available", partType: KINDS[kind].partType }, select: { spec: true, price: true } });
-  const by = new Map<string, { count: number; from: number; to: number; sizes: Map<string, number> }>();
+  const rows = await db.part.findMany({ where: { status: "available", partType: KINDS[kind].partType }, select: { spec: true, price: true, updatedAt: true } });
+  const by = new Map<string, { count: number; from: number; to: number; updated: Date; sizes: Map<string, number> }>();
   for (const r of rows) {
     const code = codeOf(kind, r.spec);
     if (!code) continue;
-    const f = by.get(code) ?? by.set(code, { count: 0, from: r.price, to: r.price, sizes: new Map() }).get(code)!;
+    const f = by.get(code) ?? by.set(code, { count: 0, from: r.price, to: r.price, updated: r.updatedAt, sizes: new Map() }).get(code)!;
+    if (r.updatedAt > f.updated) f.updated = r.updatedAt;
     f.count++;
     f.from = Math.min(f.from, r.price);
     f.to = Math.max(f.to, r.price);
@@ -40,7 +42,7 @@ export async function codesFor(kind: Kind): Promise<CodeFacet[]> {
   }
   return [...by.entries()]
     .filter(([, f]) => f.count >= MIN_CODE_LISTINGS)
-    .map(([code, f]) => ({ code, count: f.count, from: f.from, to: f.to, size: [...f.sizes.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null }))
+    .map(([code, f]) => ({ code, count: f.count, from: f.from, to: f.to, updated: f.updated, size: [...f.sizes.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null }))
     .sort((a, b) => b.count - a.count || a.code.localeCompare(b.code));
 }
 
@@ -50,6 +52,38 @@ export async function listingsForCode(kind: Kind, code: string) {
     orderBy: [{ price: "asc" }],
   });
   return rows.filter((p) => codeOf(kind, p.spec) === code);
+}
+
+// Makes that can use a code family. The spec data has a few rows filed under the wrong make
+// (Chevy G20 van specs under "Infiniti G20"), so a GM or Ford code only lists vehicles from that family.
+const GM = ["Chevrolet", "GMC", "Cadillac", "Buick", "Pontiac", "Oldsmobile", "Saturn", "Hummer", "Isuzu", "Saab"];
+const FORD = ["Ford", "Lincoln", "Mercury", "Mazda"];
+function familyOf(kind: Kind, code: string): string[] | null {
+  if (kind === "used-engines") return /^L/.test(code) ? GM : null; // GM RPO engine codes
+  if (/^\d[LT]\d/.test(code)) return GM; // 4L60E, 6L80, 6T70 …
+  if (/^\d[RF]\d/.test(code)) return FORD; // 4R70W, 6R80, 5R110W, 6F35 …
+  return null;
+}
+
+// GM twins sold under one brand only; the spec data sometimes lists them under the other.
+const ONE_BRAND: Record<string, string> = {
+  s10: "Chevrolet", silverado: "Chevrolet", express: "Chevrolet", tahoe: "Chevrolet", avalanche: "Chevrolet",
+  sonoma: "GMC", sierra: "GMC", savana: "GMC", yukon: "GMC", jimmy: "GMC",
+};
+const wrongBrand = (make: string, model: string) => {
+  const owner = ONE_BRAND[model.split(" ")[0].toLowerCase()];
+  return owner !== undefined && owner !== make;
+};
+
+/** "Truck-Silverado 1500 (1999 Up)" / "Suburban-1500" / "Ford F150 Raptor" → a clean model name. */
+function cleanSpecModel(make: string, model: string) {
+  const s = model
+    .replace(new RegExp(`^${make}\\s+`, "i"), "")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/([A-Za-z]{3,})-(?=[A-Za-z0-9])/g, "$1 ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return normalizeModel(make, s);
 }
 
 type Entry = { e?: string[]; t?: string[] };
@@ -62,13 +96,17 @@ export function vehiclesWithCode(kind: Kind, code: string) {
   const hit = vehicleCache.get(key);
   if (hit) return hit;
   const slot = kind === "used-engines" ? "e" : "t";
+  const family = familyOf(kind, code);
   const by = new Map<string, { make: string; model: string; from: number; to: number }>();
   for (const [y, makes] of Object.entries(SPECS)) {
     const year = Number(y);
     for (const [make, models] of Object.entries(makes)) {
-      for (const [model, entry] of Object.entries(models)) {
+      if (family && !family.includes(make)) continue;
+      for (const [rawModel, entry] of Object.entries(models)) {
         if (!(entry[slot] ?? []).some((s) => codeOf(kind, s) === code)) continue;
-        const k = `${make}|${model}`;
+        const model = cleanSpecModel(make, rawModel);
+        if (wrongBrand(make, model)) continue;
+        const k = `${make}|${modelSlug(make, model)}`;
         const v = by.get(k);
         if (!v) by.set(k, { make, model, from: year, to: year });
         else {

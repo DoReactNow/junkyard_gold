@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { BUSINESS, siteUrl, smsWithBody } from "@/lib/business";
-import { KINDS, catalogPath, modelsFor, type Kind } from "@/lib/catalog";
+import { KINDS, catalogPath, fitTitle, modelsFor, type Kind } from "@/lib/catalog";
 import { codePath, codesFor, listingsForCode, vehiclesWithCode } from "@/lib/codes";
 import { money, partUrl } from "@/lib/inventory";
 import { AssuranceStrip } from "./assurance";
@@ -25,7 +25,7 @@ export async function codeMetadata(kind: Kind, raw: string): Promise<Metadata> {
   const k = KINDS[kind];
   const name = label(kind, f.code, f.size);
   return {
-    title: `Used ${name} ${k.plural} for Sale from ${money(f.from)}`,
+    title: fitTitle(`Used ${name} ${k.plural}`, ` from ${money(f.from)}`, BUSINESS.name),
     description: `${f.count} used ${name} ${k.singular}s listed from ${money(f.from)}, VIN-matched before shipping, with a ${BUSINESS.warrantyAdj} warranty. Free delivery to repair shops in the lower 48.`,
     alternates: { canonical: codePath(kind, f.code) },
   };

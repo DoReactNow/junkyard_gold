@@ -10,6 +10,20 @@ export const KINDS = {
 } as const;
 export type Kind = keyof typeof KINDS;
 
+/**
+ * Page title that fits in search results (~65 characters with the " | Junkyard Gold" suffix the layout adds):
+ * drops "for Sale" first, then the brand suffix. `head` is e.g. "Used 2004 Dodge Dakota Engines".
+ */
+export function fitTitle(head: string, from: string, brand: string): string | { absolute: string } {
+  const MAX = 65;
+  const suffix = ` | ${brand}`;
+  const full = `${head} for Sale${from}`;
+  if (full.length + suffix.length <= MAX) return full;
+  const short = `${head}${from}`;
+  if (short.length + suffix.length <= MAX) return short;
+  return { absolute: short };
+}
+
 export const catalogPath = (kind: Kind, make?: string, model?: string, year?: number) =>
   "/" + [kind, make && slugify(make), make && model && modelSlug(make, model), year && String(year)].filter(Boolean).join("/");
 
@@ -98,26 +112,34 @@ export function isIndexable(level: "hub" | "make" | "model" | "year", count: num
   return level === "hub" || level === "make" || count >= MIN_INDEXABLE[level];
 }
 
-/** Every indexable catalog URL, for the sitemap. */
+/** Every indexable catalog URL, for the sitemap, with the newest listing change on that page. */
 export async function allCatalogPaths() {
-  const out: string[] = [];
+  const out: { path: string; lastModified?: Date }[] = [];
   for (const kind of Object.keys(KINDS) as Kind[]) {
-    out.push(catalogPath(kind));
-    const rows = await db.part.groupBy({ by: ["make", "model", "year"], where: avail(kind), _count: true });
-    // Counts per URL, so names that differ only in capitalization add up on the page they share.
-    const makes = new Set<string>();
-    const models = new Map<string, number>();
-    const years = new Map<string, number>();
+    const rows = await db.part.groupBy({ by: ["make", "model", "year"], where: avail(kind), _count: true, _max: { updatedAt: true } });
+    // Counts per URL, so spellings that share a page add up on it.
+    type Acc = { n: number; at?: Date };
+    const add = (map: Map<string, Acc>, path: string, n: number, at: Date | null) => {
+      const a = map.get(path) ?? map.set(path, { n: 0 }).get(path)!;
+      a.n += n;
+      if (at && (!a.at || at > a.at)) a.at = at;
+    };
+    const hub = new Map<string, Acc>();
+    const makes = new Map<string, Acc>();
+    const models = new Map<string, Acc>();
+    const years = new Map<string, Acc>();
     for (const r of rows) {
-      makes.add(catalogPath(kind, r.make));
-      const m = catalogPath(kind, r.make, r.model);
-      models.set(m, (models.get(m) ?? 0) + r._count);
-      const y = catalogPath(kind, r.make, r.model, r.year);
-      years.set(y, (years.get(y) ?? 0) + r._count);
+      const at = r._max.updatedAt;
+      add(hub, catalogPath(kind), r._count, at);
+      add(makes, catalogPath(kind, r.make), r._count, at);
+      add(models, catalogPath(kind, r.make, r.model), r._count, at);
+      add(years, catalogPath(kind, r.make, r.model, r.year), r._count, at);
     }
-    out.push(...makes);
-    for (const [path, n] of models) if (isIndexable("model", n)) out.push(path);
-    for (const [path, n] of years) if (isIndexable("year", n)) out.push(path);
+    for (const [path, a] of hub) out.push({ path, lastModified: a.at });
+    if (!hub.size) out.push({ path: catalogPath(kind) });
+    for (const [path, a] of makes) out.push({ path, lastModified: a.at });
+    for (const [path, a] of models) if (isIndexable("model", a.n)) out.push({ path, lastModified: a.at });
+    for (const [path, a] of years) if (isIndexable("year", a.n)) out.push({ path, lastModified: a.at });
   }
   return out;
 }

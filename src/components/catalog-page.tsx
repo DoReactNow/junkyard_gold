@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { BUSINESS, siteUrl, smsWithBody } from "@/lib/business";
-import { KINDS, catalogPath, isIndexable, listingsFor, makesFor, modelsFor, resolveMake, resolveModel, yearsFor, type Facet, type Kind } from "@/lib/catalog";
+import { KINDS, catalogPath, fitTitle, isIndexable, listingsFor, makesFor, modelsFor, resolveMake, resolveModel, yearsFor, type Facet, type Kind } from "@/lib/catalog";
 import { money, partUrl } from "@/lib/inventory";
+import { codeOf, codePath, codesFor } from "@/lib/codes";
 import { specsFor } from "@/lib/specs";
 import { PageHero, PageShell } from "./site-chrome";
 import { PartCard } from "./part-card";
@@ -46,7 +47,7 @@ export async function catalogMetadata(kind: Kind, p: Params): Promise<Metadata> 
   const indexable = isIndexable(level, facet?.count ?? 0);
   return {
     ...(indexable ? {} : { robots: { index: false, follow: true } }),
-    title: `${title} for Sale${from}`,
+    title: fitTitle(title, from, BUSINESS.name),
     description: `${vehicle ? `${vehicle} used ${k.singular}s` : `Used ${k.singular}s`}${from}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and photos before you buy. Shipped nationwide by ${BUSINESS.name}.`,
     alternates: { canonical: catalogPath(kind, r.make?.name, r.model?.name, r.year) },
   };
@@ -71,11 +72,31 @@ function FacetLinks({ title, items, href }: { title: string; items: Facet[]; hre
   );
 }
 
+/** "5th" when the specs say which VIN character carries the engine code ("VIN F, 5th digit"), else null. */
+function vinDigit(specs: string[]) {
+  const counts = new Map<string, number>();
+  for (const sp of specs) {
+    const d = sp.match(/\b(\d{1,2})(?:st|nd|rd|th)\s+digit\b/i)?.[1];
+    if (d) counts.set(d, (counts.get(d) ?? 0) + 1);
+  }
+  const d = [...counts.entries()].sort((x, y) => y[1] - x[1])[0]?.[0];
+  if (!d) return null;
+  const n = Number(d);
+  return `${n}${n % 10 === 1 && n !== 11 ? "st" : n % 10 === 2 && n !== 12 ? "nd" : n % 10 === 3 && n !== 13 ? "rd" : "th"}`;
+}
+
+/** A spec row; linked to its code page (/used-transmissions/code/4l60e) when one exists. */
+function SpecText({ kind, spec, codes }: { kind: Kind; spec: string; codes: Set<string> }) {
+  const code = codeOf(kind, spec);
+  if (!code || !codes.has(code)) return <>{spec}</>;
+  return <Link href={codePath(kind, code)} className="font-medium underline decoration-gold/60 underline-offset-2 hover:decoration-gold">{spec}</Link>;
+}
+
 /**
  * Factory engine or transmission options for the vehicle on this page (from src/data/specs.json):
  * real fitment facts that differ from page to page, instead of shared boilerplate.
  */
-function FitmentFacts({ kind, make, model, year, years }: { kind: Kind; make: string; model: string; year?: number; years: Facet[] }) {
+function FitmentFacts({ kind, make, model, year, years, codes }: { kind: Kind; make: string; model: string; year?: number; years: Facet[]; codes: Set<string> }) {
   const k = KINDS[kind];
   const rows = (year ? [year] : years.map((y) => Number(y.name)))
     .map((y) => ({ year: y, specs: specsFor(y, make, model, k.partType) }))
@@ -83,14 +104,16 @@ function FitmentFacts({ kind, make, model, year, years }: { kind: Kind; make: st
   if (!rows.length) return null;
   const vehicle = year ? `${year} ${make} ${model}` : `${make} ${model}`;
   const engine = k.partType === "Engine";
+  const digit = engine ? vinDigit(rows.flatMap((r) => r.specs)) : null;
   return (
     <section className="mt-12">
       <h2 className="font-serif text-[2rem] leading-none">{year ? `${vehicle} ${k.singular} options` : `${vehicle} ${k.singular} options by year`}</h2>
       <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-ink/75">
         {engine ? (
           <>
-            {year ? `The ${vehicle} was built with ${rows[0].specs.length === 1 ? "one engine" : `${rows[0].specs.length} engines`}. ` : ""}
-            The 8th character of your VIN usually tells us which one your vehicle left the factory with.{" "}
+            {digit
+              ? `On the ${vehicle}, the ${digit} character of the VIN identifies the engine, so your VIN tells us which one your vehicle left the factory with. `
+              : "Your VIN tells us which engine your vehicle left the factory with. "}
             <Link href="/guides/find-your-engine-code-from-your-vin" className="font-semibold underline">How to find your engine code</Link>.
           </>
         ) : (
@@ -100,7 +123,7 @@ function FitmentFacts({ kind, make, model, year, years }: { kind: Kind; make: st
       {year ? (
         <ul className="mt-4 grid gap-2 sm:grid-cols-2">
           {rows[0].specs.map((sp) => (
-            <li key={sp} className="rounded-xl border border-line bg-white px-4 py-3 text-sm">{sp}</li>
+            <li key={sp} className="rounded-xl border border-line bg-white px-4 py-3 text-sm"><SpecText kind={kind} spec={sp} codes={codes} /></li>
           ))}
         </ul>
       ) : (
@@ -109,7 +132,9 @@ function FitmentFacts({ kind, make, model, year, years }: { kind: Kind; make: st
             <div key={r.year} className="grid gap-1 px-4 py-3 sm:grid-cols-[64px_1fr]">
               <dt className="font-semibold">{r.year}</dt>
               <dd className="text-steel">
-                {r.specs.slice(0, 6).join(" · ")}
+                {[...r.specs].sort((x, y) => Number(codes.has(codeOf(kind, y) ?? "")) - Number(codes.has(codeOf(kind, x) ?? ""))).slice(0, 6).map((sp, i) => (
+                  <span key={sp}>{i > 0 && " · "}<SpecText kind={kind} spec={sp} codes={codes} /></span>
+                ))}
                 {r.specs.length > 6 ? ` · +${r.specs.length - 6} more` : ""}
               </dd>
             </div>
@@ -126,12 +151,14 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
   const { vehicle, title } = heading(kind, r);
   const f = { make: r.make?.name, model: r.model?.name, models: r.model?.names, year: r.year };
 
-  const [listings, makes, models, years] = await Promise.all([
+  const [listings, makes, models, years, codeList] = await Promise.all([
     listingsFor(kind, f),
     r.make ? Promise.resolve([]) : makesFor(kind),
     r.make && !r.model ? modelsFor(kind, r.make.name) : Promise.resolve([]),
     r.model && !r.year ? yearsFor(kind, r.make!.name, r.model.names) : Promise.resolve([]),
+    r.model ? codesFor(kind) : Promise.resolve([]),
   ]);
+  const codes = new Set(codeList.map((c) => c.code));
   const facets = r.year ? null : r.model ? years : r.make ? models : makes;
   const total = r.year
     ? (await yearsFor(kind, r.make!.name, r.model!.names)).find((y) => y.name === String(r.year))!.count
@@ -220,7 +247,7 @@ export async function CatalogPage({ kind, params }: { kind: Kind; params: Params
 
           {!r.make && <CodeLinks kind={kind} />}
 
-          {r.model && <FitmentFacts kind={kind} make={r.make!.name} model={r.model.name} year={r.year} years={years} />}
+          {r.model && <FitmentFacts kind={kind} make={r.make!.name} model={r.model.name} year={r.year} years={years} codes={codes} />}
 
           <section className="mt-12">
             <h2 className="font-serif text-[2rem] leading-none">Questions</h2>

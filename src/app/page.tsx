@@ -93,7 +93,7 @@ export default async function Home() {
                 <em className="text-gold-grad">done right.</em>
               </h1>
               <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-white/65">
-                Quality used engines and transmissions for every make, sourced from a network of {BUSINESS.networkSize}, matched to your VIN, backed by a{" "}
+                Quality used engines and transmissions for every make, sourced from a supplier network of {BUSINESS.networkSize} units, matched to your VIN, backed by a{" "}
                 {BUSINESS.warrantyAdj} warranty, with photos of the exact unit before you pay.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">

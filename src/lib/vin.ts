@@ -42,8 +42,11 @@ const isVinToken = (t: string) => /\d/.test(t) && /[a-z]/i.test(t);
  */
 export function stripVins(text: string) {
   if (!text) return text;
-  return text
-    .replace(VIN_TOKEN, (t) => (isVinToken(t) ? "" : t))
+  let removed = false;
+  let s = text.replace(VIN_TOKEN, (t) => (isVinToken(t) ? ((removed = true), "") : t));
+  if (!removed) return text;
+  s = s.replace(/[\s/,(]*\bVIN\s*[:#]?\s*$/i, ""); // the "VIN" label left behind ("(Pickup) / VIN")
+  return s
     .replace(/(\s*\/\s*){2,}/g, " / ")
     .replace(/\(\s*\)/g, "")
     .replace(/\s+([,;)])/g, "$1")
@@ -53,9 +56,22 @@ export function stripVins(text: string) {
     .trim();
 }
 
-/** Drops VIN segments from a URL slug ("...-1g2zh57nx84216204-88000mi" → "...-88000mi"). */
+/** Longest slug the importer makes (slugify cuts at 90), which can cut a VIN short at the end. */
+const SLUG_MAX = 90;
+const isPartialVinTail = (seg: string) =>
+  seg.length >= 11 && seg.length < 17 && /^[a-hj-npr-z0-9]+$/.test(seg) && (seg.match(/\d/g) ?? []).length >= 3 && (seg.match(/[a-z]/g) ?? []).length >= 3;
+
+/**
+ * Drops VIN segments from a URL slug ("...-1g2zh57nx84216204-88000mi" → "...-88000mi"), including a VIN
+ * cut short by the 90-character limit at the very end ("...-pickup-vin-1ft7w2bt1lee5" → "...-pickup").
+ */
 export function stripVinSlug(slug: string) {
-  return slug.split("-").filter((seg) => !(seg.length === 17 && /^[a-hj-npr-z0-9]+$/.test(seg) && isVinToken(seg))).join("-");
+  const segs = slug.split("-").filter((seg) => !(seg.length === 17 && /^[a-hj-npr-z0-9]+$/.test(seg) && isVinToken(seg)));
+  if (slug.length >= SLUG_MAX && segs.length && isPartialVinTail(segs[segs.length - 1])) {
+    segs.pop();
+    if (segs[segs.length - 1] === "vin") segs.pop();
+  }
+  return segs.join("-");
 }
 
 const MAKE_FIX: Record<string, string> = {
