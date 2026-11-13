@@ -3,6 +3,7 @@ import { Inter, Inter_Tight, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { BUSINESS } from "@/lib/business";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { BusinessSchema } from "@/components/business-schema";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const serif = Instrument_Serif({ variable: "--font-serif", subsets: ["latin"], weight: "400", style: ["normal", "italic"] });
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script dangerouslySetInnerHTML={{ __html: googleTag }} />
       </head>
       <body className={`${inter.variable} ${interTight.variable} ${serif.variable} font-sans antialiased`}>
+        <BusinessSchema />
         <SmoothScroll />
         {children}
       </body>

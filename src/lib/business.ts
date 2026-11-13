@@ -38,7 +38,10 @@ export function smsWithBody(body: string) {
   return `${SMS_HREF}?&body=${encodeURIComponent(body)}`;
 }
 
-export const siteUrl = () => (process.env.SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+// Production builds fall back to the live domain: robots.txt is prerendered at build time, when SITE_URL
+// isn't set, and once shipped "Sitemap: http://localhost:3000/sitemap.xml" to search engines.
+const DEFAULT_SITE_URL = process.env.NODE_ENV === "production" ? "https://junkyardgold.com" : "http://localhost:3000";
+export const siteUrl = () => (process.env.SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, "");
 
 export type Delivery = "shop" | "home";
 export const parseDelivery = (v: unknown): Delivery => (v === "home" ? "home" : "shop");

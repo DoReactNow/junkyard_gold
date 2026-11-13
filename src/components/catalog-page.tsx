@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BUSINESS, siteUrl, smsWithBody } from "@/lib/business";
-import { KINDS, catalogPath, listingsFor, makesFor, modelsFor, resolveMake, resolveModel, yearsFor, type Facet, type Kind } from "@/lib/catalog";
+import { KINDS, catalogPath, isIndexable, listingsFor, makesFor, modelsFor, resolveMake, resolveModel, yearsFor, type Facet, type Kind } from "@/lib/catalog";
 import { money, partUrl } from "@/lib/inventory";
 import { PageHero, PageShell } from "./site-chrome";
 import { PartCard } from "./part-card";
@@ -38,7 +38,10 @@ export async function catalogMetadata(kind: Kind, p: Params): Promise<Metadata> 
     ? (await yearsFor(kind, r.make!.name, r.model!.name)).find((y) => y.name === String(r.year))
     : (r.model ?? r.make);
   const from = facet ? ` from ${money(facet.from)}` : "";
+  const level = r.year ? "year" : r.model ? "model" : r.make ? "make" : "hub";
+  const indexable = isIndexable(level, facet?.count ?? 0);
   return {
+    ...(indexable ? {} : { robots: { index: false, follow: true } }),
     title: `${title} for Sale${from}`,
     description: `${vehicle ? `${vehicle} used ${k.singular}s` : `Used ${k.singular}s`}${from}, VIN-matched, with a ${BUSINESS.warrantyAdj} warranty and photos before you buy. Shipped nationwide by ${BUSINESS.name}.`,
     alternates: { canonical: catalogPath(kind, r.make?.name, r.model?.name, r.year) },

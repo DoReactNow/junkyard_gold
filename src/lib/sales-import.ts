@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import { readSheet } from "read-excel-file/node";
 import { parseCsv } from "./import-parts";
-import { titleMake } from "./vin";
+import { stripVins, titleMake } from "./vin";
 
 /**
  * Turns the yearly sales sheet (columns: Car / Truck, Part, Specification, Total Sales Amount,
@@ -130,7 +130,7 @@ export function normalizePart(raw: string): string | null {
 }
 
 export function cleanSpec(raw: string) {
-  let s = raw.replace(/\r/g, "").split("\n").map((l) => l.trim()).filter(Boolean).join(" / ");
+  let s = stripVins(raw.replace(/\r/g, "").split("\n").map((l) => l.trim()).filter(Boolean).join(" / "));
   s = s.replace(/\s+/g, " ").trim();
   if (/^\(([^()]*)\)$/.test(s)) s = s.slice(1, -1); // "(3.7L, VIN K, 8th digit)"
   s = s.replace(/^[:\-,\s]+/, "").replace(/\s*,\s*$/, "");

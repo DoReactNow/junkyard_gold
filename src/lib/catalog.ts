@@ -68,21 +68,37 @@ export function listingsFor(kind: Kind, f: { make?: string; model?: string; year
   });
 }
 
-/** Every catalog URL, for the sitemap. */
+/**
+ * Minimum listings for a catalog page to be indexed. Year and model pages with only one or two units are
+ * near-copies of each other and of the product page, so they stay live for shoppers but are noindex,follow
+ * and left out of the sitemap. Hubs and make pages are always indexed.
+ */
+export const MIN_INDEXABLE = { model: 2, year: 3 } as const;
+
+export function isIndexable(level: "hub" | "make" | "model" | "year", count: number) {
+  return level === "hub" || level === "make" || count >= MIN_INDEXABLE[level];
+}
+
+/** Every indexable catalog URL, for the sitemap. */
 export async function allCatalogPaths() {
   const out: string[] = [];
   for (const kind of Object.keys(KINDS) as Kind[]) {
     out.push(catalogPath(kind));
-    const rows = await db.part.findMany({ where: avail(kind), distinct: ["make", "model", "year"], select: { make: true, model: true, year: true } });
-    const seen = new Set<string>();
+    const rows = await db.part.groupBy({ by: ["make", "model", "year"], where: avail(kind), _count: true });
+    // Counts per URL, so names that differ only in capitalization add up on the page they share.
+    const makes = new Set<string>();
+    const models = new Map<string, number>();
+    const years = new Map<string, number>();
     for (const r of rows) {
-      for (const p of [catalogPath(kind, r.make), catalogPath(kind, r.make, r.model), catalogPath(kind, r.make, r.model, r.year)]) {
-        if (!seen.has(p)) {
-          seen.add(p);
-          out.push(p);
-        }
-      }
+      makes.add(catalogPath(kind, r.make));
+      const m = catalogPath(kind, r.make, r.model);
+      models.set(m, (models.get(m) ?? 0) + r._count);
+      const y = catalogPath(kind, r.make, r.model, r.year);
+      years.set(y, (years.get(y) ?? 0) + r._count);
     }
+    out.push(...makes);
+    for (const [path, n] of models) if (isIndexable("model", n)) out.push(path);
+    for (const [path, n] of years) if (isIndexable("year", n)) out.push(path);
   }
   return out;
 }

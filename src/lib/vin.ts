@@ -32,6 +32,32 @@ export function findVinInText(text: string): string | null {
   return m ? m[0] : null;
 }
 
+// A VIN-shaped token: 17 VIN characters with at least one letter and one digit (rules out plain words and numbers).
+const VIN_TOKEN = /\b[A-HJ-NPR-Z0-9]{17}\b/gi;
+const isVinToken = (t: string) => /\d/.test(t) && /[a-z]/i.test(t);
+
+/**
+ * Removes full VINs from listing text. The sales sheet's Specification column sometimes holds the donor or
+ * customer vehicle's VIN, which must never reach a public title, spec or URL.
+ */
+export function stripVins(text: string) {
+  if (!text) return text;
+  return text
+    .replace(VIN_TOKEN, (t) => (isVinToken(t) ? "" : t))
+    .replace(/(\s*\/\s*){2,}/g, " / ")
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s+([,;)])/g, "$1")
+    .replace(/[\s/,;:-]+$/, "")
+    .replace(/^[\s/,;:-]+/, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+/** Drops VIN segments from a URL slug ("...-1g2zh57nx84216204-88000mi" → "...-88000mi"). */
+export function stripVinSlug(slug: string) {
+  return slug.split("-").filter((seg) => !(seg.length === 17 && /^[a-hj-npr-z0-9]+$/.test(seg) && isVinToken(seg))).join("-");
+}
+
 const MAKE_FIX: Record<string, string> = {
   CHEVROLET: "Chevrolet",
   GMC: "GMC",

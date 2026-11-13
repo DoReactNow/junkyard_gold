@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { PartCard, partImages } from "@/components/part-card";
 import { ProductView } from "@/components/product-view";
 import { PageShell } from "@/components/site-chrome";
@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { money, warrantyAdj } from "@/lib/inventory";
 import { salesSummary } from "@/lib/site-data";
 import { listedOptions } from "@/lib/unit-options";
+import { stripVinSlug } from "@/lib/vin";
 
 export const dynamic = "force-dynamic";
 
@@ -29,9 +30,24 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
+/** Old listing URLs carried a VIN from the sales sheet; send them to the cleaned slug (suffix allowed for collisions). */
+async function vinFreeSlug(slug: string) {
+  const clean = stripVinSlug(slug);
+  if (clean === slug || !clean) return null;
+  const hit =
+    (await db.part.findUnique({ where: { slug: clean }, select: { slug: true } })) ??
+    (await db.part.findFirst({ where: { slug: { startsWith: `${clean}-` } }, select: { slug: true }, orderBy: { createdAt: "asc" } }));
+  return hit?.slug ?? null;
+}
+
 export default async function PartPage({ params }: { params: Params }) {
-  const part = await db.part.findUnique({ where: { slug: (await params).slug } });
-  if (!part) notFound();
+  const { slug } = await params;
+  const part = await db.part.findUnique({ where: { slug } });
+  if (!part) {
+    const target = await vinFreeSlug(slug);
+    if (target) permanentRedirect(`/parts/${target}`);
+    notFound();
+  }
 
   const [siblings, sales] = await Promise.all([
     db.part.findMany({

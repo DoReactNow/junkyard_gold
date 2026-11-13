@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { slugify } from "./inventory";
-import { titleMake } from "./vin";
+import { stripVins, titleMake } from "./vin";
 
 /** Minimal RFC-4180 CSV parser (quoted fields, commas and newlines inside quotes). */
 export function parseCsv(text: string): Record<string, string>[] {
@@ -69,7 +69,7 @@ export async function importParts(rows: Record<string, string>[]): Promise<Impor
     if (!partType || !year || !make || !model) { result.skipped.push({ line, reason: "needs part_type, year, make and model" }); continue; }
     if (!price || price < 1) { result.skipped.push({ line, reason: "missing price" }); continue; }
 
-    const spec = pick(row, "spec", "option", "engine", "description_short");
+    const spec = stripVins(pick(row, "spec", "option", "engine", "description_short"));
     const mileage = parseInt(pick(row, "mileage", "miles").replace(/[,\s]/g, ""), 10) || null;
     const stockNo = pick(row, "stock_no", "stock", "sku") || null;
     const title = `${year} ${make} ${model} Used ${partType}${spec ? ` ${spec}` : ""}`;
@@ -77,7 +77,7 @@ export async function importParts(rows: Record<string, string>[]): Promise<Impor
       partType, year, make, model, spec, title, price, mileage,
       warranty: pick(row, "warranty") || "3 months",
       condition: pick(row, "condition") || "Used, tested",
-      description: pick(row, "description", "notes"),
+      description: stripVins(pick(row, "description", "notes")),
       imageUrl: pick(row, "image_url", "photo") || null,
       status: (pick(row, "status") || "available").toLowerCase(),
     };
